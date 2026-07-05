@@ -1,0 +1,79 @@
+# =========================
+# Unity Generated Folders
+# =========================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+
+# =========================
+# User Settings
+# =========================
+UserSettings/
+
+# 임포트한 에셋 전부 무시
+Assets/Imports/
+Assets/Imports/**
+
+Assets/Animation/
+Assets/Animation/**
+
+
+# Prefab 메타파일도 포함
+!Assets/**/Prefab.meta
+!Assets/**/Prefab/**/*.meta
+
+# =========================
+# OS / Editor Files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# IDE / Editor Files
+# =========================
+.vscode/
+.vs/
+.idea/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.suo
+
+# =========================
+# Unity Cache / Meta
+# =========================
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# =========================
+# Crash Reports
+# =========================
+sysinfo.txt
+
+# =========================
+# Build Outputs
+# =========================
+*.apks
+*.aab
+*.unitypackage
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Others
+# =========================
+*.tmp
+*.bak
+*.swp
+*.swo

@@ -87,6 +87,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Simulation:
+                StatisticsManager.Instance.ResetSeason();
                 BattleSimulator.Instance.StartSimulation();
                 break;
 

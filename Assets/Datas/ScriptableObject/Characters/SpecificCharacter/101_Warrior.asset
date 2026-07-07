@@ -17,19 +17,19 @@ MonoBehaviour:
   role: 0
   stats:
   - statType: 0
-    value: 100
+    value: 32
   - statType: 1
-    value: 100
+    value: 420
   - statType: 2
-    value: 100
+    value: 24
   - statType: 3
-    value: 10
+    value: 4.1
   - statType: 4
-    value: 1
+    value: 0.8
   - statType: 5
-    value: 1
+    value: 1.8
   - statType: 6
-    value: 10
+    value: 3
   - statType: 7
     value: 10
   - statType: 8
@@ -37,5 +37,6 @@ MonoBehaviour:
   - statType: 9
     value: 100
   - statType: 10
-    value: 1
+    value: 2.3
   defaultEditableStats: 00000000010000000200000004000000
+  battleAI: {fileID: 11400000, guid: 93fae18e31d78e848998b4d770c11ca3, type: 2}

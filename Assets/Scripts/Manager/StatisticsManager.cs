@@ -20,6 +20,8 @@ public class StatisticsManager : MonoBehaviour
         {
             statistics.Add(character.id, new CharacterStatistics());
         }
+
+        // Debug.Log($"statisticsCount : {statistics.Count}");
     }
 
     public CharacterStatistics GetStatistics(int characterId)
@@ -37,22 +39,20 @@ public class StatisticsManager : MonoBehaviour
         return statistics;
     }
 
-    public void RecordMatch(MatchResult result)
+    public void RecordBattle(BattleResult result)
     {
-        CharacterStatistics stat = statistics[result.CharacterID];
+        foreach (CharacterBattleStatistics battleStat in result.statistics.GetAll())
+        {
+            CharacterStatistics totalStat = GetStatistics(battleStat.runtimeCharacter);
 
-        stat.MatchCount++;
+            totalStat.MatchCount++;
+            totalStat.TotalDamage += battleStat.damageDealt;
+            totalStat.TotalSurvivalTime += battleStat.survivalTime;
 
-        if (result.IsPicked)
-            stat.PickCount++;
+            if (ReferenceEquals(result.winner, battleStat.runtimeCharacter)) totalStat.WinCount++;
+            if (ReferenceEquals(result.loser, battleStat.runtimeCharacter)) totalStat.LoseCount++;
 
-        if (result.IsWin)
-            stat.WinCount++;
-        else
-            stat.LoseCount++;
-
-        stat.TotalDamage += result.DamageDealt;
-        stat.TotalSurvivalTime += result.SurvivalTime;
+        }
     }
 
     public void ResetSeason()
@@ -63,3 +63,26 @@ public class StatisticsManager : MonoBehaviour
         }
     }
 }
+
+public class BattleStatistics
+{
+    public float battleDuration;
+
+    private Dictionary<int, CharacterBattleStatistics> characterStatistics = new();
+
+    public void Register(RuntimeCharacter runtimeCharacter)
+    {
+        characterStatistics.Add(runtimeCharacter.OriginCharacter.id, new CharacterBattleStatistics() { runtimeCharacter = runtimeCharacter });
+    }
+
+    public CharacterBattleStatistics Get(RuntimeCharacter runtimeCharacter)
+    {
+        return characterStatistics[runtimeCharacter.OriginCharacter.id];
+    }
+
+    public IEnumerable<CharacterBattleStatistics> GetAll()
+    {
+        return characterStatistics.Values;
+    }
+}
+

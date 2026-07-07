@@ -23,4 +23,6 @@ public class Character : ScriptableObject
 
     // 직업 기본 수정 가능 스탯
     public List<CharacterStatType> defaultEditableStats = new();
+
+    public BattleAI battleAI;
 }

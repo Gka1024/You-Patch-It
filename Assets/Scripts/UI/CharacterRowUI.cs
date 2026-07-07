@@ -33,8 +33,7 @@ public class CharacterRowUI : MonoBehaviour
 
     public void Refresh()
     {
-        CharacterStatistics stat =
-            StatisticsManager.Instance.GetStatistics(runtimeCharacter.OriginCharacter.id);
+        CharacterStatistics stat = StatisticsManager.Instance.GetStatistics(runtimeCharacter);
 
         nameText.text = runtimeCharacter.OriginCharacter.characterName;
 

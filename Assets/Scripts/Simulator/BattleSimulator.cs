@@ -17,4 +17,6 @@ public class BattleSimulator : MonoBehaviour
 
         SeasonManager.Instance.FinishSimulation();
     }
+
+    
 }

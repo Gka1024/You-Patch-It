@@ -7,6 +7,8 @@ public class StatisticsManager : MonoBehaviour
 
     private Dictionary<int, CharacterStatistics> statistics = new();
 
+    [SerializeField] private int totalBattles = 0;
+
     private void Awake()
     {
         Instance = this;
@@ -39,13 +41,21 @@ public class StatisticsManager : MonoBehaviour
         return statistics;
     }
 
+    public void RecordBattle(List<BattleResult> results)
+    {
+        foreach (BattleResult result in results)
+        {
+            RecordBattle(result);
+        }
+    }
+
     public void RecordBattle(BattleResult result)
     {
         foreach (CharacterBattleStatistics battleStat in result.statistics.GetAll())
         {
             CharacterStatistics totalStat = GetStatistics(battleStat.runtimeCharacter);
 
-            totalStat.MatchCount++;
+            PickCount(totalStat);
             totalStat.TotalDamage += battleStat.damageDealt;
             totalStat.TotalSurvivalTime += battleStat.survivalTime;
 
@@ -55,8 +65,21 @@ public class StatisticsManager : MonoBehaviour
         }
     }
 
+    private void PickCount(CharacterStatistics statistics)
+    {
+        statistics.MatchCount++;
+        totalBattles++;
+    }
+
+    public float GetPickRate(RuntimeCharacter character)
+    {
+        if (totalBattles != 0) return (float)GetStatistics(character).MatchCount / totalBattles;
+        else return 0;
+    }
+
     public void ResetSeason()
     {
+        totalBattles = 0;
         foreach (CharacterStatistics stat in statistics.Values)
         {
             stat.Reset();
@@ -68,21 +91,16 @@ public class BattleStatistics
 {
     public float battleDuration;
 
-    private Dictionary<int, CharacterBattleStatistics> characterStatistics = new();
+    private readonly List<CharacterBattleStatistics> characterStatistics = new();
 
-    public void Register(RuntimeCharacter runtimeCharacter)
+    public void Register(CharacterBattleStatistics statistics)
     {
-        characterStatistics.Add(runtimeCharacter.OriginCharacter.id, new CharacterBattleStatistics() { runtimeCharacter = runtimeCharacter });
-    }
-
-    public CharacterBattleStatistics Get(RuntimeCharacter runtimeCharacter)
-    {
-        return characterStatistics[runtimeCharacter.OriginCharacter.id];
+        characterStatistics.Add(statistics);
     }
 
     public IEnumerable<CharacterBattleStatistics> GetAll()
     {
-        return characterStatistics.Values;
+        return characterStatistics;
     }
 }
 

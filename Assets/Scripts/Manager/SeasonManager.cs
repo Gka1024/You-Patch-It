@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -6,6 +9,8 @@ public enum SeasonState
     None,
     Start,
     Patch,
+    GeneratePlayer,
+    Pick,
     Simulation,
     Result,
     Trust,
@@ -19,6 +24,13 @@ public class SeasonManager : MonoBehaviour
 
     public int CurrentSeason { get; private set; } = 1;
     public SeasonState CurrentState { get; private set; }
+
+    public int SeasonSeed { get; private set; }
+    private System.Random SeasonRandom;
+
+    List<RuntimePlayer> players;
+    List<MatchData> matches;
+    List<BattleResult> results;
 
     private void Awake()
     {
@@ -37,15 +49,34 @@ public class SeasonManager : MonoBehaviour
         StartSeason();
     }
 
+    public int NextSeed()
+    {
+        return SeasonRandom.Next();
+    }
+
     public void StartSeason()
     {
         Debug.Log($"============  Season {CurrentSeason}  ==============");
+
+        SeasonSeed = UnityEngine.Random.Range(0, int.MaxValue);
+        SeasonRandom = new System.Random(SeasonSeed);
+        Debug.Log($"Season : {CurrentSeason} || Seed : {SeasonSeed}");
 
         ChangeState(SeasonState.Start);
         ChangeState(SeasonState.Patch);
     }
 
     public void FinishPatch()
+    {
+        ChangeState(SeasonState.GeneratePlayer);
+    }
+
+    public void FinishGeneratePlayer()
+    {
+        ChangeState(SeasonState.Pick);
+    }
+
+    public void FinishPick()
     {
         ChangeState(SeasonState.Simulation);
     }
@@ -86,12 +117,24 @@ public class SeasonManager : MonoBehaviour
                 PatchManager.Instance.StartPatch();
                 break;
 
+            case SeasonState.GeneratePlayer:
+                players = PlayerManager.Instance.GenerateProfiles(1000).ToList();
+                FinishGeneratePlayer();
+                break;
+
+            case SeasonState.Pick:
+                matches = PickManager.Instance.StartPick(players, SeasonRandom);
+                FinishPick();
+                break;
+
             case SeasonState.Simulation:
                 StatisticsManager.Instance.ResetSeason();
-                BattleSimulator.Instance.StartSimulation();
+                results = BattleSimulator.Instance.StartSimulation(matches, SeasonRandom);
+                FinishSimulation();
                 break;
 
             case SeasonState.Result:
+                StatisticsManager.Instance.RecordBattle(results);
                 ResultManager.Instance.GenerateResult();
                 break;
 

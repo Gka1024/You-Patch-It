@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d69d0ebeac54ac4e8e0a4e1f0c627bb, type: 3}
-  m_Name: 103_Assasin
+  m_Name: 102_Berserker
   m_EditorClassIdentifier: 
-  id: 103
-  characterName: "\uC554\uC0B4\uC790"
-  role: 3
+  id: 102
+  characterName: "\uAD11\uC804\uC0AC"
+  role: 0
   stats:
   - statType: 0
-    value: 42
+    value: 38
   - statType: 1
     value: 220
   - statType: 2
-    value: 8
+    value: 12
   - statType: 3
-    value: 5.3
+    value: 5.5
   - statType: 4
-    value: 1
+    value: 1.5
   - statType: 5
-    value: 2.5
+    value: 0.5
   - statType: 6
     value: 4
   - statType: 7

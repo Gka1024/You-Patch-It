@@ -39,14 +39,14 @@ public class CharacterRowUI : MonoBehaviour
 
         winRateText.text = $"{stat.WinRate:F1}%";
 
-        pickRateText.text = $"{stat.PickRate:F1}%";
+        pickRateText.text = $"{StatisticsManager.Instance.GetPickRate(runtimeCharacter) * 100}%";
 
         damageText.text = $"{stat.AverageDamage:F0}";
     }
 
     private void OnClick()
     {
-        Debug.Log(runtimeCharacter);
+        Debug.Log(runtimeCharacter.OriginCharacter.name);
         InspectorUI.Instance.Show(runtimeCharacter);
     }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Player Profile Sample
   m_EditorClassIdentifier: 
   reactionTime: 30
-  consistency: 40
+  consistency: 5
   executionSkill: 20
   decisionAccuracy: 10
   metaKnowledge: 10

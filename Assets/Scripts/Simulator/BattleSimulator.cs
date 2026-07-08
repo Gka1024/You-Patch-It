@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public class BattleSimulator : MonoBehaviour
@@ -16,33 +18,27 @@ public class BattleSimulator : MonoBehaviour
         Instance = this;
     }
 
-    public void StartSimulation()
+    public List<BattleResult> StartSimulation(List<MatchData> matches, System.Random random)
     {
-        RuntimeCharacter red = RuntimeCharacterManager.Instance.GetRuntimeCharacter(101);
-        RuntimeCharacter blue = RuntimeCharacterManager.Instance.GetRuntimeCharacter(103);
+        List<BattleResult> results = new();
 
-        StartSimulation(red, blue, 10000, UnityEngine.Random.Range(1, int.MaxValue));
+        foreach (MatchData match in matches)
+        {
+            results.Add(StartSimulation(match.redCharacter, match.blueCharacter, SeasonManager.Instance.SeasonSeed));
+        }
 
-        SeasonManager.Instance.FinishSimulation();
+        return results;
     }
 
-    public void StartSimulation(RuntimeCharacter redCharacter, RuntimeCharacter blueCharacter, int simulationCount, int simulationSeed)
+    public BattleResult StartSimulation(RuntimeCharacter redCharacter, RuntimeCharacter blueCharacter, int simulationSeed)
     {
-        Debug.Log($"{redCharacter.OriginCharacter.name} vs {blueCharacter.OriginCharacter.name} || Seed : {simulationSeed}");
+        //        Debug.Log($"{redCharacter.OriginCharacter.name} vs {blueCharacter.OriginCharacter.name} || Seed : {simulationSeed}");
 
         System.Random simulationRandom = new System.Random(simulationSeed);
 
-        BattleStatistics statistics = new BattleStatistics();
-        statistics.Register(redCharacter);
-        statistics.Register(blueCharacter);
+        int battleSeed = simulationRandom.Next();
 
-        for (int i = 0; i < simulationCount; i++)
-        {
-            int battleSeed = simulationRandom.Next();
-
-            BattleResult result = Simulate(redCharacter, blueCharacter, battleSeed);
-            statisticsManager.RecordBattle(result);
-        }
+        return Simulate(redCharacter, blueCharacter, battleSeed);
     }
 
     public BattleResult Simulate(RuntimeCharacter redCharacter, RuntimeCharacter blueCharacter, int battleSeed)
@@ -50,14 +46,18 @@ public class BattleSimulator : MonoBehaviour
         System.Random battleRandom = new System.Random(battleSeed);
 
         BattleStatistics statistics = new BattleStatistics();
-        statistics.Register(redCharacter);
-        statistics.Register(blueCharacter);
 
         BattleAIState redAI = new BattleAIState(redCharacter.OriginCharacter.battleAI, sampleProfile, battleRandom);
-        BattleCharacter red = new BattleCharacter(redCharacter, redAI, statistics.Get(redCharacter), 0f);
+
+        BattleCharacter red = new BattleCharacter(redCharacter, redAI, 0f);
 
         BattleAIState blueAI = new BattleAIState(blueCharacter.OriginCharacter.battleAI, sampleProfile, battleRandom);
-        BattleCharacter blue = new BattleCharacter(blueCharacter, blueAI, statistics.Get(blueCharacter), 10f);
+
+        BattleCharacter blue = new BattleCharacter(blueCharacter, blueAI, 10f);
+
+        // BattleCharacter가 생성한 통계를 등록
+        statistics.Register(red.statistics);
+        statistics.Register(blue.statistics);
 
         float battleTime = 0f;
 
@@ -67,7 +67,7 @@ public class BattleSimulator : MonoBehaviour
             TickCharacter(red);
             TickCharacter(blue);
 
-            // 둘 다 행동을 결정
+            // 행동 결정
             BattleAction redAction = BattleAction.None;
             BattleAction blueAction = BattleAction.None;
 
@@ -83,7 +83,7 @@ public class BattleSimulator : MonoBehaviour
                 blueAction = blue.aiState.DecideAction(blue, red);
             }
 
-            // 결정된 행동 실행
+            // 행동 실행
             ExecuteAction(red, blue, redAction, tick);
             ExecuteAction(blue, red, blueAction, tick);
 
@@ -97,13 +97,29 @@ public class BattleSimulator : MonoBehaviour
         }
 
         statistics.battleDuration = battleTime;
+
         red.statistics.survivalTime = battleTime;
         blue.statistics.survivalTime = battleTime;
 
-        return new BattleResult(
-            red.IsDead ? blue.runtimeCharacter : red.runtimeCharacter,
-            red.IsDead ? red.runtimeCharacter : blue.runtimeCharacter,
-            statistics);
+        RuntimeCharacter winner = null;
+        RuntimeCharacter loser = null;
+
+        if (red.IsDead && blue.IsDead)
+        {
+            // 동시에 죽은 경우
+        }
+        else if (red.IsDead)
+        {
+            winner = blue.runtimeCharacter;
+            loser = red.runtimeCharacter;
+        }
+        else
+        {
+            winner = red.runtimeCharacter;
+            loser = blue.runtimeCharacter;
+        }
+
+        return new BattleResult(winner, loser, statistics);
     }
 
     private void TickCharacter(BattleCharacter character)
@@ -165,11 +181,5 @@ public class BattleSimulator : MonoBehaviour
         self.statistics.damageDealt += damage;
         enemy.statistics.damageTaken += damage;
     }
-}
-
-public enum BattleSide
-{
-    Red,
-    Blue
 }
 

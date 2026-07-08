@@ -27,10 +27,10 @@ public class BattleCharacter
     public bool CanThink => reactionTimer <= 0f;
     public bool CanAct => actionLockTime <= 0f;
 
-    public BattleCharacter(RuntimeCharacter runtimeCharacter, BattleAIState ai, CharacterBattleStatistics statistics, float startPosition)
+    public BattleCharacter(RuntimeCharacter runtimeCharacter, BattleAIState ai, float startPosition)
     {
         this.runtimeCharacter = runtimeCharacter;
-        this.statistics = statistics;
+        this.statistics = new CharacterBattleStatistics { runtimeCharacter = runtimeCharacter };
 
         aiState = ai;
 

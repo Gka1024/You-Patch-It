@@ -11,7 +11,7 @@ public class RuntimeCharacter
     public RuntimeCharacter(Character character)
     {
         OriginCharacter = character;
-        foreach(var stat in character.stats)
+        foreach (var stat in character.stats)
         {
             Stats.Add(stat.statType, new RuntimeStat(stat.value));
         }
@@ -22,6 +22,14 @@ public class RuntimeCharacter
         return Stats[stat].CurrentValue;
     }
 
+    public void Patch(List<CharacterPatch> patchs)
+    {
+        foreach (CharacterPatch delta in patchs)
+        {
+            Patch(delta.StatType, delta.Delta, "");
+        }
+    }
+
     public void Patch(CharacterStatType stat, float delta, string reason)
     {
         Stats[stat].AddModifier(new StatModifier(reason, delta));
@@ -30,7 +38,7 @@ public class RuntimeCharacter
 
     public void Reset()
     {
-        foreach(var stat in Stats.Values)
+        foreach (var stat in Stats.Values)
         {
             stat.Reset();
         }

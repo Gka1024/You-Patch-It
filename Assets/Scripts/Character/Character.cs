@@ -4,7 +4,7 @@ using UnityEngine;
 public enum CharacterRole
 {
     Warrior,
-    Archer,
+    Ranged,
     Mage,
     Assassin,
     Tank,

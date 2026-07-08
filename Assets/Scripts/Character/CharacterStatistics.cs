@@ -15,8 +15,6 @@ public class CharacterStatistics
 
     public float WinRate => MatchCount == 0 ? 0 : (float)WinCount / MatchCount * 100f;
 
-    public float PickRate;
-
     public float AverageDamage => MatchCount == 0 ? 0 : TotalDamage / MatchCount;
 
     public float AverageSurvivalTime => MatchCount == 0 ? 0 : TotalSurvivalTime / MatchCount;
@@ -28,6 +26,5 @@ public class CharacterStatistics
         LoseCount = 0;
         TotalDamage = 0;
         TotalSurvivalTime = 0;
-        PickRate = 0;
     }
 }

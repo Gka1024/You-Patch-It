@@ -31,7 +31,7 @@ public class BattleAIState
         float variationPercent = (100f - consistency) / 100f;
         float variation = baseValue * variationPercent * 0.2f;
 
-        return baseValue + RandomRange(random, -variation, variation);
+        return baseValue + RandomRange(random, -variation * 2, variation * 2);
     }
 
     private float GetReactionTime(float reaction, float consistency, Random random)

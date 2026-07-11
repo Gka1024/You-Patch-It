@@ -56,8 +56,8 @@ public class BattleSimulator : MonoBehaviour
         BattleCharacter blue = new BattleCharacter(blueCharacter, blueAI, 10f);
 
         // BattleCharacter가 생성한 통계를 등록
-        statistics.Register(red.statistics);
-        statistics.Register(blue.statistics);
+        statistics.RegisterRed(red.statistics);
+        statistics.RegisterBlue(blue.statistics);
 
         float battleTime = 0f;
 

@@ -13,19 +13,36 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private Button applyPatchButton;
 
-    [Header("Rows")]
-    [SerializeField] private GameObject[] rows;
+    [Header("Stats")]
+    [SerializeField] private Button StatsButton;
+    [SerializeField] private GameObject Stats;
+    [SerializeField] private GameObject[] StatRows;
+
+    [Header("Analyses")]
+    [SerializeField] private Button AnalysisButton;
+    [SerializeField] private GameObject Analysis;
+    [SerializeField] private GameObject[] AnalysisRows;
+
+    [Header("Winrate")]
+    [SerializeField] private Button WinrateButton;
+    [SerializeField] private GameObject Winrate;
+
 
     private void Awake()
     {
         Instance = this;
         applyPatchButton.onClick.AddListener(ApplyPatch);
+        StatsButton.onClick.AddListener(ShowStats);
+        WinrateButton.onClick.AddListener(ShowHistorys);
+        AnalysisButton.onClick.AddListener(ShowAnalysis);
     }
 
     public void Show(RuntimeCharacter character)
     {
         currentCharacter = character;
-        ShowRows();
+        InitializeStats();
+        InitializeAnalysis();
+        InitializeWinrate();
         Refresh();
     }
 
@@ -39,13 +56,26 @@ public class InspectorUI : MonoBehaviour
         nameText.text = currentCharacter.OriginCharacter.characterName;
     }
 
-    private void ShowRows()
+    private void InitializeStats()
     {
-        foreach (var row in rows)
+        foreach (var row in StatRows)
         {
             row.SetActive(true);
             row.GetComponent<InspectorRowUI>().Initialize(currentCharacter);
         }
+    }
+
+    private void InitializeAnalysis()
+    {
+        foreach (var row in AnalysisRows)
+        {
+            row.GetComponent<InspectorAnalysisRowUI>().Initialize(currentCharacter);
+        }
+    }
+
+    private void InitializeWinrate()
+    {
+        Winrate.GetComponent<InspectorWinrateUI>().Initialize(currentCharacter);
     }
 
     private void ApplyPatch()
@@ -55,7 +85,7 @@ public class InspectorUI : MonoBehaviour
 
         List<CharacterPatch> patches = new();
 
-        foreach (GameObject row in rows)
+        foreach (GameObject row in StatRows)
         {
             InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
             patches.Add(rowUI.GetPatch());
@@ -64,6 +94,31 @@ public class InspectorUI : MonoBehaviour
         currentCharacter.Patch(patches);
 
         Refresh();
-        ShowRows();
+        InitializeStats();
+    }
+
+    public void ShowStats()
+    {
+        HideInspector();
+        Stats.SetActive(true);
+    }
+
+    public void ShowHistorys()
+    {
+        HideInspector();
+        Winrate.SetActive(true);
+    }
+
+    public void ShowAnalysis()
+    {
+        HideInspector();
+        Analysis.SetActive(true);
+    }
+
+    private void HideInspector()
+    {
+        Stats.SetActive(false);
+        Winrate.SetActive(false);
+        Analysis.SetActive(false);
     }
 }

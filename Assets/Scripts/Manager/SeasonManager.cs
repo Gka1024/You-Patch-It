@@ -118,7 +118,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.GeneratePlayer:
-                players = PlayerManager.Instance.GenerateProfiles(1000).ToList();
+                players = PlayerManager.Instance.GenerateProfiles(1000, SeasonRandom).ToList();
                 FinishGeneratePlayer();
                 break;
 

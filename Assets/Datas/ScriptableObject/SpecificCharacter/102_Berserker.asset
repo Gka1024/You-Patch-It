@@ -19,7 +19,7 @@ MonoBehaviour:
   - statType: 0
     value: 38
   - statType: 1
-    value: 220
+    value: 380
   - statType: 2
     value: 12
   - statType: 3
@@ -27,7 +27,7 @@ MonoBehaviour:
   - statType: 4
     value: 1.5
   - statType: 5
-    value: 0.5
+    value: 1.2
   - statType: 6
     value: 4
   - statType: 7

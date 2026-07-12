@@ -162,7 +162,6 @@ public class StatisticsManager : MonoBehaviour
 
     public MatchUpData GetMatchupData(RuntimeCharacter baseCharacter, RuntimeCharacter opponentCharacter)
     {
-        Debug.Log(baseCharacter.OriginCharacter.name);
         MatchupStatistics current = currentMatchDatas[(baseCharacter.OriginCharacter.id, opponentCharacter.OriginCharacter.id)];
         MatchupStatistics past = pastMatchDatas[(baseCharacter.OriginCharacter.id, opponentCharacter.OriginCharacter.id)];
 

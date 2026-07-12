@@ -10,10 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37b1eb9491cf7b24a8682401477f74b7, type: 3}
-  m_Name: Player Profile Sample
+  m_Name: 02_SilverPlayerProfile
   m_EditorClassIdentifier: 
+  tier: 1
   reactionTime: 30
   consistency: 5
   executionSkill: 20
   decisionAccuracy: 10
   metaKnowledge: 10
+  metaDependence: 0
+  experiment: 0
+  classPreferencesList: []
+  classSkillsList: []

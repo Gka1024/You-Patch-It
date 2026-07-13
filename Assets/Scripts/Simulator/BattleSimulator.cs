@@ -24,13 +24,13 @@ public class BattleSimulator : MonoBehaviour
 
         foreach (MatchData match in matches)
         {
-            results.Add(StartSimulation(match.redCharacter, match.blueCharacter, SeasonManager.Instance.SeasonSeed));
+            results.Add(StartSimulation(match, SeasonManager.Instance.SeasonSeed));
         }
 
         return results;
     }
 
-    public BattleResult StartSimulation(RuntimeCharacter redCharacter, RuntimeCharacter blueCharacter, int simulationSeed)
+    public BattleResult StartSimulation(MatchData data, int simulationSeed)
     {
         //        Debug.Log($"{redCharacter.OriginCharacter.name} vs {blueCharacter.OriginCharacter.name} || Seed : {simulationSeed}");
 
@@ -38,10 +38,12 @@ public class BattleSimulator : MonoBehaviour
 
         int battleSeed = simulationRandom.Next();
 
-        return Simulate(redCharacter, blueCharacter, battleSeed);
+
+
+        return Simulate(data.redCharacter, data.redPlayer, data.blueCharacter, data.bluePlayer, battleSeed);
     }
 
-    public BattleResult Simulate(RuntimeCharacter redCharacter, RuntimeCharacter blueCharacter, int battleSeed)
+    public BattleResult Simulate(RuntimeCharacter redCharacter, RuntimePlayer redPlayer, RuntimeCharacter blueCharacter, RuntimePlayer bluePlayer, int battleSeed)
     {
         System.Random battleRandom = new System.Random(battleSeed);
 
@@ -49,11 +51,11 @@ public class BattleSimulator : MonoBehaviour
 
         BattleAIState redAI = new BattleAIState(redCharacter.OriginCharacter.battleAI, sampleProfile, battleRandom);
 
-        BattleCharacter red = new BattleCharacter(redCharacter, redAI, 0f);
+        BattleCharacter red = new BattleCharacter(redCharacter, redPlayer, redAI, 0f);
 
         BattleAIState blueAI = new BattleAIState(blueCharacter.OriginCharacter.battleAI, sampleProfile, battleRandom);
 
-        BattleCharacter blue = new BattleCharacter(blueCharacter, blueAI, 10f);
+        BattleCharacter blue = new BattleCharacter(blueCharacter, bluePlayer, blueAI, 10f);
 
         // BattleCharacter가 생성한 통계를 등록
         statistics.RegisterRed(red.statistics);
@@ -73,13 +75,13 @@ public class BattleSimulator : MonoBehaviour
 
             if (red.CanAct && red.CanThink)
             {
-                red.reactionTimer = red.aiState.reactionTime;
+                red.reactionTimer = GetReactionTime(red);
                 redAction = red.aiState.DecideAction(red, blue);
             }
 
             if (blue.CanAct && blue.CanThink)
             {
-                blue.reactionTimer = blue.aiState.reactionTime;
+                blue.reactionTimer = GetReactionTime(blue);
                 blueAction = blue.aiState.DecideAction(blue, red);
             }
 
@@ -129,8 +131,17 @@ public class BattleSimulator : MonoBehaviour
         character.reactionTimer = Mathf.Max(0, character.reactionTimer - tick);
     }
 
+    private float GetReactionTime(BattleCharacter character)
+    {
+        float multiflier = Mathf.Lerp(1.4f, 0.6f, character.player.reactionTime / 100f);
+
+        return character.aiState.reactionTime * multiflier;
+    }
+
     private void ExecuteAction(BattleCharacter self, BattleCharacter enemy, BattleAction action, float tick)
     {
+        action = ApplyDecisionAccuracy(self, action);
+
         switch (action)
         {
             case BattleAction.MoveTowards:
@@ -170,7 +181,8 @@ public class BattleSimulator : MonoBehaviour
 
     private void Attack(BattleCharacter self, BattleCharacter enemy)
     {
-        float damage = Mathf.Max(1, self.attack * (100f / (100f + enemy.defence)));
+        float damage = self.attack * GetDamageMultiplier(self);
+        damage *= 100f / (100f + enemy.defence);
 
         enemy.currentHealth -= damage;
 
@@ -180,6 +192,38 @@ public class BattleSimulator : MonoBehaviour
 
         self.statistics.damageDealt += damage;
         enemy.statistics.damageTaken += damage;
+    }
+
+    private float GetDamageMultiplier(BattleCharacter self)
+    {
+        return Mathf.Lerp(0.8f, 1.2f, self.player.executionSkill / 100f);
+    }
+
+    private float GetConsistencyModifier(BattleCharacter self)
+    {
+        float variance = Mathf.Lerp(0.35f, 0.05f, self.player.consistency / 100f);
+
+        return UnityEngine.Random.Range(1f - variance, 1f + variance);
+    }
+
+    private BattleAction ApplyDecisionAccuracy(BattleCharacter self, BattleAction action)
+    {
+        float failChance = Mathf.Lerp(0.3f, 0f, self.player.decisionAccuracy / 100f);
+
+        if (UnityEngine.Random.value > failChance)
+        {
+            return action;
+        }
+
+        BattleAction[] actions =
+        {
+            BattleAction.MoveAway,
+            BattleAction.MoveTowards,
+            BattleAction.Attack,
+            BattleAction.None
+        };
+
+        return actions[UnityEngine.Random.Range(0, actions.Length)];
     }
 }
 

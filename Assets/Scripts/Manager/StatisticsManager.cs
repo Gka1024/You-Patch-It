@@ -125,15 +125,11 @@ public class StatisticsManager : MonoBehaviour
             totalStat.LoseCount++;
     }
 
-    private void RecordMatchup(
-        RuntimeCharacter self,
-        RuntimeCharacter opponent,
-        bool isWinner)
+    private void RecordMatchup(RuntimeCharacter self, RuntimeCharacter opponent, bool isWinner)
     {
-        MatchupStatistics matchup =
-            currentMatchDatas[(self.OriginCharacter.id,
-                               opponent.OriginCharacter.id)];
+        if (self.OriginCharacter.id == opponent.OriginCharacter.id) return;
 
+        MatchupStatistics matchup = currentMatchDatas[(self.OriginCharacter.id, opponent.OriginCharacter.id)];
         matchup.MatchCount++;
 
         if (isWinner)

@@ -48,5 +48,6 @@ public class CharacterRowUI : MonoBehaviour
     {
         Debug.Log(runtimeCharacter.OriginCharacter.name);
         InspectorUI.Instance.Show(runtimeCharacter);
+        InspectorUI.Instance.ShowStats();
     }
 }

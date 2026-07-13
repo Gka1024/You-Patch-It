@@ -4,7 +4,7 @@ public class BattleCharacter
 {
     public RuntimeCharacter runtimeCharacter;
     public BattleAIState aiState;
-
+    public RuntimePlayer player;
     public CharacterBattleStatistics statistics;
 
     public float currentHealth;
@@ -27,11 +27,11 @@ public class BattleCharacter
     public bool CanThink => reactionTimer <= 0f;
     public bool CanAct => actionLockTime <= 0f;
 
-    public BattleCharacter(RuntimeCharacter runtimeCharacter, BattleAIState ai, float startPosition)
+    public BattleCharacter(RuntimeCharacter runtimeCharacter, RuntimePlayer player, BattleAIState ai, float startPosition)
     {
         this.runtimeCharacter = runtimeCharacter;
         this.statistics = new CharacterBattleStatistics { runtimeCharacter = runtimeCharacter };
-
+        this.player = player;
         aiState = ai;
 
         attack = runtimeCharacter.GetStat(CharacterStatType.Attack);

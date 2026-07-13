@@ -47,7 +47,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public IReadOnlyList<RuntimePlayer> GenerateProfiles(int count, System.Random random)
+    public IReadOnlyList<RuntimePlayer> GeneratePlayers(int count, System.Random random)
     {
         players.Clear();
 

@@ -18,11 +18,9 @@ public class PlayerProfile : ScriptableObject
     public float experiment; // idk
 
     [Header("Class Skill & Preference")]
-    public List<ClassPreference> classPreferencesList = new();
-    public List<ClassSkill> classSkillsList = new();
+    public List<ClassPreference> classPreferences = new();
+    public List<ClassSkill> classSkills = new();
 
-    public Dictionary<CharacterRole, float> classPreferences = new();
-    public Dictionary<CharacterRole, float> classSkills = new();
 }
 
 [System.Serializable]

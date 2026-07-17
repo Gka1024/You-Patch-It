@@ -128,13 +128,14 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Simulation:
-                StatisticsManager.Instance.ResetSeason();
+                StatisticsManager.Instance.ResetSeason(true);
                 results = BattleSimulator.Instance.StartSimulation(matches, SeasonRandom);
                 FinishSimulation();
                 break;
 
             case SeasonState.Result:
                 StatisticsManager.Instance.RecordBattle(results);
+                AnalysisManager.Instance.AnalyzeSeason();
                 ResultManager.Instance.GenerateResult();
                 break;
 

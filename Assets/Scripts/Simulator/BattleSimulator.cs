@@ -32,13 +32,9 @@ public class BattleSimulator : MonoBehaviour
 
     public BattleResult StartSimulation(MatchData data, int simulationSeed)
     {
-        //        Debug.Log($"{redCharacter.OriginCharacter.name} vs {blueCharacter.OriginCharacter.name} || Seed : {simulationSeed}");
-
         System.Random simulationRandom = new System.Random(simulationSeed);
 
         int battleSeed = simulationRandom.Next();
-
-
 
         return Simulate(data.redCharacter, data.redPlayer, data.blueCharacter, data.bluePlayer, battleSeed);
     }
@@ -191,6 +187,7 @@ public class BattleSimulator : MonoBehaviour
         self.actionLockTime = 0.4f / self.attackSpeed;
 
         self.statistics.damageDealt += damage;
+        self.statistics.attackCount++;
         enemy.statistics.damageTaken += damage;
     }
 

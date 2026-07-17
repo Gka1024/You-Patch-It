@@ -12,6 +12,7 @@ public class ResourceManager : MonoBehaviour
     public void GiveReward()
     {
         Debug.Log("GiveReward Start");
+        SeasonManager.Instance.FinishReward();
     }
 
     public void ConfirmPatch()

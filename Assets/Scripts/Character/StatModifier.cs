@@ -1,11 +1,11 @@
 public class StatModifier
 {
     public string reason;
-    public float delta;
+    public float value;
 
-    public StatModifier(string reason, float delta)
+    public StatModifier(string reason, float value)
     {
         this.reason = reason;
-        this.delta = delta;
+        this.value = value;
     }
 }

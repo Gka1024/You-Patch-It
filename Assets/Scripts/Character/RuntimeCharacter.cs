@@ -22,17 +22,33 @@ public class RuntimeCharacter
         return Stats[stat].CurrentValue;
     }
 
-    public void Patch(List<CharacterPatch> patchs)
+    public void Patch(List<CharacterPatch> patches)
     {
-        foreach (CharacterPatch delta in patchs)
+        foreach(var patch in patches)
         {
-            Patch(delta.StatType, delta.Delta, "");
+            Patch(patch.StatType, patch.After);
         }
     }
 
-    public void Patch(CharacterStatType stat, float delta, string reason)
+    public void Patch(CharacterStatType stat, float value)
     {
-        Stats[stat].AddModifier(new StatModifier(reason, delta));
+        Stats[stat].SetValue(value);
+
+        OnStatChanged?.Invoke();
+    }
+
+    public RuntimeCharacterSnapshot CreateSnapshot()
+    {
+        return new RuntimeCharacterSnapshot(this);
+    }
+
+    public void RestoreSnapshot(RuntimeCharacterSnapshot snapshot)
+    {
+        foreach (var pair in snapshot.Stats)
+        {
+            Stats[pair.Key].RestoreSnapshot(pair.Value);
+        }
+
         OnStatChanged?.Invoke();
     }
 
@@ -41,6 +57,21 @@ public class RuntimeCharacter
         foreach (var stat in Stats.Values)
         {
             stat.Reset();
+        }
+    }
+}
+
+public class RuntimeCharacterSnapshot
+{
+    public Dictionary<CharacterStatType, RuntimeStatSnapshot> Stats { get; }
+
+    public RuntimeCharacterSnapshot(RuntimeCharacter character)
+    {
+        Stats = new();
+
+        foreach (var pair in character.Stats)
+        {
+            Stats.Add(pair.Key, pair.Value.CreateSnapshot());
         }
     }
 }

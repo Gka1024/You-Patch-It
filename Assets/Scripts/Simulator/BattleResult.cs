@@ -15,3 +15,20 @@ public class BattleResult
 
     }
 }
+
+public class BattleStatistics
+{
+    public float battleDuration;
+    public CharacterBattleStatistics Red { get; private set; }
+    public CharacterBattleStatistics Blue { get; private set; }
+    
+    public void RegisterRed(CharacterBattleStatistics statistics)
+    {
+        Red = statistics;
+    }
+
+    public void RegisterBlue(CharacterBattleStatistics statistics)
+    {
+        Blue = statistics;
+    }
+}

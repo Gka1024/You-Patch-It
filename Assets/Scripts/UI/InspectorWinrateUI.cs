@@ -45,7 +45,7 @@ public class InspectorWinrateUI : MonoBehaviour
 
     private void Refresh()
     {
-        MatchUpData data = StatisticsManager.Instance.GetMatchupData(baseCharacter, opponentCharacter);
+        MatchUpData data = AnalysisManager.Instance.GetMatchupData(baseCharacter, opponentCharacter);
 
         SetText(data);
     }

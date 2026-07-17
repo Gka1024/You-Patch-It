@@ -58,7 +58,7 @@ public class InspectorRowUI : MonoBehaviour
 
     public CharacterPatch GetPatch()
     {
-        return new CharacterPatch(statType, changeValueFloat);
+        return new CharacterPatch(statType, currentValueFloat, currentValueFloat + changeValueFloat);
     }
 
 }
@@ -66,11 +66,13 @@ public class InspectorRowUI : MonoBehaviour
 public readonly struct CharacterPatch
 {
     public CharacterStatType StatType { get; }
-    public float Delta { get; }
+    public float Before { get; }
+    public float After { get; }
 
-    public CharacterPatch(CharacterStatType statType, float delta)
+    public CharacterPatch(CharacterStatType statType, float before, float after)
     {
         StatType = statType;
-        Delta = delta;
+        Before = before;
+        After = after;
     }
 }

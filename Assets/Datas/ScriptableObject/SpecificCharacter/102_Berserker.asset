@@ -17,9 +17,9 @@ MonoBehaviour:
   role: 0
   stats:
   - statType: 0
-    value: 31
+    value: 30
   - statType: 1
-    value: 320
+    value: 330
   - statType: 2
     value: 10
   - statType: 3

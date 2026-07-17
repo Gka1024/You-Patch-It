@@ -157,7 +157,7 @@ public class PickManager : MonoBehaviour
     private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
     {
         float winRate =
-            StatisticsManager.Instance.GetStatistics(character).WinRate;
+            StatisticsManager.Instance.GetCurrentStatistics(character).WinRate;
 
         float delta = winRate - 50f;
 
@@ -173,7 +173,7 @@ public class PickManager : MonoBehaviour
     private float PickRateScore(RuntimeCharacter character)
     {
         float pickRate =
-            StatisticsManager.Instance.GetPickRate(character);
+            AnalysisManager.Instance.GetPickRate(character);
 
         return pickRate * 0.3f;
     }

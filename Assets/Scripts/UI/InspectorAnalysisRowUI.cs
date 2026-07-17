@@ -23,7 +23,7 @@ public class InspectorAnalysisRowUI : MonoBehaviour
 
     private void RefreshUI(RuntimeCharacter character)
     {
-        AnalysisData data = StatisticsManager.Instance.GetAnalysis(character, analysisItem);
+        AnalysisData data = AnalysisManager.Instance.GetAnalysis(character, analysisItem);
 
         SetText(data);
     }
@@ -68,11 +68,10 @@ public enum AnalysisItem
     Winrate,
     Pickrate,
     AverageDamage,
-    AverageLiveTme,
+    AverageLiveTime,
     AverageDPS,
     AverageMoveDistance,
     AverageAttackCount,
     AverageSkillCount,
     MatchCount,
-    
 }

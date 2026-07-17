@@ -17,7 +17,7 @@ MonoBehaviour:
   role: 2
   stats:
   - statType: 0
-    value: 20
+    value: 19
   - statType: 1
     value: 240
   - statType: 2

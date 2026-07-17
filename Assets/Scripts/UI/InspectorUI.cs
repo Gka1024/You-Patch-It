@@ -12,6 +12,7 @@ public class InspectorUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private Button applyPatchButton;
+    [SerializeField] private Button undoButton;
 
     [Header("Stats")]
     [SerializeField] private Button StatsButton;
@@ -27,15 +28,28 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private Button WinrateButton;
     [SerializeField] private GameObject Winrate;
 
+    [Header("Bellow")]
+    [SerializeField] private GameObject patchReason;
+    [SerializeField] private Button patchConfirmButton;
+    [SerializeField] private Button simulateButton;
 
     private void Awake()
     {
         Instance = this;
-        applyPatchButton.onClick.AddListener(ApplyPatch);
+        applyPatchButton.onClick.AddListener(ShowPatchReason);
         StatsButton.onClick.AddListener(ShowStats);
         WinrateButton.onClick.AddListener(ShowHistorys);
         AnalysisButton.onClick.AddListener(ShowAnalysis);
+        patchConfirmButton.onClick.AddListener(ApplyPatch);
+        simulateButton.onClick.AddListener(Refresh);
     }
+
+    private void Start()
+    {
+        PatchManager.Instance.OnPatchApplied += Refresh;
+        PatchManager.Instance.OnPatchUndone += Refresh;
+    }
+
 
     public void Show(RuntimeCharacter character)
     {
@@ -48,15 +62,22 @@ public class InspectorUI : MonoBehaviour
 
     public void Refresh()
     {
-        if (currentCharacter == null)
-        {
-            return;
-        }
+        if (currentCharacter == null) return;
 
         nameText.text = currentCharacter.OriginCharacter.characterName;
+        InitializeStats();
+        InitializeAnalysis();
+        InitializeWinrate();
     }
 
-    private void InitializeStats()
+    public void Refresh(PatchRecord record)
+    {
+        if (!ReferenceEquals(currentCharacter, record.Character)) return;
+
+        InitializeStats();
+    }
+
+    public void InitializeStats()
     {
         foreach (var row in StatRows)
         {
@@ -78,6 +99,13 @@ public class InspectorUI : MonoBehaviour
         Winrate.GetComponent<InspectorWinrateUI>().Initialize(currentCharacter);
     }
 
+    private void ShowPatchReason()
+    {
+        if (currentCharacter == null) return;
+        patchReason.SetActive(true);
+        patchConfirmButton.interactable = false;
+    }
+
     private void ApplyPatch()
     {
         if (currentCharacter == null)
@@ -91,10 +119,13 @@ public class InspectorUI : MonoBehaviour
             patches.Add(rowUI.GetPatch());
         }
 
-        currentCharacter.Patch(patches);
+        List<PatchReason> reasons = patchReason.GetComponent<PatchReasonPopupUI>().GetPatchReasons();
 
-        Refresh();
+        PatchManager.Instance.ApplyPatch(currentCharacter, patches, reasons);
+
         InitializeStats();
+        patchReason.SetActive(false);
+        Refresh();
     }
 
     public void ShowStats()

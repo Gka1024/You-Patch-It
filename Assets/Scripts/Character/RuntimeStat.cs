@@ -1,28 +1,44 @@
-using System.Collections.Generic;
-using UnityEngine;
-
 public class RuntimeStat
 {
-    public float BaseValue { get; private set; }
-    public float CurrentValue { get; private set; }
+    public float BaseValue { get; }
 
-    public List<StatModifier> Modifiers { get; } = new();
+    public float CurrentValue { get; private set; }
 
     public RuntimeStat(float baseValue)
     {
-        this.BaseValue = baseValue;
+        BaseValue = baseValue;
         CurrentValue = baseValue;
     }
 
-    public void AddModifier(StatModifier modifier)
+    public void SetValue(float value)
     {
-        Modifiers.Add(modifier);
-        CurrentValue += modifier.delta;
+        CurrentValue = value;
+    }
+
+    public RuntimeStatSnapshot CreateSnapshot()
+    {
+        return new(CurrentValue);
+    }
+
+    public void RestoreSnapshot(RuntimeStatSnapshot snapshot)
+    {
+        CurrentValue = snapshot.CurrentValue;
     }
 
     public void Reset()
     {
         CurrentValue = BaseValue;
-        Modifiers.Clear();
+    }
+}
+
+public class RuntimeStatSnapshot
+{
+    public float CurrentValue { get; }
+
+
+    public RuntimeStatSnapshot(float currentValue)
+    {
+        CurrentValue = currentValue;
+        
     }
 }

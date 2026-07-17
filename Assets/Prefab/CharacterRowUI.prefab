@@ -466,7 +466,7 @@ MonoBehaviour:
   winRateText: {fileID: 4543728986315720860}
   pickRateText: {fileID: 1793684566372996349}
   damageText: {fileID: 7791378425029134185}
-  KDAText: {fileID: 8834437980708421406}
+  DPSText: {fileID: 8834437980708421406}
   button: {fileID: 8208820175080331056}
 --- !u!1 &5041814841401333062
 GameObject:
@@ -888,7 +888,7 @@ GameObject:
   - component: {fileID: 893642065649038129}
   - component: {fileID: 8834437980708421406}
   m_Layer: 5
-  m_Name: KDA
+  m_Name: DPS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

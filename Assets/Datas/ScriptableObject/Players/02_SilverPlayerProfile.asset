@@ -20,5 +20,5 @@ MonoBehaviour:
   metaKnowledge: 10
   metaDependence: 0
   experiment: 0
-  classPreferencesList: []
-  classSkillsList: []
+  classPreferences: []
+  classSkills: []

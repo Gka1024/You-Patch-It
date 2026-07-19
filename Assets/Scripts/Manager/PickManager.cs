@@ -175,7 +175,7 @@ public class PickManager : MonoBehaviour
         float pickRate =
             AnalysisManager.Instance.GetPickRate(character);
 
-        return pickRate * 0.3f;
+        return pickRate * 0.3f ;
     }
 
     private float PreferenceScore(RuntimeCharacter character, RuntimePlayer player)

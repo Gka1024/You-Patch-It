@@ -1,75 +1,81 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    public static PlayerManager Instance;
+    public static PlayerManager Instance { get; private set; }
 
-    [Header("Tier Profiles")]
-    [SerializeField] private List<PlayerProfile> tierProfiles = new();
-    private readonly Dictionary<PlayerTier, PlayerProfile> profileTable = new();
+    [Header("Player Profiles")]
+    [SerializeField] private List<PlayerProfile> playerProfiles = new();
 
     [Header("Tier Settings")]
     [SerializeField] private List<TierSetting> tierSettings = new();
-    private readonly Dictionary<PlayerTier, TierSetting> settingTable = new();
 
+    private readonly Dictionary<PlayerTier, TierSetting> settingTable = new();
     private readonly List<RuntimePlayer> players = new();
-    private int totalWeight;
+
+    private int totalSpawnWeight;
+    private int totalProfileWeight;
 
     private void Awake()
     {
         Instance = this;
-        totalWeight = 0;
-        Init();
+        Initialize();
     }
 
-    private void Init()
+    private void Initialize()
     {
-        profileTable.Clear();
-        foreach (PlayerProfile profile in tierProfiles)
-        {
-            if (!profileTable.TryAdd(profile.tier, profile))
-            {
-                Debug.LogError($"중복된 PlayerProfile : {profile.tier}");
-            }
-        }
-
         settingTable.Clear();
+
+        totalSpawnWeight = 0;
+        totalProfileWeight = 0;
+
         foreach (TierSetting setting in tierSettings)
         {
             if (!settingTable.TryAdd(setting.tier, setting))
             {
-                Debug.LogError($"중복된 PlayerProfile : {setting.tier}");
+                Debug.LogError($"중복된 TierSetting : {setting.tier}");
+                continue;
             }
-            totalWeight += setting.weight;
+
+            totalSpawnWeight += setting.spawnWeight;
+        }
+
+        foreach (PlayerProfile profile in playerProfiles)
+        {
+            totalProfileWeight += profile.spawnWeight;
         }
     }
+
+    //====================================================
+    // Generate
+    //====================================================
 
     public IReadOnlyList<RuntimePlayer> GeneratePlayers(int count, System.Random random)
     {
         players.Clear();
 
-        int totalWeight = tierSettings.Sum(x => x.weight);
-
         for (int i = 0; i < count; i++)
         {
-            PlayerTier tier = GetRandomTier(random);
-            players.Add(GeneratePlayer(tier, random));
+            players.Add(GenerateRandomPlayer(random));
         }
 
         return players;
     }
 
-    public RuntimePlayer GeneratePlayer(PlayerTier tier, System.Random random)
+    public RuntimePlayer GenerateRandomPlayer(System.Random random)
     {
-        if (!profileTable.TryGetValue(tier, out PlayerProfile profile))
-        {
-            Debug.LogError($"PlayerProfile이 존재하지 않습니다. ({tier})");
-            return null;
-        }
+        PlayerTier tier = GetRandomTier(random);
+        PlayerProfile profile = GetRandomProfile(random);
 
+        return GeneratePlayer(tier, profile, random);
+    }
+
+    public RuntimePlayer GeneratePlayer(
+        PlayerTier tier,
+        PlayerProfile profile,
+        System.Random random)
+    {
         if (!settingTable.TryGetValue(tier, out TierSetting setting))
         {
             Debug.LogError($"TierSetting이 존재하지 않습니다. ({tier})");
@@ -79,25 +85,48 @@ public class PlayerManager : MonoBehaviour
         return new RuntimePlayer(profile, setting, random);
     }
 
-    public IReadOnlyList<RuntimePlayer> GetPlayerProfiles()
-    {
-        return players;
-    }
+    //====================================================
+    // Random
+    //====================================================
 
     private PlayerTier GetRandomTier(System.Random random)
     {
-        int roll = random.Next(totalWeight);
+        int roll = random.Next(totalSpawnWeight);
 
         foreach (TierSetting setting in tierSettings)
         {
-            roll -= setting.weight;
+            roll -= setting.spawnWeight;
 
-            if (roll < 0) return setting.tier;
+            if (roll < 0)
+                return setting.tier;
         }
 
         return tierSettings[^1].tier;
     }
 
+    private PlayerProfile GetRandomProfile(System.Random random)
+    {
+        int roll = random.Next(totalProfileWeight);
+
+        foreach (PlayerProfile profile in playerProfiles)
+        {
+            roll -= profile.spawnWeight;
+
+            if (roll < 0)
+                return profile;
+        }
+
+        return playerProfiles[^1];
+    }
+
+    //====================================================
+    // Getter
+    //====================================================
+
+    public IReadOnlyList<RuntimePlayer> GetPlayers()
+    {
+        return players;
+    }
 }
 
 public enum PlayerTier

@@ -2,23 +2,23 @@ using System;
 
 public class BattleAIState
 {
-    public float preferredDistance { get; private set; }
-    public float reactionTime { get; private set; }
+    public float PreferredDistance { get; private set; }
+    public float ReactionTime { get; private set; }
 
     private readonly BattleAI originAI;
-    private readonly PlayerProfile playerProfile;
+    private readonly RuntimePlayer player;
 
-    public BattleAIState(BattleAI originAI, PlayerProfile profile, Random random)
+    public BattleAIState(BattleAI originAI, RuntimePlayer player, Random random)
     {
         this.originAI = originAI;
-        this.playerProfile = profile;
+        this.player = player;
         Initialize(random);
     }
 
     private void Initialize(Random random)
     {
-        preferredDistance = GetRandomValue(originAI.prefferedDistance, playerProfile.consistency, random);
-        reactionTime = GetReactionTime(playerProfile.reactionTime, playerProfile.consistency, random);
+        PreferredDistance = GetRandomValue(originAI.prefferedDistance, player.Consistency, random);
+        ReactionTime = GetReactionTime(player.ReactionTime, player.Consistency, random);
     }
 
     public BattleAction DecideAction(BattleCharacter self, BattleCharacter enemy)

@@ -5,161 +5,207 @@ using UnityEngine;
 
 public class RuntimePlayer
 {
-    public PlayerProfile originalProfile;
-    public PlayerTier Tier;
+    public PlayerProfile OriginalProfile { get; }
+    public PlayerTier Tier { get; }
 
-    // Combat
-    public float reactionTime;
-    public float consistency;
-    public float executionSkill;
-    public float decisionAccuracy;
+    // ===== Combat =====
 
-    // Knowledge
-    public float metaKnowledge;
-    public float metaDependence;
-    public float experiment;
+    public float ReactionTime { get; private set; }
+    public float Consistency { get; private set; }
+    public float ExecutionSkill { get; private set; }
+    public float DecisionAccuracy { get; private set; }
 
-    // Personality
-    public PreferenceShape preferenceShape;
+    // ===== Knowledge =====
 
-    // Role
-    public Dictionary<CharacterRole, float> classPreferences = new();
-    public Dictionary<CharacterRole, float> classSkills = new();
+    public float MetaKnowledge { get; private set; }
 
-    public RuntimePlayer(PlayerProfile profile, TierSetting tierSetting, System.Random random)
+    // ===== Play Style =====
+
+    public float MetaDependence { get; private set; }
+    public float Experiment { get; private set; }
+
+    public PreferenceShape PreferenceShape { get; private set; }
+
+    public Dictionary<CharacterRole, float> ClassPreferences { get; } = new();
+    public Dictionary<CharacterRole, float> ClassSkills { get; } = new();
+
+    public RuntimePlayer(
+        PlayerProfile profile,
+        TierSetting tierSetting,
+        System.Random random)
     {
-        originalProfile = profile;
+        OriginalProfile = profile;
         Tier = tierSetting.tier;
 
-        //---------------------------------------
-        // 공통 재능
-        //---------------------------------------
-
-        float combatTalent = RandomOffsetNormal(tierSetting.combatVariance * 0.5f, random);
-
-        float knowledgeTalent = RandomOffsetNormal(tierSetting.knowledgeVariance * 0.5f, random);
-
-        //---------------------------------------
-        // Combat
-        //---------------------------------------
-
-        reactionTime = RandomizeNormal(profile.reactionTime, combatTalent, tierSetting.combatVariance, random);
-
-        consistency = RandomizeNormal(profile.consistency, combatTalent, tierSetting.combatVariance, random);
-
-        executionSkill = RandomizeNormal(profile.executionSkill, combatTalent, tierSetting.combatVariance, random);
-
-        decisionAccuracy = RandomizeNormal(profile.decisionAccuracy, combatTalent, tierSetting.combatVariance, random);
-
-        //---------------------------------------
-        // Knowledge
-        //---------------------------------------
-
-        metaKnowledge = RandomizeNormal(profile.metaKnowledge, knowledgeTalent, tierSetting.knowledgeVariance, random);
-
-        metaDependence = RandomizeNormal(profile.metaDependence, knowledgeTalent, tierSetting.knowledgeVariance, random);
-
-        experiment = RandomizeNormal(profile.experiment, knowledgeTalent, tierSetting.knowledgeVariance, random);
-
-        //---------------------------------------
-        // Role Data
-        //---------------------------------------
-
+        GenerateCombat(tierSetting, random);
+        GenerateKnowledge(tierSetting, random);
+        GeneratePlayStyle(profile, random);
         GenerateRoleData(profile, tierSetting, random);
     }
 
     //========================================================
+    // Combat
+    //========================================================
 
-    private void GenerateRoleData(PlayerProfile profile, TierSetting tierSetting, System.Random random)
+    private void GenerateCombat(TierSetting tier, System.Random random)
     {
-        classPreferences.Clear();
-        classSkills.Clear();
+        ReactionTime =
+            RandomizeNormal(tier.reactionTime, tier.combatVariance, random);
 
-        if (profile.classPreferences.Count == 0)
-        {
-            GeneratePreferenceRandom(tierSetting, random);
-        }
-        else
-        {
-            LoadPreference(profile, tierSetting, random);
-        }
+        Consistency =
+            RandomizeNormal(tier.consistency, tier.combatVariance, random);
 
-        if (profile.classSkills.Count == 0)
-        {
-            GenerateSkillRandom(tierSetting, random);
-        }
-        else
-        {
-            LoadSkills(profile, tierSetting, random);
-        }
+        ExecutionSkill =
+            RandomizeNormal(tier.executionSkill, tier.combatVariance, random);
+
+        DecisionAccuracy =
+            RandomizeNormal(tier.decisionAccuracy, tier.combatVariance, random);
     }
 
-    private void GeneratePreferenceRandom(TierSetting tierSetting, System.Random random)
+    //========================================================
+    // Knowledge
+    //========================================================
+
+    private void GenerateKnowledge(TierSetting tier, System.Random random)
     {
-        preferenceShape = GeneratePreferenceShape(random);
+        MetaKnowledge =
+            RandomizeNormal(tier.metaKnowledge, tier.knowledgeVariance, random);
+    }
 
-        List<CharacterRole> roles = Enum.GetValues(typeof(CharacterRole))
-            .Cast<CharacterRole>()
-            .OrderBy(_ => random.Next())
-            .ToList();
+    //========================================================
+    // Play Style
+    //========================================================
 
-        float[] means = GetPreferenceMeans(preferenceShape);
+    private void GeneratePlayStyle(PlayerProfile profile, System.Random random)
+    {
+        MetaDependence =
+            RandomizeNormal(profile.metaDependence, 5f, random);
+
+        Experiment =
+            RandomizeNormal(profile.experiment, 5f, random);
+    }
+
+    //========================================================
+    // Role Data
+    //========================================================
+
+    private void GenerateRoleData(
+        PlayerProfile profile,
+        TierSetting tier,
+        System.Random random)
+    {
+        ClassPreferences.Clear();
+        ClassSkills.Clear();
+
+        if (profile.classPreferences.Count == 0)
+            GeneratePreferenceRandom(tier, random);
+        else
+            LoadPreference(profile, tier, random);
+
+        if (profile.classSkills.Count == 0)
+            GenerateSkillRandom(tier, random);
+        else
+            LoadSkill(profile, tier, random);
+    }
+
+    //========================================================
+    // Preference
+    //========================================================
+
+    private void GeneratePreferenceRandom(
+        TierSetting tier,
+        System.Random random)
+    {
+        PreferenceShape = GeneratePreferenceShape(random);
+
+        List<CharacterRole> roles =
+            Enum.GetValues(typeof(CharacterRole))
+                .Cast<CharacterRole>()
+                .OrderBy(_ => random.Next())
+                .ToList();
+
+        float[] means = GetPreferenceMeans(PreferenceShape);
 
         for (int i = 0; i < roles.Count; i++)
         {
-            classPreferences.Add(roles[i], RandomizeNormal(means[i], 0, tierSetting.preferenceVariance, random));
+            ClassPreferences.Add(
+                roles[i],
+                RandomizeNormal(
+                    means[i],
+                    tier.preferenceVariance,
+                    random));
         }
     }
 
-    private void GenerateSkillRandom(TierSetting tierSetting, System.Random random)
-    {
-        foreach (KeyValuePair<CharacterRole, float> pair in classPreferences)
-        {
-            float talent = RandomizeNormal(50f, 0, tierSetting.classSkillVariance, random);
-
-            float skill = Mathf.Clamp(pair.Value * 0.45f + talent * 0.55f + RandomOffsetNormal(3f, random), 0, 100);
-
-            classSkills.Add(pair.Key, skill);
-        }
-    }
-
-    private void LoadPreference(PlayerProfile profile, TierSetting tierSetting, System.Random random)
+    private void LoadPreference(
+        PlayerProfile profile,
+        TierSetting tier,
+        System.Random random)
     {
         foreach (ClassPreference preference in profile.classPreferences)
         {
-            classPreferences.Add(
+            ClassPreferences.Add(
                 preference.characterClass,
                 RandomizeNormal(
                     preference.preference,
-                    0,
-                    tierSetting.preferenceVariance,
+                    tier.preferenceVariance,
                     random));
         }
     }
 
-    private void LoadSkills(PlayerProfile profile, TierSetting tierSetting, System.Random random)
+    //========================================================
+    // Skill
+    //========================================================
+
+    private void GenerateSkillRandom(
+        TierSetting tier,
+        System.Random random)
+    {
+        foreach (var pair in ClassPreferences)
+        {
+            float talent =
+                RandomizeNormal(
+                    50,
+                    tier.classSkillVariance,
+                    random);
+
+            float skill =
+                Mathf.Clamp(
+                    pair.Value * 0.45f +
+                    talent * 0.55f,
+                    0,
+                    100);
+
+            ClassSkills.Add(pair.Key, skill);
+        }
+    }
+
+    private void LoadSkill(
+        PlayerProfile profile,
+        TierSetting tier,
+        System.Random random)
     {
         foreach (ClassSkill skill in profile.classSkills)
         {
-            classSkills.Add(
+            ClassSkills.Add(
                 skill.characterClass,
                 RandomizeNormal(
                     skill.skill,
-                    0,
-                    tierSetting.classSkillVariance,
+                    tier.classSkillVariance,
                     random));
         }
     }
 
+    //========================================================
+    // Preference Shape
+    //========================================================
 
     private PreferenceShape GeneratePreferenceShape(System.Random random)
     {
         int roll = random.Next(100);
 
         if (roll < 25) return PreferenceShape.OneTrick;
-
         if (roll < 55) return PreferenceShape.MainTwo;
-
         if (roll < 85) return PreferenceShape.Balanced;
 
         return PreferenceShape.Flexible;
@@ -171,42 +217,22 @@ public class RuntimePlayer
         {
             PreferenceShape.OneTrick => new[]
             {
-                100f,
-                40f,
-                30f,
-                20f,
-                10f,
-                0f
+                100f, 40f, 30f, 20f, 10f, 0f
             },
 
             PreferenceShape.MainTwo => new[]
             {
-                90f,
-                80f,
-                40f,
-                20f,
-                20f,
-                10f
+                90f, 80f, 40f, 20f, 20f, 10f
             },
 
             PreferenceShape.Balanced => new[]
             {
-                80f,
-                85f,
-                70f,
-                60f,
-                50f,
-                40f,
+                80f, 85f, 70f, 60f, 50f, 40f
             },
 
             PreferenceShape.Flexible => new[]
             {
-                75f,
-                70f,
-                68f,
-                65f,
-                62f,
-                60f
+                75f, 70f, 68f, 65f, 62f, 60f
             },
 
             _ => throw new ArgumentOutOfRangeException()
@@ -214,15 +240,23 @@ public class RuntimePlayer
     }
 
     //========================================================
+    // Utility
+    //========================================================
 
-    private float RandomizeNormal(float mean, float talent, float variance, System.Random random)
+    private float RandomizeNormal(
+        float mean,
+        float variance,
+        System.Random random)
     {
-        float offset = RandomOffsetNormal(variance, random);
-
-        return Mathf.Clamp(mean + talent + offset, 0f, 100f);
+        return Mathf.Clamp(
+            mean + RandomOffsetNormal(variance, random),
+            0,
+            100);
     }
 
-    private float RandomOffsetNormal(float variance, System.Random random)
+    private float RandomOffsetNormal(
+        float variance,
+        System.Random random)
     {
         double u1 = 1.0 - random.NextDouble();
         double u2 = 1.0 - random.NextDouble();
@@ -236,9 +270,9 @@ public class RuntimePlayer
         return (float)(standard * sigma);
     }
 }
-
 public enum PreferenceShape
 {
+    Custom,
     OneTrick,
     MainTwo,
     Balanced,

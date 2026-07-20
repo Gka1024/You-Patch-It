@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 04_PlatinumTierSetting
   m_EditorClassIdentifier: 
   tier: 3
-  weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
-  classSkillVariance: 10
-  preferenceVariance: 3
+  spawnWeight: 180
+  reactionTime: 68
+  consistency: 67
+  executionSkill: 70
+  decisionAccuracy: 68
+  metaKnowledge: 72
+  combatVariance: 30
+  knowledgeVariance: 35
+  preferenceVariance: 40
+  classSkillVariance: 30

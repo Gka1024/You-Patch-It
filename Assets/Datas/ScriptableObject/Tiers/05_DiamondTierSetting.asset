@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 05_DiamondTierSetting
   m_EditorClassIdentifier: 
   tier: 4
-  weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
-  classSkillVariance: 10
-  preferenceVariance: 3
+  spawnWeight: 130
+  reactionTime: 80
+  consistency: 78
+  executionSkill: 82
+  decisionAccuracy: 80
+  metaKnowledge: 84
+  combatVariance: 25
+  knowledgeVariance: 30
+  preferenceVariance: 35
+  classSkillVariance: 25

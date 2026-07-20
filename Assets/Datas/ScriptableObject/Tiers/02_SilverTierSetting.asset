@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 02_SilverTierSetting
   m_EditorClassIdentifier: 
   tier: 1
-  weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
-  classSkillVariance: 10
-  preferenceVariance: 3
+  spawnWeight: 180
+  reactionTime: 45
+  consistency: 40
+  executionSkill: 45
+  decisionAccuracy: 42
+  metaKnowledge: 40
+  combatVariance: 40
+  knowledgeVariance: 45
+  preferenceVariance: 50
+  classSkillVariance: 40

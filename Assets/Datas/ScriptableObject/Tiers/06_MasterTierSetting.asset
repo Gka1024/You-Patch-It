@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 06_MasterTierSetting
   m_EditorClassIdentifier: 
   tier: 5
-  weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
-  classSkillVariance: 10
-  preferenceVariance: 3
+  spawnWeight: 90
+  reactionTime: 90
+  consistency: 89
+  executionSkill: 92
+  decisionAccuracy: 91
+  metaKnowledge: 90
+  combatVariance: 20
+  knowledgeVariance: 25
+  preferenceVariance: 30
+  classSkillVariance: 20

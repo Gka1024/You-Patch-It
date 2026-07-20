@@ -16,7 +16,7 @@ public class RangedBattleAI : BattleAI
         if (distance > self.attackRange)
             return BattleAction.MoveTowards;
 
-        if (distance < state.preferredDistance)
+        if (distance < state.PreferredDistance)
         {
             if (self.CanAttack)
                 return BattleAction.Attack;

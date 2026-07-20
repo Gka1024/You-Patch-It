@@ -28,6 +28,8 @@ public class SeasonManager : MonoBehaviour
     public int SeasonSeed { get; private set; }
     private System.Random SeasonRandom;
 
+    public UpDisplayUI upDisplayUI;
+
     List<RuntimePlayer> players;
     List<MatchData> matches;
     List<BattleResult> results;
@@ -114,6 +116,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Patch:
+                upDisplayUI.Refresh();
                 PatchManager.Instance.StartPatch();
                 break;
 

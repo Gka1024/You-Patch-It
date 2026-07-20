@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 03_GoldTierSetting
   m_EditorClassIdentifier: 
   tier: 2
-  weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
-  classSkillVariance: 10
-  preferenceVariance: 3
+  spawnWeight: 240
+  reactionTime: 58
+  consistency: 55
+  executionSkill: 58
+  decisionAccuracy: 55
+  metaKnowledge: 60
+  combatVariance: 34
+  knowledgeVariance: 40
+  preferenceVariance: 45
+  classSkillVariance: 35

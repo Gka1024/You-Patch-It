@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 07_ChallengerTierSetting
   m_EditorClassIdentifier: 
   tier: 6
-  weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
-  classSkillVariance: 10
-  preferenceVariance: 3
+  spawnWeight: 40
+  reactionTime: 98
+  consistency: 97
+  executionSkill: 99
+  decisionAccuracy: 98
+  metaKnowledge: 95
+  combatVariance: 15
+  knowledgeVariance: 20
+  preferenceVariance: 25
+  classSkillVariance: 15

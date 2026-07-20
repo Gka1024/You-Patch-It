@@ -7,7 +7,6 @@ public abstract class DeveloperGoal
     public int TrustPointReward;
 
     public bool IsComplete { get; private set; }
-
     
     public void Evaluate()
     {
@@ -15,4 +14,5 @@ public abstract class DeveloperGoal
     }
 
     protected abstract bool CheckCompleted();
+    
 }

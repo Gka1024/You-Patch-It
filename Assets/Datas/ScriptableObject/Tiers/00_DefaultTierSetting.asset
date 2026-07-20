@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: 00_DefaultTierSetting
   m_EditorClassIdentifier: 
   tier: 0
+  combatBonus: 0
+  knowledgeBonus: 0
   weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
+  combatVariance: 10
+  knowledgeVariance: 10
+  preferenceVariance: 10
   classSkillVariance: 10
-  preferenceVariance: 3

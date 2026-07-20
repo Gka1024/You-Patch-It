@@ -46,5 +46,10 @@ public class CharacterDatabase : ScriptableObject
         return characters;
     }
 
+    public Character GetRandomCharacter()
+    {
+        return characters[Random.Range(0, Count)];
+    }
+
     public int Count => characters.Count;
 }

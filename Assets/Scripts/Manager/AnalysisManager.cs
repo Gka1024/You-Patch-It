@@ -126,6 +126,18 @@ public class AnalysisManager : MonoBehaviour
         return value;
     }
 
+    public float GetMaxValue(AnalysisItem item, bool past = false)
+    {
+        float max = float.MinValue;
+
+        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
+        {
+            max = Mathf.Max(max, GetValue(character, item, past));
+        }
+
+        return max;
+    }
+
     // ===== Rank Cache =====
 
     private void BuildRankCache(bool past)

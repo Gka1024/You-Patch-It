@@ -4,23 +4,22 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObject/PlayerProfile")]
 public class PlayerProfile : ScriptableObject
 {
-    public PlayerTier tier;
+    [Header("Spawn")]
+    [Min(0)] public int spawnWeight;
 
-    [Header("Combat Ability")]
-    public float reactionTime; // less is good
-    public float consistency; // high is good
-    public float executionSkill; // middle is good
-    public float decisionAccuracy; // high is good
+    [Header("Play Style")]
 
-    [Header("Game Knowledge")]
-    public float metaKnowledge; // high is good
-    public float metaDependence; // idk
-    public float experiment; // idk
+    [Range(0,100)]
+    public float metaDependence;
 
-    [Header("Class Skill & Preference")]
+    [Range(0,100)]
+    public float experiment;
+
+    [Header("Class Preference")]
     public List<ClassPreference> classPreferences = new();
-    public List<ClassSkill> classSkills = new();
 
+    [Header("Class Skill")]
+    public List<ClassSkill> classSkills = new();
 }
 
 [System.Serializable]
@@ -28,7 +27,7 @@ public class ClassPreference
 {
     public CharacterRole characterClass;
 
-    [Range(0, 100)]
+    [Range(0,100)]
     public float preference;
 }
 
@@ -37,6 +36,6 @@ public class ClassSkill
 {
     public CharacterRole characterClass;
 
-    [Range(0, 100)]
+    [Range(0,100)]
     public float skill;
 }

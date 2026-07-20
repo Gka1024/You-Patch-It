@@ -12,6 +12,7 @@ public class DashBoardUI : MonoBehaviour
     [Header("CharacterObject")]
     [SerializeField] private GameObject CharacterTable;
     [SerializeField] private GameObject Inspector;
+    [SerializeField] private GameObject DeveloperGoal;
 
     void Awake()
     {
@@ -23,6 +24,7 @@ public class DashBoardUI : MonoBehaviour
     {
         CharacterTable.SetActive(false);
         Inspector.SetActive(false);
+        DeveloperGoal.SetActive(false);
     }
 
     private void ShowCharacter()
@@ -36,5 +38,6 @@ public class DashBoardUI : MonoBehaviour
     private void ShowGoals()
     {
         RemoveAll();
+        DeveloperGoal.SetActive(true);
     }
 }

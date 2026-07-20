@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 01_BronzeTierSetting
   m_EditorClassIdentifier: 
   tier: 0
-  weight: 0
-  combatVariance: 12
-  knowledgeVariance: 15
-  classSkillVariance: 10
-  preferenceVariance: 3
+  spawnWeight: 140
+  reactionTime: 35
+  consistency: 30
+  executionSkill: 35
+  decisionAccuracy: 30
+  metaKnowledge: 25
+  combatVariance: 45
+  knowledgeVariance: 50
+  preferenceVariance: 55
+  classSkillVariance: 45

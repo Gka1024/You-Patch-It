@@ -45,11 +45,11 @@ public class BattleSimulator : MonoBehaviour
 
         BattleStatistics statistics = new BattleStatistics();
 
-        BattleAIState redAI = new BattleAIState(redCharacter.OriginCharacter.battleAI, sampleProfile, battleRandom);
+        BattleAIState redAI = new BattleAIState(redCharacter.OriginCharacter.battleAI, redPlayer, battleRandom);
+
+        BattleAIState blueAI = new BattleAIState(blueCharacter.OriginCharacter.battleAI, bluePlayer, battleRandom);
 
         BattleCharacter red = new BattleCharacter(redCharacter, redPlayer, redAI, 0f);
-
-        BattleAIState blueAI = new BattleAIState(blueCharacter.OriginCharacter.battleAI, sampleProfile, battleRandom);
 
         BattleCharacter blue = new BattleCharacter(blueCharacter, bluePlayer, blueAI, 10f);
 
@@ -129,9 +129,9 @@ public class BattleSimulator : MonoBehaviour
 
     private float GetReactionTime(BattleCharacter character)
     {
-        float multiflier = Mathf.Lerp(1.4f, 0.6f, character.player.reactionTime / 100f);
+        float multiplier = Mathf.Lerp(1.4f, 0.6f, character.player.ReactionTime / 100f);
 
-        return character.aiState.reactionTime * multiflier;
+        return character.aiState.ReactionTime * multiplier;
     }
 
     private void ExecuteAction(BattleCharacter self, BattleCharacter enemy, BattleAction action, float tick)
@@ -193,19 +193,19 @@ public class BattleSimulator : MonoBehaviour
 
     private float GetDamageMultiplier(BattleCharacter self)
     {
-        return Mathf.Lerp(0.8f, 1.2f, self.player.executionSkill / 100f);
+        return Mathf.Lerp(0.8f, 1.2f, self.player.ExecutionSkill / 100f);
     }
 
     private float GetConsistencyModifier(BattleCharacter self)
     {
-        float variance = Mathf.Lerp(0.35f, 0.05f, self.player.consistency / 100f);
+        float variance = Mathf.Lerp(0.35f, 0.05f, self.player.Consistency / 100f);
 
         return UnityEngine.Random.Range(1f - variance, 1f + variance);
     }
 
     private BattleAction ApplyDecisionAccuracy(BattleCharacter self, BattleAction action)
     {
-        float failChance = Mathf.Lerp(0.3f, 0f, self.player.decisionAccuracy / 100f);
+        float failChance = Mathf.Lerp(0.3f, 0f, self.player.DecisionAccuracy / 100f);
 
         if (UnityEngine.Random.value > failChance)
         {

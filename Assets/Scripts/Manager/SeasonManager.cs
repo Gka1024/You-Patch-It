@@ -23,6 +23,7 @@ public class SeasonManager : MonoBehaviour
     public static SeasonManager Instance;
 
     public int CurrentSeason { get; private set; } = 1;
+    public int CurrentSubSeason { get; private set; } = 1;
     public SeasonState CurrentState { get; private set; }
 
     public int SeasonSeed { get; private set; }
@@ -58,11 +59,17 @@ public class SeasonManager : MonoBehaviour
 
     public void StartSeason()
     {
-        Debug.Log($"============  Season {CurrentSeason}  ==============");
+        CurrentSubSeason = 1;
+        StartSubSeason();
+    }
+
+    private void StartSubSeason()
+    {
+        Debug.Log($"============  Season {CurrentSeason} - {CurrentSubSeason} ==============");
 
         SeasonSeed = UnityEngine.Random.Range(0, int.MaxValue);
         SeasonRandom = new System.Random(SeasonSeed);
-        Debug.Log($"Season : {CurrentSeason} || Seed : {SeasonSeed}");
+        Debug.Log($"Season : {CurrentSeason} - {CurrentSubSeason} || Seed : {SeasonSeed}");
 
         ChangeState(SeasonState.Start);
         ChangeState(SeasonState.Patch);
@@ -90,7 +97,26 @@ public class SeasonManager : MonoBehaviour
 
     public void FinishResult()
     {
+        NextSubSeason();
+    }
+
+    public void FinishTrust()
+    {
         ChangeState(SeasonState.Reward);
+    }
+
+    private void NextSubSeason()
+    {
+        CurrentSubSeason++;
+
+        if (CurrentSubSeason > 3)
+        {
+            ChangeState(SeasonState.Trust);
+        }
+        else
+        {
+            StartSubSeason();
+        }
     }
 
     public void FinishReward()
@@ -101,6 +127,7 @@ public class SeasonManager : MonoBehaviour
     public void NextSeason()
     {
         CurrentSeason++;
+        CurrentSubSeason = 1;
         StartSeason();
     }
 
@@ -121,8 +148,8 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.GeneratePlayer:
-                players = PlayerManager.Instance.GeneratePlayers(10000, SeasonRandom).ToList();
-                FinishGeneratePlayer();
+                players = PlayerManager.Instance.GeneratePlayers(50000, SeasonRandom).ToList();
+                FinishGeneratePlayer(); 
                 break;
 
             case SeasonState.Pick:
@@ -140,10 +167,13 @@ public class SeasonManager : MonoBehaviour
                 StatisticsManager.Instance.RecordBattle(results);
                 AnalysisManager.Instance.AnalyzeSeason();
                 ResultManager.Instance.GenerateResult();
+                GoalManager.Instance.EvaluateAllGoals();
                 break;
 
             case SeasonState.Trust:
+                GoalManager.Instance.CalculateGoals();
                 TrustManager.Instance.CalculateTrust();
+                FinishTrust();
                 break;
 
             case SeasonState.Reward:

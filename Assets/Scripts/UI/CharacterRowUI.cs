@@ -39,7 +39,7 @@ public class CharacterRowUI : MonoBehaviour
 
         winRateText.text = $"{stat.WinRate:F1}%";
 
-        pickRateText.text = $"{AnalysisManager.Instance.GetPickRate(runtimeCharacter)}%";
+        pickRateText.text = $"{AnalysisManager.Instance.GetPickRate(runtimeCharacter):F1}%";
 
         damageText.text = $"{stat.AverageDamage:F0}";
 

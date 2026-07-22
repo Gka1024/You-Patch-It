@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d69d0ebeac54ac4e8e0a4e1f0c627bb, type: 3}
+  m_Name: 402_Exorcist
+  m_EditorClassIdentifier: 
+  id: 402
+  characterName: "\uD1F4\uB9C8\uC0AC"
+  role: 3
+  stats:
+  - statType: 0
+    value: 23
+  - statType: 1
+    value: 240
+  - statType: 2
+    value: 12
+  - statType: 3
+    value: 6.3
+  - statType: 4
+    value: 3.4
+  - statType: 5
+    value: 1
+  - statType: 6
+    value: 4
+  - statType: 7
+    value: 7
+  - statType: 8
+    value: 100
+  - statType: 9
+    value: 100
+  - statType: 10
+    value: 1.7
+  defaultEditableStats: 00000000010000000200000004000000
+  battleAI: {fileID: 11400000, guid: 93fae18e31d78e848998b4d770c11ca3, type: 2}

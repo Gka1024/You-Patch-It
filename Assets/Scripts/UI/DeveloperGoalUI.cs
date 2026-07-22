@@ -20,10 +20,10 @@ public class DeveloperGoalUI : MonoBehaviour
         {
             goalsUI[i].Initialize(goals[i]);
         }
-        ChangeButton.onClick.AddListener(Refresh);
+        ChangeButton.onClick.AddListener(RefreshUI);
     }
 
-    public void Refresh()
+    public void RefreshUI()
     {
         int index = 0;
         int DeveloperReward = 0;
@@ -35,14 +35,18 @@ public class DeveloperGoalUI : MonoBehaviour
 
             if (goal.Goal.IsComplete)
             {
-                DeveloperReward += goal.Goal.DevelopResourceReward;
-                TrustPoint += goal.Goal.TrustPointReward;
+                DeveloperReward += goal.Goal.Reward.DevelopResource;
+                TrustPoint += goal.Goal.Reward.TrustPoint;
             }
+
+            goal.ReflectProgrss();
         }
 
-        SeasonText.text = $"시즌 {SeasonManager.Instance.CurrentSeason}";
+        SeasonText.text = $"시즌 {SeasonManager.Instance.CurrentSeason} - {SeasonManager.Instance.CurrentSubSeason}";
         DRReward.text = $"+{DeveloperReward}";
         TPReward.text = $"+{TrustPoint}";
+
+
     }
 
 }

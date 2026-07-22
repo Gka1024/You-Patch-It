@@ -168,7 +168,7 @@ public class AnalysisManager : MonoBehaviour
         rankCache[past] = itemRanks;
     }
 
-    private int GetRank(RuntimeCharacter character, AnalysisItem item, bool past)
+    public int GetRank(RuntimeCharacter character, AnalysisItem item, bool past)
     {
         int id = character.OriginCharacter.id;
 

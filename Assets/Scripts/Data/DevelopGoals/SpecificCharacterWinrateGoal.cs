@@ -8,7 +8,7 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
     public override string Description =>
     $"{character.characterName}의 승률을 {minWinrate}% ~ {maxWinrate}%로 맞추세요.";
 
-    public SpecificCharacterWinrateGoal(float minWinrate, float maxWinrate, Character character)
+    public SpecificCharacterWinrateGoal(float minWinrate, float maxWinrate, Character character, GoalDifficulty difficulty) : base(difficulty)
     {
         this.minWinrate = minWinrate;
         this.maxWinrate = maxWinrate;
@@ -18,5 +18,10 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
     protected override bool CheckCompleted()
     {
         return AnalysisManager.Instance.GetMaxValue(AnalysisItem.Pickrate, false) < 20f;
+    }
+
+    public override float GetCurrentProgress()
+    {
+        return CheckCompleted() ? 1 : 0;
     }
 }

@@ -655,7 +655,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 399.3292, y: 27.4973}
+  m_SizeDelta: {x: 399.33, y: 27.4973}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &8180971212451975430
 CanvasRenderer:
@@ -678,7 +678,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1033,6 +1033,7 @@ MonoBehaviour:
   DRReward: {fileID: 7842403827291561413}
   TrustPoint: {fileID: 6979198875833137024}
   TPReward: {fileID: 7658406897730225093}
+  Gauge: {fileID: 4010293755713606217}
 --- !u!1 &7067587308099172231
 GameObject:
   m_ObjectHideFlags: 0

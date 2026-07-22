@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d69d0ebeac54ac4e8e0a4e1f0c627bb, type: 3}
+  m_Name: 302_Summoner
+  m_EditorClassIdentifier: 
+  id: 302
+  characterName: "\uC18C\uD658\uC0AC"
+  role: 2
+  stats:
+  - statType: 0
+    value: 19
+  - statType: 1
+    value: 240
+  - statType: 2
+    value: 8
+  - statType: 3
+    value: 4.2
+  - statType: 4
+    value: 1.1
+  - statType: 5
+    value: 7.5
+  - statType: 6
+    value: 4
+  - statType: 7
+    value: 17
+  - statType: 8
+    value: 100
+  - statType: 9
+    value: 100
+  - statType: 10
+    value: 1.7
+  defaultEditableStats: 00000000010000000200000004000000
+  battleAI: {fileID: 11400000, guid: e6b4f5c38a12d2344b191767cd4daf5a, type: 2}

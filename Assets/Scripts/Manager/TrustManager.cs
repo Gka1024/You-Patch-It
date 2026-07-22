@@ -10,7 +10,7 @@ public class TrustManager : MonoBehaviour
     }
 
     public void CalculateTrust()
-    {
+    { // 신뢰도에 비례해서 유저 수 증감
         Debug.Log("Calculate Start");
     }
 

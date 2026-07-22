@@ -6,7 +6,7 @@ public class MaxPickRateGoal : DeveloperGoal
     public override string Description =>
     $"가장 높은 픽률을 {maxPickRate}% 미만으로 유지하세요.";
 
-    public MaxPickRateGoal(float maxPickRate)
+    public MaxPickRateGoal(float maxPickRate, GoalDifficulty difficulty) : base(difficulty)
     {
         this.maxPickRate = maxPickRate;
     }
@@ -14,5 +14,10 @@ public class MaxPickRateGoal : DeveloperGoal
     protected override bool CheckCompleted()
     {
         return AnalysisManager.Instance.GetMaxValue(AnalysisItem.Pickrate, false) < 20f;
+    }
+
+    public override float GetCurrentProgress()
+    {
+        return CheckCompleted() ? 1 : 0;
     }
 }

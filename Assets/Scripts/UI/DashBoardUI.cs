@@ -38,6 +38,7 @@ public class DashBoardUI : MonoBehaviour
     private void ShowGoals()
     {
         RemoveAll();
+        DeveloperGoal.GetComponent<DeveloperGoalUI>().RefreshUI();
         DeveloperGoal.SetActive(true);
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -39,17 +40,26 @@ public class ResourceManager : MonoBehaviour
         AddDevelopResource(CalculateSeasonDevelopResource());
     }
 
-    public void AddTrust(float amount)
+    public void AddReward(GoalReward reward)
+    {
+        Debug.Log(AddTrust(reward.TrustPoint));
+        Debug.Log(AddDevelopResource(reward.DevelopResource));
+    }
+
+    public float AddTrust(float amount)
     {
         float multiplier = Mathf.Pow((100f - trust) / 100f, 1.5f);
 
         trust += amount * multiplier;
         trust = Mathf.Clamp(trust, 0f, 100f);
+
+        return amount;
     }
 
-    public void AddDevelopResource(int amount)
+    public int AddDevelopResource(int amount)
     {
         developResource += Mathf.Max(0, amount);
+        return amount;
     }
 
     public bool SpendDevelopResource(int amount)
@@ -134,15 +144,70 @@ public class ResourceManager : MonoBehaviour
 
     private int EvaluateCharacterIdentity()
     {
-        // TODO
-        // 캐릭터들이 지나치게 비슷해지면 감점
-        return 0;
+        List<RuntimeCharacter> characters =
+            RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+
+        if (characters.Count < 2)
+            return 10;
+
+        float totalDistance = 0f;
+        int pairCount = 0;
+
+        for (int i = 0; i < characters.Count; i++)
+        {
+            for (int j = i + 1; j < characters.Count; j++)
+            {
+                totalDistance += GetCharacterDistance(characters[i], characters[j]);
+                pairCount++;
+            }
+        }
+
+        float averageDistance = totalDistance / pairCount;
+
+        // 평균 거리가 1.5 이하면 0점
+        // 평균 거리가 4.5 이상이면 10점
+        float score = Mathf.InverseLerp(1.5f, 4.5f, averageDistance);
+
+        Debug.Log(Mathf.RoundToInt(score * 10f));
+
+        return Mathf.RoundToInt(score * 10f);
+    }
+
+    private float GetCharacterDistance(RuntimeCharacter a, RuntimeCharacter b)
+    {
+        float distance = 0f;
+
+        distance += Mathf.Abs(a.GetStat(CharacterStatType.Attack) - b.GetStat(CharacterStatType.Attack)) / 100f;
+        distance += Mathf.Abs(a.GetStat(CharacterStatType.Health) - b.GetStat(CharacterStatType.Health)) / 500f;
+        distance += Mathf.Abs(a.GetStat(CharacterStatType.Defence) - b.GetStat(CharacterStatType.Defence)) / 50f;
+        distance += Mathf.Abs(a.GetStat(CharacterStatType.MoveSpeed) - b.GetStat(CharacterStatType.MoveSpeed)) / 3f;
+        distance += Mathf.Abs(a.GetStat(CharacterStatType.AttackSpeed) - b.GetStat(CharacterStatType.AttackSpeed)) / 2f;
+        distance += Mathf.Abs(a.GetStat(CharacterStatType.AttackRange) - b.GetStat(CharacterStatType.AttackRange)) / 5f;
+
+        return distance;
     }
 
     private int EvaluateMetaDiversity()
     {
-        // TODO
-        // 픽률 분산, 역할 다양성 등
-        return 0;
+        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+
+        float average = 100f / characters.Count;
+
+        float variance = 0;
+
+        foreach (var c in characters)
+        {
+            float pick = AnalysisManager.Instance.GetPickRate(c);
+
+            variance += Mathf.Pow(pick - average, 2);
+        }
+
+        variance /= characters.Count;
+
+        float std = Mathf.Sqrt(variance);
+
+        float score = Mathf.InverseLerp(15f, 0f, std);
+
+        return Mathf.RoundToInt(score * 10);
     }
 }

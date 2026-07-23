@@ -12,15 +12,28 @@ public class DeveloperGoalUI : MonoBehaviour
     [SerializeField] private TMP_Text[] TitleText;
     [SerializeField] private TMP_Text DRReward;
     [SerializeField] private TMP_Text TPReward;
+    [SerializeField] private TMP_Text RerollCost;
+    [SerializeField] private TMP_Text RerollCostValue;
     [SerializeField] private Button ChangeButton;
+    [SerializeField] private Button ConfirmButton;
 
-    public void Initialize(List<DeveloperGoal> goals)
+    public void Initialize(List<DeveloperGoal> goals, GoalManager goalManager)
     {
         for (int i = 0; i < goals.Count; i++)
         {
             goalsUI[i].Initialize(goals[i]);
         }
-        ChangeButton.onClick.AddListener(RefreshUI);
+        ChangeButton.onClick.AddListener(goalManager.ChangeGoals);
+        ConfirmButton.onClick.AddListener(goalManager.ConfirmGoals);
+    }
+
+    public void SetGoals(List<DeveloperGoal> goals)
+    {
+        for (int i = 0; i < goals.Count; i++)
+        {
+            goalsUI[i].Initialize(goals[i]);
+        }
+        RefreshUI();
     }
 
     public void RefreshUI()
@@ -45,8 +58,11 @@ public class DeveloperGoalUI : MonoBehaviour
         SeasonText.text = $"시즌 {SeasonManager.Instance.CurrentSeason} - {SeasonManager.Instance.CurrentSubSeason}";
         DRReward.text = $"+{DeveloperReward}";
         TPReward.text = $"+{TrustPoint}";
+    }
 
-
+    public void SetRerollCostValue(int value)
+    {
+        RerollCostValue.text = value.ToString();
     }
 
 }

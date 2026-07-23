@@ -27,7 +27,7 @@ public class DashBoardUI : MonoBehaviour
         DeveloperGoal.SetActive(false);
     }
 
-    private void ShowCharacter()
+    public void ShowCharacter()
     {
         RemoveAll();
 
@@ -35,7 +35,7 @@ public class DashBoardUI : MonoBehaviour
         Inspector.SetActive(true);
     }
 
-    private void ShowGoals()
+    public void ShowGoals()
     {
         RemoveAll();
         DeveloperGoal.GetComponent<DeveloperGoalUI>().RefreshUI();

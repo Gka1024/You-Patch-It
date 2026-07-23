@@ -8,7 +8,7 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
     public override string Description =>
     $"{character.characterName}의 승률을 {minWinrate}% ~ {maxWinrate}%로 맞추세요.";
 
-    public SpecificCharacterWinrateGoal(float minWinrate, float maxWinrate, Character character, GoalDifficulty difficulty) : base(difficulty)
+    public SpecificCharacterWinrateGoal(float minWinrate, float maxWinrate, Character character, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
     {
         this.minWinrate = minWinrate;
         this.maxWinrate = maxWinrate;

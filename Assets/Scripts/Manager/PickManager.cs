@@ -148,7 +148,6 @@ public class PickManager : MonoBehaviour
         score += WinrateScore(character, player);
         score += PickRateScore(character);
         score += PreferenceScore(character, player);
-        score += SkillScore(character, player);
 
         return Mathf.Max(1, score);
     }
@@ -163,7 +162,7 @@ public class PickManager : MonoBehaviour
         float delta = winRate - 50f;
 
         float experimentWeight =
-            1f - player.Experiment / 200f;
+            1f - player.RiskTaking / 200f;
 
         return delta
              * 2f
@@ -191,15 +190,5 @@ public class PickManager : MonoBehaviour
 
         return (preference - 30f) * weight;
     }
-
-    private float SkillScore(RuntimeCharacter character, RuntimePlayer player)
-    {
-        if (!player.ClassSkills.TryGetValue(
-            character.OriginCharacter.role,
-            out float skill))
-            return 0f;
-
-        // 자신의 숙련도가 높은 역할일수록 조금 더 선호
-        return (skill - 50f) * 0.2f;
-    }
+   
 }

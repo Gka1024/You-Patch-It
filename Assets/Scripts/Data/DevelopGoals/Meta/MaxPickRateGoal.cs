@@ -6,7 +6,7 @@ public class MaxPickRateGoal : DeveloperGoal
     public override string Description =>
     $"가장 높은 픽률을 {maxPickRate}% 미만으로 유지하세요.";
 
-    public MaxPickRateGoal(float maxPickRate, GoalDifficulty difficulty) : base(difficulty)
+    public MaxPickRateGoal(float maxPickRate, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
     {
         this.maxPickRate = maxPickRate;
     }

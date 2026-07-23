@@ -10,10 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37b1eb9491cf7b24a8682401477f74b7, type: 3}
-  m_Name: 00_SamplePlayerProfile
+  m_Name: 06_Experimenter
   m_EditorClassIdentifier: 
-  spawnWeight: 1000
-  metaDependence: 0
-  experiment: 0
-  classPreferences: []
-  classSkills: []
+  spawnWeight: 40
+  preferenceShape: 0
+  metaDependence: 50
+  riskTaking: 80
+  classPreferences:
+  - characterClass: 0
+    preference: 60
+  - characterClass: 1
+    preference: 60
+  - characterClass: 2
+    preference: 60
+  - characterClass: 3
+    preference: 60
+  - characterClass: 4
+    preference: 60

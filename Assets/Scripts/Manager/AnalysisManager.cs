@@ -41,6 +41,20 @@ public class AnalysisManager : MonoBehaviour
         return (float)stat.MatchCount / statisticsManager.TotalBattles * 100f;
     }
 
+    public float GetAveragePickRate(CharacterRole role)
+    {
+        float value = 0;
+        int count = 0;
+
+        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetCharactersInRole(role))
+        {
+            value += GetPickRate(character);
+            count++;
+        }
+
+        return value / count;
+    }
+
     public MatchUpData GetMatchupData(RuntimeCharacter self, RuntimeCharacter enemy)
     {
         StatisticsManager statisticsManager = StatisticsManager.Instance;
@@ -83,6 +97,44 @@ public class AnalysisManager : MonoBehaviour
         }
 
         return data;
+    }
+
+    public RuntimeCharacter GetLowestCharacter(AnalysisItem item, bool past = false)
+    {
+        RuntimeCharacter result = null;
+        float lowest = float.MaxValue;
+
+        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
+        {
+            float value = GetValue(character, item, past);
+
+            if (value < lowest)
+            {
+                lowest = value;
+                result = character;
+            }
+        }
+
+        return result;
+    }
+
+    public RuntimeCharacter GetHighestCharacter(AnalysisItem item, bool past = false)
+    {
+        RuntimeCharacter result = null;
+        float highest = float.MinValue;
+
+        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
+        {
+            float value = GetValue(character, item, past);
+
+            if (value > highest)
+            {
+                highest = value;
+                result = character;
+            }
+        }
+
+        return result;
     }
 
     // ===== Value =====

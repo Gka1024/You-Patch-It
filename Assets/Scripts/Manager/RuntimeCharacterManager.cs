@@ -43,6 +43,21 @@ public class RuntimeCharacterManager : MonoBehaviour
         return character;
     }
 
+    public List<RuntimeCharacter> GetCharactersInRole(CharacterRole role)
+    {
+        List<RuntimeCharacter> result = new();
+
+        foreach(var kvp in runtimeCharacters)
+        {
+            if(kvp.Value.OriginCharacter.role == role)
+            {
+                result.Add(kvp.Value);
+            }
+        }
+
+        return result;
+    }
+
     public IEnumerable<RuntimeCharacter> GetAllCharacters()
     {
         return runtimeCharacters.Values;

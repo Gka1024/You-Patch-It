@@ -7,7 +7,7 @@ public class PredictCharacterWinrateRank : DeveloperGoal
     public override string Description =>
     $"{character.characterName}의 승률 랭킹을 {rank}위로 만드세요.";
 
-    public PredictCharacterWinrateRank(Character character, int rank, GoalDifficulty difficulty) : base(difficulty)
+    public PredictCharacterWinrateRank(Character character, int rank, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
     {
         this.character = character;
         this.rank = rank;

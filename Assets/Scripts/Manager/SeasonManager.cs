@@ -61,6 +61,7 @@ public class SeasonManager : MonoBehaviour
     {
         CurrentSubSeason = 1;
         StartSubSeason();
+        ChangeState(SeasonState.Start);
     }
 
     private void StartSubSeason()
@@ -70,8 +71,11 @@ public class SeasonManager : MonoBehaviour
         SeasonSeed = UnityEngine.Random.Range(0, int.MaxValue);
         SeasonRandom = new System.Random(SeasonSeed);
         Debug.Log($"Season : {CurrentSeason} - {CurrentSubSeason} || Seed : {SeasonSeed}");
+        ChangeState(SeasonState.Patch);
+    }
 
-        ChangeState(SeasonState.Start);
+    public void FinishStart()
+    {
         ChangeState(SeasonState.Patch);
     }
 
@@ -140,16 +144,19 @@ public class SeasonManager : MonoBehaviour
         switch (state)
         {
             case SeasonState.Start:
+                UIManager.Instance.dashBoardUI.ShowGoals();
+                GoalManager.Instance.ResetRerollCount();
                 break;
 
             case SeasonState.Patch:
+                UIManager.Instance.dashBoardUI.ShowCharacter();
                 upDisplayUI.Refresh();
                 PatchManager.Instance.StartPatch();
                 break;
 
             case SeasonState.GeneratePlayer:
                 players = PlayerManager.Instance.GeneratePlayers(50000, SeasonRandom).ToList();
-                FinishGeneratePlayer(); 
+                FinishGeneratePlayer();
                 break;
 
             case SeasonState.Pick:

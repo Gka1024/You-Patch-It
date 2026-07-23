@@ -19,6 +19,7 @@ public class ResourceManager : MonoBehaviour
     {
         Instance = this;
         trust = 50f;
+        developResource = 200;
     }
 
     //====================================================
@@ -68,6 +69,7 @@ public class ResourceManager : MonoBehaviour
             return false;
 
         developResource -= amount;
+        UIManager.Instance.upDisplayUI.Refresh();
         return true;
     }
 
@@ -78,11 +80,19 @@ public class ResourceManager : MonoBehaviour
     private int CalculateSeasonTrust()
     {
         int trust = 0;
+        int temp = 0;
 
-        trust += EvaluateWinRate();
-        trust += EvaluateDeveloperGoal();
-        trust += EvaluateCharacterIdentity();
-        trust += EvaluateMetaDiversity();
+        temp = EvaluateWinRate();
+        Debug.Log($"WinratePoint : {temp}");
+        trust += temp;
+
+        temp = EvaluateCharacterIdentity();
+        Debug.Log($"EvaluateCharacterIdentity : {temp}");
+        trust += temp;
+
+        temp = EvaluateMetaDiversity();
+        Debug.Log($"EvaluateMetaDiversity : {temp}");
+        trust += temp;
 
         return trust;
     }
@@ -136,12 +146,6 @@ public class ResourceManager : MonoBehaviour
         return Mathf.RoundToInt(totalScore / characters.Count);
     }
 
-    private int EvaluateDeveloperGoal()
-    {
-        // TODO
-        return 0;
-    }
-
     private int EvaluateCharacterIdentity()
     {
         List<RuntimeCharacter> characters =
@@ -167,9 +171,6 @@ public class ResourceManager : MonoBehaviour
         // 평균 거리가 1.5 이하면 0점
         // 평균 거리가 4.5 이상이면 10점
         float score = Mathf.InverseLerp(1.5f, 4.5f, averageDistance);
-
-        Debug.Log(Mathf.RoundToInt(score * 10f));
-
         return Mathf.RoundToInt(score * 10f);
     }
 

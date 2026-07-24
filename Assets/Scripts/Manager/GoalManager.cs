@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using Mono.Cecil;
-using NUnit.Framework;
 using UnityEngine;
 
 public class GoalManager : MonoBehaviour
@@ -24,12 +21,12 @@ public class GoalManager : MonoBehaviour
     {
         Instance = this;
         GenerateRewards();
-        GenerateGoals();
         ResetRerollCount();
     }
 
     void Start()
     {
+        GenerateGoals();
         SetGoals();
         GoalUI.Initialize(currentGoals, this);
     }
@@ -38,7 +35,7 @@ public class GoalManager : MonoBehaviour
     {
         GoalList.Clear();
 
-        GoalList.Add(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate), 3, GoalDifficulty.Normal, GoalType.Balance));
+        GoalList.Add(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
         GoalList.Add(new VeteranMakerGoal(57f, GoalDifficulty.Normal, GoalType.Balance));
         GoalList.Add(new WinrateBandGoal(49f, 54f, 4, GoalDifficulty.Hard, GoalType.Balance));
         GoalList.Add(new WinrateRangeGoal(45f, 55f, GoalDifficulty.Impossible, GoalType.Balance));
@@ -56,7 +53,6 @@ public class GoalManager : MonoBehaviour
         GoalList.Add(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
         GoalList.Add(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
         GoalList.Add(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
-
     }
 
     public void SetGoals()
@@ -94,6 +90,11 @@ public class GoalManager : MonoBehaviour
     {
         isRerollAvailable = false;
         SeasonManager.Instance.FinishStart();
+    }
+
+    public void SeasonReset()
+    {
+        
     }
 
     public void ResetRerollCount()

@@ -146,6 +146,8 @@ public class SeasonManager : MonoBehaviour
             case SeasonState.Start:
                 UIManager.Instance.dashBoardUI.ShowGoals();
                 GoalManager.Instance.ResetRerollCount();
+                GoalManager.Instance.GenerateGoals();
+                GoalManager.Instance.SetGoals();
                 break;
 
             case SeasonState.Patch:
@@ -184,7 +186,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Reward:
-                ResourceManager.Instance.GiveReward();
+                // ResourceManager.Instance.GiveReward();
                 break;
 
             case SeasonState.End:

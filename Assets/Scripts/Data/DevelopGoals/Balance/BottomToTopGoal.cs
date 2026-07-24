@@ -11,15 +11,15 @@ public class BottomToTopGoal : DeveloperGoal
     public override string Description =>
         $"지난 시즌 최하위였던 {targetCharacter.OriginCharacter.characterName}을(를) 이번 시즌 승률 상위 {rank}위 안에 올리세요.";
 
-    public BottomToTopGoal(RuntimeCharacter targetCharacter, int rank, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
+    public BottomToTopGoal(RuntimeCharacter character, int rank, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
     {
-        this.targetCharacter = targetCharacter;
+        this.targetCharacter = character;
         this.rank = rank;
     }
 
     protected override bool CheckCompleted()
     {
-        return AnalysisManager.Instance.GetRank(
+        return AnalysisManager.Instance.GetRank(    
             targetCharacter,
             AnalysisItem.Winrate,
             false) <= 4;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GoalManager : MonoBehaviour
@@ -16,6 +17,7 @@ public class GoalManager : MonoBehaviour
     private const int REROLL_REQUIRE_RESOURCE = 10;
 
     private bool isRerollAvailable;
+    private bool isGoalConfirmed;
 
     void Awake()
     {
@@ -40,8 +42,8 @@ public class GoalManager : MonoBehaviour
         GoalList.Add(new WinrateBandGoal(49f, 54f, 4, GoalDifficulty.Hard, GoalType.Balance));
         GoalList.Add(new WinrateRangeGoal(45f, 55f, GoalDifficulty.Impossible, GoalType.Balance));
 
-        GoalList.Add(new PredictCharacterWinrateRank(characterDatabase.GetRandomCharacter(), Random.Range(1, 9), GoalDifficulty.Impossible, GoalType.Challenge));
-        GoalList.Add(new SpecificCharacterWinrateGoal(40, 60, characterDatabase.GetRandomCharacter(), GoalDifficulty.Hard, GoalType.Challenge));
+        GoalList.Add(new PredictCharacterWinrateRank(RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, Random.Range(1, 9), GoalDifficulty.Impossible, GoalType.Challenge));
+        GoalList.Add(new SpecificCharacterWinrateGoal(40, 60, RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, GoalDifficulty.Hard, GoalType.Challenge));
 
         GoalList.Add(new MaxPickRateGoal(12f, GoalDifficulty.Hard, GoalType.Meta));
         GoalList.Add(new MinPickRateGoal(4f, GoalDifficulty.Hard, GoalType.Meta));
@@ -88,18 +90,24 @@ public class GoalManager : MonoBehaviour
 
     public void ConfirmGoals()
     {
+        GoalUI.ShowAlert(false);
+        isGoalConfirmed = true;
         isRerollAvailable = false;
         SeasonManager.Instance.FinishStart();
     }
 
     public void SeasonReset()
     {
-        
+        GoalUI.ShowAlert(true);
+        ResetRerollCount();
+        GenerateGoals();
+        SetGoals();
     }
 
     public void ResetRerollCount()
     {
         isRerollAvailable = true;
+        isGoalConfirmed = false;
         rerollCount = 0;
     }
 
@@ -130,6 +138,7 @@ public class GoalManager : MonoBehaviour
 
     public void CalculateGoals()
     {
+        Debug.Log("CalculateGoals");
         EvaluateAllGoals();
 
         foreach (DeveloperGoal goal in currentGoals)

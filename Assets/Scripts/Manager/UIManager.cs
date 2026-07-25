@@ -21,6 +21,8 @@ public class UIManager: MonoBehaviour
     public DeveloperGoalUI developerGoalUI;
     public DeveloperGoalItemUI developerGoalItemUI;
 
+    public GameObject GameOverUI;
+
     void Awake()
     {
         Instance = this;

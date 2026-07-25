@@ -25,6 +25,8 @@ public class TrustManager : MonoBehaviour
 
         Debug.Log(
             $"Reward : +{developResource} Develop / {trust:+0;-0;0} Trust");
+
+            
     }
 
     //====================================================

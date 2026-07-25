@@ -5,6 +5,8 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance { get; private set; }
 
+    [SerializeField] private int currentPlayerCount;
+
     [Header("Player Profiles")]
     [SerializeField] private List<PlayerProfile> playerProfiles = new();
 
@@ -20,6 +22,7 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        currentPlayerCount = 10000;
         Initialize();
     }
 
@@ -51,11 +54,11 @@ public class PlayerManager : MonoBehaviour
     // Generate
     //====================================================
 
-    public IReadOnlyList<RuntimePlayer> GeneratePlayers(int count, System.Random random)
+    public IReadOnlyList<RuntimePlayer> GeneratePlayers(System.Random random)
     {
         players.Clear();
 
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < currentPlayerCount; i++)
         {
             players.Add(GenerateRandomPlayer(random));
         }
@@ -126,6 +129,39 @@ public class PlayerManager : MonoBehaviour
     public IReadOnlyList<RuntimePlayer> GetPlayers()
     {
         return players;
+    }
+
+    //====================================================
+    // PlayerCount
+    //====================================================
+
+    public void UpdatePlayerCount(System.Random random)
+    {
+        float trust = ResourceManager.Instance.TrustPoint;
+
+        // 30을 기준으로 -1 ~ 1
+        float normalized = (trust - 30f) / 70f;
+
+        normalized = Mathf.Clamp(normalized, -1f, 1f);
+
+        // 최대 ±20%
+        float baseRate = normalized * 0.2f;
+
+        // 시즌 이슈
+        float randomRate =
+            (float)(random.NextDouble() * 0.08 - 0.04);
+
+        float finalRate = baseRate + randomRate;
+
+        currentPlayerCount =
+            Mathf.RoundToInt(
+                currentPlayerCount * (1f + finalRate));
+
+        currentPlayerCount =
+            Mathf.Clamp(
+                currentPlayerCount,
+                10000,
+                1000000);
     }
 }
 

@@ -16,6 +16,7 @@ public class DeveloperGoalUI : MonoBehaviour
     [SerializeField] private TMP_Text RerollCostValue;
     [SerializeField] private Button ChangeButton;
     [SerializeField] private Button ConfirmButton;
+    [SerializeField] private GameObject GoalAlert;
 
     public void Initialize(List<DeveloperGoal> goals, GoalManager goalManager)
     {
@@ -63,6 +64,11 @@ public class DeveloperGoalUI : MonoBehaviour
     public void SetRerollCostValue(int value)
     {
         RerollCostValue.text = value.ToString();
+    }
+
+    public void ShowAlert(bool show)
+    {
+        GoalAlert.SetActive(show);
     }
 
 }

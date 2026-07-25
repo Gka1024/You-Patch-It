@@ -28,6 +28,14 @@ public class ResourceManager : MonoBehaviour
     // Reward
     //====================================================
 
+    public void CheckReward()
+    {
+        if(trust <= 0)
+        {
+            GameManager.Instance.GameOver();
+        }
+    }
+
     public void GiveSeasonReward(
         int develop,
         float trustPoint)

@@ -19,7 +19,7 @@ public class CharacterStatistics
 
     public float TotalSurvivalTime;
 
-    public float WinRate => MatchCount == 0 ? 0 : (float)WinCount / MatchCount * 100f;
+    public float WinRate => MatchCount == 0 ? 0 : (float)WinCount / (WinCount + LoseCount) * 100f;
 
     public float AverageDamage => MatchCount == 0 ? 0 : TotalDamage / MatchCount;
 

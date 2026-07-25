@@ -92,21 +92,39 @@ public class StatisticsManager : MonoBehaviour
 
     public void RecordBattle(BattleResult result)
     {
-        bool redWin =
-            ReferenceEquals(result.winner,
-                result.statistics.Red.runtimeCharacter);
+        // 픽률 및 기본 전투 통계는 항상 기록
+        RecordCharacter(result.statistics.Red, false);
+        RecordCharacter(result.statistics.Blue, false);
 
-        RecordCharacter(result.statistics.Red, redWin);
-        RecordCharacter(result.statistics.Blue, !redWin);
+        // 같은 캐릭터끼리의 대전은 승률/매치업만 제외
+        if (result.statistics.Red.runtimeCharacter.OriginCharacter.id ==
+            result.statistics.Blue.runtimeCharacter.OriginCharacter.id)
+        {
+            return;
+        }
 
-        RecordMatchup(result.statistics.Red.runtimeCharacter, result.statistics.Blue.runtimeCharacter, redWin);
+        bool redWin = ReferenceEquals(
+            result.winner,
+            result.statistics.Red.runtimeCharacter);
 
-        RecordMatchup(result.statistics.Blue.runtimeCharacter, result.statistics.Red.runtimeCharacter, !redWin);
+        RecordWinLose(result.statistics.Red.runtimeCharacter, redWin);
+        RecordWinLose(result.statistics.Blue.runtimeCharacter, !redWin);
+
+        RecordMatchup(
+            result.statistics.Red.runtimeCharacter,
+            result.statistics.Blue.runtimeCharacter,
+            redWin);
+
+        RecordMatchup(
+            result.statistics.Blue.runtimeCharacter,
+            result.statistics.Red.runtimeCharacter,
+            !redWin);
     }
 
-    private void RecordCharacter(CharacterBattleStatistics battleStat, bool isWinner)
+    private void RecordCharacter(CharacterBattleStatistics battleStat, bool countWin)
     {
-        CharacterStatistics totalStat = GetCurrentStatistics(battleStat.runtimeCharacter);
+        CharacterStatistics totalStat =
+            GetCurrentStatistics(battleStat.runtimeCharacter);
 
         totalStat.MatchCount++;
         TotalBattles++;
@@ -116,11 +134,16 @@ public class StatisticsManager : MonoBehaviour
         totalStat.MoveDistance += battleStat.moveDistance;
         totalStat.AttackCount += battleStat.attackCount;
         totalStat.SkillCount += battleStat.skillCount;
+    }
+
+    private void RecordWinLose(RuntimeCharacter character, bool isWinner)
+    {
+        CharacterStatistics stat = GetCurrentStatistics(character);
 
         if (isWinner)
-            totalStat.WinCount++;
+            stat.WinCount++;
         else
-            totalStat.LoseCount++;
+            stat.LoseCount++;
     }
 
     private void RecordMatchup(RuntimeCharacter self, RuntimeCharacter enemy, bool isWinner)
@@ -143,7 +166,7 @@ public class StatisticsManager : MonoBehaviour
 
     public void ResetSeason(bool past)
     {
-        if(past) MakePast();
+        if (past) MakePast();
 
         TotalBattles = 0;
 

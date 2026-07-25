@@ -26,10 +26,14 @@ public class SeasonManager : MonoBehaviour
     public int CurrentSubSeason { get; private set; } = 1;
     public SeasonState CurrentState { get; private set; }
 
+    public int DisplaySeason { get; private set; } = 1;
+    public int DisplaySubSeason { get; private set; } = 1;
+
     public int SeasonSeed { get; private set; }
     private System.Random SeasonRandom;
 
     public UpDisplayUI upDisplayUI;
+    public CharacterTableUI characterTableUI;
 
     List<RuntimePlayer> players;
     List<MatchData> matches;
@@ -66,12 +70,34 @@ public class SeasonManager : MonoBehaviour
 
     private void StartSubSeason()
     {
-        Debug.Log($"============  Season {CurrentSeason} - {CurrentSubSeason} ==============");
-
         SeasonSeed = UnityEngine.Random.Range(0, int.MaxValue);
         SeasonRandom = new System.Random(SeasonSeed);
-        Debug.Log($"Season : {CurrentSeason} - {CurrentSubSeason} || Seed : {SeasonSeed}");
+
+        Debug.Log($"Season : {DisplaySeason}-{DisplaySubSeason} || Seed : {SeasonSeed}");
+
         ChangeState(SeasonState.Patch);
+    }
+
+    private void NextSubSeason()
+    {
+        CurrentSubSeason++;
+
+        if (CurrentSubSeason > 3)
+        {
+            ChangeState(SeasonState.Trust);
+        }
+        else
+        {
+            StartSubSeason();
+        }
+    }
+
+    public void NextSeason()
+    {
+        CurrentSeason++;
+        CurrentSubSeason = 1;
+
+        StartSeason();
     }
 
     public void FinishStart()
@@ -81,9 +107,13 @@ public class SeasonManager : MonoBehaviour
 
     public void FinishPatch()
     {
+        DisplaySeason = CurrentSeason;
+        DisplaySubSeason = CurrentSubSeason;
+
+        upDisplayUI.Refresh();
+
         ChangeState(SeasonState.GeneratePlayer);
     }
-
     public void FinishGeneratePlayer()
     {
         ChangeState(SeasonState.Pick);
@@ -109,30 +139,9 @@ public class SeasonManager : MonoBehaviour
         ChangeState(SeasonState.Reward);
     }
 
-    private void NextSubSeason()
-    {
-        CurrentSubSeason++;
-
-        if (CurrentSubSeason > 3)
-        {
-            ChangeState(SeasonState.Trust);
-        }
-        else
-        {
-            StartSubSeason();
-        }
-    }
-
     public void FinishReward()
     {
         ChangeState(SeasonState.End);
-    }
-
-    public void NextSeason()
-    {
-        CurrentSeason++;
-        CurrentSubSeason = 1;
-        StartSeason();
     }
 
     private void ChangeState(SeasonState state)
@@ -143,11 +152,8 @@ public class SeasonManager : MonoBehaviour
 
         switch (state)
         {
-            case SeasonState.Start:
-                UIManager.Instance.dashBoardUI.ShowGoals();
-                GoalManager.Instance.ResetRerollCount();
-                GoalManager.Instance.GenerateGoals();
-                GoalManager.Instance.SetGoals();
+            case SeasonState.Start: // 신규 캐릭터 추가, 리롤 횟수 초기화
+                GoalManager.Instance.SeasonReset();
                 break;
 
             case SeasonState.Patch:
@@ -157,7 +163,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.GeneratePlayer:
-                players = PlayerManager.Instance.GeneratePlayers(50000, SeasonRandom).ToList();
+                players = PlayerManager.Instance.GeneratePlayers(SeasonRandom).ToList();
                 FinishGeneratePlayer();
                 break;
 
@@ -186,10 +192,16 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Reward:
-                // ResourceManager.Instance.GiveReward();
+                ResourceManager.Instance.CheckReward();
                 break;
 
             case SeasonState.End:
+                if (RuntimeCharacterManager.Instance.HasLockedCharacter())
+                {
+                    RuntimeCharacterManager.Instance.AddRandomCharacter(SeasonRandom);
+                    characterTableUI.GenerateTable();
+                }
+                PlayerManager.Instance.UpdatePlayerCount(SeasonRandom);
                 NextSeason();
                 break;
         }

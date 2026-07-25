@@ -4,8 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObject/Character Database")]
 public class CharacterDatabase : ScriptableObject
 {
-    [SerializeField]
-    private List<Character> characters = new();
+    [SerializeField] private List<Character> InGameCharacters = new();
 
     private Dictionary<int, Character> characterMap;
 
@@ -16,7 +15,7 @@ public class CharacterDatabase : ScriptableObject
     {
         characterMap = new Dictionary<int, Character>();
 
-        foreach (Character character in characters)
+        foreach (Character character in InGameCharacters)
         {
             if (character == null)
                 continue;
@@ -43,13 +42,13 @@ public class CharacterDatabase : ScriptableObject
 
     public IReadOnlyList<Character> GetAllCharacters()
     {
-        return characters;
+        return InGameCharacters;
     }
 
     public Character GetRandomCharacter()
     {
-        return characters[Random.Range(0, Count)];
+        return InGameCharacters[Random.Range(0, Count)];
     }
 
-    public int Count => characters.Count;
+    public int Count => InGameCharacters.Count;
 }

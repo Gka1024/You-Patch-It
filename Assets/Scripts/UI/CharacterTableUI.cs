@@ -89,6 +89,7 @@ public class CharacterTableUI : MonoBehaviour
         }
 
         rowList.Clear();
+        rowMap.Clear();
     }
 
     private void DisplayRankNumber(int count)

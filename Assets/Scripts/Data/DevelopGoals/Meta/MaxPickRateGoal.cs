@@ -13,7 +13,7 @@ public class MaxPickRateGoal : DeveloperGoal
 
     protected override bool CheckCompleted()
     {
-        return AnalysisManager.Instance.GetMaxValue(AnalysisItem.Pickrate, false) < 20f;
+        return AnalysisManager.Instance.GetMaxValue(AnalysisItem.Pickrate, false) < maxPickRate;
     }
 
     public override float GetCurrentProgress()

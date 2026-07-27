@@ -82,6 +82,16 @@ public class StatisticsManager : MonoBehaviour
     public IReadOnlyDictionary<int, CharacterStatistics> PastStatistics
         => pastStatistics;
 
+    public TierStatistics GetCurrentTierStatistics(RuntimeCharacter character, PlayerTier tier)
+    {
+        return currentStatistics[character.OriginCharacter.id].TierStatistics[tier];
+    }
+
+    public TierStatistics GetPastTierStatistics(RuntimeCharacter character, PlayerTier tier)
+    {
+        return pastStatistics[character.OriginCharacter.id].TierStatistics[tier];
+    }
+
     // ===== Record =====
 
     public void RecordBattle(List<BattleResult> results)
@@ -93,8 +103,8 @@ public class StatisticsManager : MonoBehaviour
     public void RecordBattle(BattleResult result)
     {
         // 픽률 및 기본 전투 통계는 항상 기록
-        RecordCharacter(result.statistics.Red, false);
-        RecordCharacter(result.statistics.Blue, false);
+        RecordCharacter(result.statistics.Red, result.redPlayer.Tier);
+        RecordCharacter(result.statistics.Blue, result.bluePlayer.Tier);
 
         // 같은 캐릭터끼리의 대전은 승률/매치업만 제외
         if (result.statistics.Red.runtimeCharacter.OriginCharacter.id ==
@@ -107,24 +117,16 @@ public class StatisticsManager : MonoBehaviour
             result.winner,
             result.statistics.Red.runtimeCharacter);
 
-        RecordWinLose(result.statistics.Red.runtimeCharacter, redWin);
-        RecordWinLose(result.statistics.Blue.runtimeCharacter, !redWin);
+        RecordWinLose(result.statistics.Red.runtimeCharacter, result.redPlayer.Tier, redWin);
+        RecordWinLose(result.statistics.Blue.runtimeCharacter, result.bluePlayer.Tier, !redWin);
 
-        RecordMatchup(
-            result.statistics.Red.runtimeCharacter,
-            result.statistics.Blue.runtimeCharacter,
-            redWin);
-
-        RecordMatchup(
-            result.statistics.Blue.runtimeCharacter,
-            result.statistics.Red.runtimeCharacter,
-            !redWin);
+        RecordMatchup(result.statistics.Red.runtimeCharacter, result.statistics.Blue.runtimeCharacter, redWin);
+        RecordMatchup(result.statistics.Blue.runtimeCharacter, result.statistics.Red.runtimeCharacter, !redWin);
     }
 
-    private void RecordCharacter(CharacterBattleStatistics battleStat, bool countWin)
+    private void RecordCharacter(CharacterBattleStatistics battleStat, PlayerTier tier)
     {
-        CharacterStatistics totalStat =
-            GetCurrentStatistics(battleStat.runtimeCharacter);
+        CharacterStatistics totalStat = GetCurrentStatistics(battleStat.runtimeCharacter);
 
         totalStat.MatchCount++;
         TotalBattles++;
@@ -134,16 +136,27 @@ public class StatisticsManager : MonoBehaviour
         totalStat.MoveDistance += battleStat.moveDistance;
         totalStat.AttackCount += battleStat.attackCount;
         totalStat.SkillCount += battleStat.skillCount;
+
+        TierStatistics tierStat = totalStat.TierStatistics[tier];
+
+        tierStat.MatchCount++;
+        tierStat.TotalDamage += battleStat.damageDealt;
+        tierStat.TotalSurvivalTime += battleStat.survivalTime;
+        tierStat.MoveDistance += battleStat.moveDistance;
+        tierStat.AttackCount += battleStat.attackCount;
+        tierStat.SkillCount += battleStat.skillCount;
     }
 
-    private void RecordWinLose(RuntimeCharacter character, bool isWinner)
+    private void RecordWinLose(RuntimeCharacter character, PlayerTier tier, bool isWinner)
     {
         CharacterStatistics stat = GetCurrentStatistics(character);
 
-        if (isWinner)
-            stat.WinCount++;
-        else
-            stat.LoseCount++;
+        if (isWinner) stat.WinCount++;
+        else stat.LoseCount++;
+
+        TierStatistics tierStat = stat.TierStatistics[tier];
+
+        if (isWinner) tierStat.WinCount++;
     }
 
     private void RecordMatchup(RuntimeCharacter self, RuntimeCharacter enemy, bool isWinner)

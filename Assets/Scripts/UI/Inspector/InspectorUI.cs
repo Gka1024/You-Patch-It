@@ -29,7 +29,7 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private GameObject Winrate;
 
     [Header("Bellow")]
-    [SerializeField] private GameObject patchReason;
+    [SerializeField] private PatchReasonPopupUI patchReason;
     [SerializeField] private Button patchConfirmButton;
     [SerializeField] private Button simulateButton;
 
@@ -102,7 +102,7 @@ public class InspectorUI : MonoBehaviour
     private void ShowPatchReason()
     {
         if (currentCharacter == null) return;
-        patchReason.SetActive(true);
+        patchReason.Show(true);
         patchConfirmButton.interactable = false;
     }
 
@@ -124,7 +124,7 @@ public class InspectorUI : MonoBehaviour
         PatchManager.Instance.ApplyPatch(currentCharacter, patches, reasons);
 
         InitializeStats();
-        patchReason.SetActive(false);
+        patchReason.Show(false);
         Refresh();
     }
 

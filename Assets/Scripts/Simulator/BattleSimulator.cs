@@ -117,7 +117,7 @@ public class BattleSimulator : MonoBehaviour
             loser = blue.runtimeCharacter;
         }
 
-        return new BattleResult(winner, loser, statistics);
+        return new BattleResult(redPlayer, bluePlayer, winner, loser, statistics);
     }
 
     private void TickCharacter(BattleCharacter character)

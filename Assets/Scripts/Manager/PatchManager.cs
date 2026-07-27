@@ -46,10 +46,7 @@ public class PatchManager : MonoBehaviour
         SeasonManager.Instance.FinishPatch();
     }
 
-    public void ApplyPatch(
-        RuntimeCharacter character,
-        List<CharacterPatch> patches,
-        List<PatchReason> reasons)
+    public void ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
     {
         if (!ResourceManager.Instance.SpendDevelopResource(PATCH_REQUIRE_RESOURCE))
             return;
@@ -65,11 +62,9 @@ public class PatchManager : MonoBehaviour
 
         character.Patch(patches);
 
-        RuntimeCharacterSnapshot after =
-            new RuntimeCharacterSnapshot(character);
+        RuntimeCharacterSnapshot after = new RuntimeCharacterSnapshot(character);
 
-        PatchRecord record =
-            new PatchRecord(character, before, after, patches, reasons);
+        PatchRecord record = new PatchRecord(character, before, after, patches, reasons);
 
         appliedPatches.Add(record);
         undoStack.Push(record);

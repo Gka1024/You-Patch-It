@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 public class CharacterStatistics
@@ -31,6 +32,7 @@ public class CharacterStatistics
 
     public float AverageSkillCount => MatchCount == 0 ? 0 : SkillCount / MatchCount;
 
+    public Dictionary<PlayerTier, TierStatistics> TierStatistics = new();
 
     public void Reset()
     {
@@ -42,9 +44,20 @@ public class CharacterStatistics
         AttackCount = 0;
         SkillCount = 0;
         MoveDistance = 0;
+
+        foreach (TierStatistics stat in TierStatistics.Values)
+        {
+            stat.Reset();
+        }
     }
 
-    public CharacterStatistics() { }
+    public CharacterStatistics()
+    {
+        foreach (PlayerTier tier in Enum.GetValues(typeof(PlayerTier)))
+        {
+            TierStatistics.Add(tier, new TierStatistics());
+        }
+    }
 
     public CharacterStatistics(CharacterStatistics other)
     {
@@ -56,5 +69,12 @@ public class CharacterStatistics
         AttackCount = other.AttackCount;
         SkillCount = other.SkillCount;
         MoveDistance = other.MoveDistance;
+
+        TierStatistics = new();
+
+        foreach (var pair in other.TierStatistics)
+        {
+            TierStatistics.Add(pair.Key, new TierStatistics(pair.Value));
+        }
     }
 }

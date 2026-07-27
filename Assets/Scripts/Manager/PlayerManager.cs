@@ -6,6 +6,7 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager Instance { get; private set; }
 
     [SerializeField] private int currentPlayerCount;
+    public int GetCurrentPlayer => currentPlayerCount;
 
     [Header("Player Profiles")]
     [SerializeField] private List<PlayerProfile> playerProfiles = new();
@@ -153,15 +154,9 @@ public class PlayerManager : MonoBehaviour
 
         float finalRate = baseRate + randomRate;
 
-        currentPlayerCount =
-            Mathf.RoundToInt(
-                currentPlayerCount * (1f + finalRate));
+        currentPlayerCount = Mathf.RoundToInt(currentPlayerCount * (1f + finalRate));
 
-        currentPlayerCount =
-            Mathf.Clamp(
-                currentPlayerCount,
-                10000,
-                1000000);
+        currentPlayerCount = Mathf.Clamp(currentPlayerCount, 10000, 1000000);
     }
 }
 

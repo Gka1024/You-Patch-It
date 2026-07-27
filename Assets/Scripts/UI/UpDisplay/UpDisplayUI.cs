@@ -6,6 +6,7 @@ public class UpDisplayUI : MonoBehaviour
     [SerializeField] private TMP_Text SeasonText;
     [SerializeField] private TMP_Text TrustPointText;
     [SerializeField] private TMP_Text DevelopResourceText;
+    [SerializeField] private TMP_Text PlayersCountText;
 
     public GameObject GameOverUI;
 
@@ -15,6 +16,7 @@ public class UpDisplayUI : MonoBehaviour
         SeasonText.text = $"시즌 {SeasonManager.Instance.DisplaySeason} - {SeasonManager.Instance.DisplaySubSeason}";
         TrustPointText.text = $"{ResourceManager.Instance.TrustPoint}%";
         DevelopResourceText.text = $"{ResourceManager.Instance.DevelopResource}";
+        PlayersCountText.text = $"{PlayerManager.Instance.GetCurrentPlayer}";
     }
 
 

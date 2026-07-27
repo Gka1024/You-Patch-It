@@ -17,14 +17,14 @@ public class PatchReasonPopupUI : MonoBehaviour
         RefreshButton();
     }
 
-    public void Show()
+    public void Show(bool show)
     {
         foreach (var toggle in toggles)
             toggle.ResetToggle();
 
         RefreshButton();
 
-        gameObject.SetActive(true);
+        gameObject.SetActive(show);
     }
 
     public List<PatchReason> GetPatchReasons()

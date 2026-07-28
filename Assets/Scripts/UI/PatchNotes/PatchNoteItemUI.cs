@@ -17,7 +17,12 @@ public class PatchNoteItemUI : MonoBehaviour
     [SerializeField] private GameObject body;
 
     [SerializeField] private SpecificPatchUI[] specificPatches;
+    [SerializeField] private GameObject specificPatch;
+    [SerializeField] private GameObject specificPatchParent;
+
     [SerializeField] private PatchReasonUI[] patchReasons;
+    [SerializeField] private GameObject patchReason;
+    [SerializeField] private GameObject patchReasonParent;
 
     private PatchHistory history;
 
@@ -55,12 +60,9 @@ public class PatchNoteItemUI : MonoBehaviour
         {
             if (history.TryGetStatPatch(stat, out float before, out float after))
             {
-                if (statIndex >= specificPatches.Length)
-                    break;
+                if (before == after) continue;
 
-                specificPatches[statIndex].gameObject.SetActive(true);
-                specificPatches[statIndex].Initialize(stat, before, after);
-
+                Instantiate(specificPatch, specificPatchParent.transform).GetComponent<SpecificPatchUI>().Initialize(stat, before, after);
                 statIndex++;
             }
         }
@@ -79,12 +81,8 @@ public class PatchNoteItemUI : MonoBehaviour
 
         foreach (PatchReason reason in history.GetReasons())
         {
-            if (reasonIndex >= patchReasons.Length)
-                break;
-
-            patchReasons[reasonIndex].gameObject.SetActive(true);
-            patchReasons[reasonIndex].Initialize(reason);
-
+            Debug.Log(reason);
+            Instantiate(patchReason, patchReasonParent.transform).GetComponent<PatchReasonUI>().Initialize(reason);
             reasonIndex++;
         }
 

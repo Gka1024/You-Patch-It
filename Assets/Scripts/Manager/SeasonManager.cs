@@ -32,10 +32,6 @@ public class SeasonManager : MonoBehaviour
     public int SeasonSeed { get; private set; }
     private System.Random SeasonRandom;
 
-    public UpDisplayUI upDisplayUI;
-    public CharacterTableUI characterTableUI;
-    public PatchNoteUI patchNoteUI;
-
     List<RuntimePlayer> players;
     List<MatchData> matches;
     List<BattleResult> results;
@@ -111,7 +107,7 @@ public class SeasonManager : MonoBehaviour
         DisplaySeason = CurrentSeason;
         DisplaySubSeason = CurrentSubSeason;
 
-        upDisplayUI.Refresh();
+        UIManager.Instance.upDisplayUI.Refresh();
 
         ChangeState(SeasonState.GeneratePlayer);
     }
@@ -159,7 +155,7 @@ public class SeasonManager : MonoBehaviour
 
             case SeasonState.Patch:
                 UIManager.Instance.dashBoardUI.ShowCharacter();
-                upDisplayUI.Refresh();
+                UIManager.Instance.upDisplayUI.Refresh();
                 PatchManager.Instance.StartPatch();
                 break;
 
@@ -185,6 +181,7 @@ public class SeasonManager : MonoBehaviour
                 ResultManager.Instance.GenerateResult();
                 GoalManager.Instance.EvaluateAllGoals();
                 PatchHistoryManager.Instance.SaveCurrentSeason();
+                UIManager.Instance.patchNoteUI.Refresh();
                 break;
 
             case SeasonState.Trust:
@@ -201,8 +198,8 @@ public class SeasonManager : MonoBehaviour
                 if (RuntimeCharacterManager.Instance.HasLockedCharacter())
                 {
                     RuntimeCharacterManager.Instance.AddRandomCharacter(SeasonRandom);
-                    patchNoteUI.InitializeDropdown();
-                    characterTableUI.GenerateTable();
+                UIManager.Instance.patchNoteUI.InitializeDropdown();
+                    UIManager.Instance.characterTableUI.GenerateTable();
                 }
                 PlayerManager.Instance.UpdatePlayerCount(SeasonRandom);
                 NextSeason();

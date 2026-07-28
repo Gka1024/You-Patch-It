@@ -5,11 +5,12 @@ using UnityEngine;
 
 public class PatchNoteUI : MonoBehaviour
 {
+    [SerializeField] private TMP_Text characterName;
     [SerializeField] private TMP_Dropdown characterDropdown;
-
     [SerializeField] private Transform content;
-
     [SerializeField] private PatchNoteItemUI patchNotePrefab;
+
+    [SerializeField] private GameObject noPatchAlert;
 
     private RuntimeCharacter currentCharacter;
 
@@ -54,18 +55,24 @@ public class PatchNoteUI : MonoBehaviour
     private void ShowCharacter(RuntimeCharacter character)
     {
         currentCharacter = character;
-
+        characterName.text = character.OriginCharacter.characterName;
         foreach (Transform child in content)
             Destroy(child.gameObject);
 
         List<PatchHistory> histories = PatchHistoryManager.Instance.GetHistories(character).ToList();
 
+       noPatchAlert.SetActive(histories.Count == 0);
+
         foreach (PatchHistory history in histories)
         {
-            PatchNoteItemUI item =
-                Instantiate(patchNotePrefab, content);
+            PatchNoteItemUI item = Instantiate(patchNotePrefab, content);
 
             item.Initialize(history);
         }
+    }
+
+    public void Refresh()
+    {
+        ShowCharacter(currentCharacter);
     }
 }

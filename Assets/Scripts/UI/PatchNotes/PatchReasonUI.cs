@@ -7,6 +7,6 @@ public class PatchReasonUI : MonoBehaviour
 
     public void Initialize(PatchReason reason)
     {
-        text.text = reason.ToString();
+        text.text = DisplayNameHelper.GetReasonName(reason);
     }
 }

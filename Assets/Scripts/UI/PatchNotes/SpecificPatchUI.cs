@@ -8,7 +8,6 @@ public class SpecificPatchUI : MonoBehaviour
     [SerializeField] private TMP_Text arrowText;
     [SerializeField] private TMP_Text afterText;
 
-
     public void Initialize(CharacterStatType stat, float before, float after)
     {
         Debug.Log("SpecificPatchUI Initialize");
@@ -17,7 +16,7 @@ public class SpecificPatchUI : MonoBehaviour
 
     private void SetText(CharacterStatType stat, float before, float after)
     {
-        item.text = stat.ToString();
+        item.text = DisplayNameHelper.GetStatName(stat);
         beforeText.text = $"{before}";
         afterText.text = $"{after}";
     }

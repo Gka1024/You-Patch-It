@@ -63,15 +63,3 @@ public class InspectorAnalysisRowUI : MonoBehaviour
     }
 }
 
-public enum AnalysisItem
-{
-    Winrate,
-    Pickrate,
-    AverageDamage,
-    AverageLiveTime,
-    AverageDPS,
-    AverageMoveDistance,
-    AverageAttackCount,
-    AverageSkillCount,
-    MatchCount,
-}

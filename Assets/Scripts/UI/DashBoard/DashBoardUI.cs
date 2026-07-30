@@ -16,6 +16,12 @@ public class DashBoardUI : MonoBehaviour
     [Header("Patch Notes")]
     [SerializeField] private GameObject PatchNotes;
 
+    [Header("Season Reports")]
+    [SerializeField] private GameObject SeasonReports;
+
+    [Header("Unlock System")]
+    [SerializeField] private GameObject UnlockUI;
+
     [Header("Developer Goals")]
     [SerializeField] private GameObject DeveloperGoal;
 
@@ -30,6 +36,8 @@ public class DashBoardUI : MonoBehaviour
     {
         CharacterTable.SetActive(false);
         Inspector.SetActive(false);
+        SeasonReports.SetActive(false);
+        UnlockUI.SetActive(false);
         PatchNotes.SetActive(false);
         DeveloperGoal.SetActive(false);
     }

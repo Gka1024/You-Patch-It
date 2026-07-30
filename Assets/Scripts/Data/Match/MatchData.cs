@@ -1,15 +1,3 @@
-using UnityEngine;
-
-public class MatchManager : MonoBehaviour
-{
-    public static MatchManager Instance;
-
-    void Awake()
-    {
-        Instance = this;
-    }
-}
-
 public class MatchData
 {
     public RuntimePlayer redPlayer;

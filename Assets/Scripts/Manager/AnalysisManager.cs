@@ -271,3 +271,16 @@ public class AnalysisData
     public int CurrentRank;
     public int PastRank;
 }
+
+public enum AnalysisItem
+{
+    Winrate,
+    Pickrate,
+    AverageDamage,
+    AverageLiveTime,
+    AverageDPS,
+    AverageMoveDistance,
+    AverageAttackCount,
+    AverageSkillCount,
+    MatchCount,
+}

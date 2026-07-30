@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,98 +12,189 @@ public class PatchNoteItemUI : MonoBehaviour
     [SerializeField] private TMP_Text currentSeasonText;
     [SerializeField] private TMP_Text seasonWinrate;
     [SerializeField] private TMP_Text seasonPickrate;
+    [SerializeField] private TMP_Text patchCount;
 
     [Header("Body")]
     [SerializeField] private GameObject body;
 
-    [SerializeField] private SpecificPatchUI[] specificPatches;
     [SerializeField] private GameObject specificPatch;
-    [SerializeField] private GameObject specificPatchParent;
+    [SerializeField] private Transform specificPatchParent;
 
-    [SerializeField] private PatchReasonUI[] patchReasons;
     [SerializeField] private GameObject patchReason;
-    [SerializeField] private GameObject patchReasonParent;
+    [SerializeField] private Transform patchReasonParent;
 
+    [Header("Layout")]
+    [SerializeField] private LayoutElement layoutElement;
+    public float CurrentHeight => layoutElement.preferredHeight;
+    public RectTransform Rect => transform as RectTransform;
+    [SerializeField] private float closedHeight = 80f;
+    [SerializeField] private float bodyHeaderHeight = 40f;
+    [SerializeField] private float patchItemHeight = 50f;
+    [SerializeField] private float reasonItemHeight = 50f;
+    [SerializeField] private float bodyPadding = 20f;
+
+    [SerializeField] private float animationTime = 0.2f;
+    private Coroutine animationCoroutine;
+
+    [Header("Other")]
     private PatchHistory history;
 
+    public event System.Action<PatchNoteItemUI> OnHeightChanged;
+    public event System.Action<PatchNoteItemUI> OnClicked;
+
     private bool opened;
+    public bool IsOpened => opened;
 
     private void Awake()
     {
         itemButton.onClick.AddListener(Toggle);
+
+
+        if (layoutElement == null)
+            layoutElement = GetComponent<LayoutElement>();
+
+        layoutElement.preferredHeight = closedHeight;
+
+        body.SetActive(false);
     }
 
     public void Initialize(PatchHistory history)
     {
         this.history = history;
 
-        SetOpen(false);
-
         Refresh();
+        SetOpen(false, true);
     }
 
     public void Refresh()
     {
-        currentSeasonText.text = $"시즌 {history.Season}-{history.SubSeason}";
+        currentSeasonText.text =
+            $"시즌 {history.Season}-{history.SubSeason}";
 
-        seasonWinrate.text = $"승률 : {history.Winrate:F1}%";
+        seasonWinrate.text =
+            $"승률 : {history.Winrate:F1}%";
 
-        seasonPickrate.text = $"픽률 : {history.Pickrate:F1}%";
+        seasonPickrate.text =
+            $"픽률 : {history.Pickrate:F1}%";
 
-        //------------------------------------------------
-        // Stat
-        //------------------------------------------------
+        //----------------------------------------
+        // 기존 생성 삭제
+        //----------------------------------------
 
-        int statIndex = 0;
+        foreach (Transform child in specificPatchParent)
+            Destroy(child.gameObject);
+
+        foreach (Transform child in patchReasonParent)
+            Destroy(child.gameObject);
+
+        //----------------------------------------
+        // Patch
+        //----------------------------------------
+
+        int statCount = 0;
 
         foreach (CharacterStatType stat in System.Enum.GetValues(typeof(CharacterStatType)))
         {
-            if (history.TryGetStatPatch(stat, out float before, out float after))
-            {
-                if (before == after) continue;
+            if (!history.TryGetStatPatch(stat, out float before, out float after))
+                continue;
 
-                Instantiate(specificPatch, specificPatchParent.transform).GetComponent<SpecificPatchUI>().Initialize(stat, before, after);
-                statIndex++;
-            }
+            if (Mathf.Approximately(before, after))
+                continue;
+
+            Instantiate(specificPatch, specificPatchParent)
+                .GetComponent<SpecificPatchUI>()
+                .Initialize(stat, before, after);
+
+            statCount++;
         }
 
-        while (statIndex < specificPatches.Length)
-        {
-            specificPatches[statIndex].gameObject.SetActive(false);
-            statIndex++;
-        }
+        patchCount.text = $"패치 수 : {statCount} 개";
 
-        //------------------------------------------------
+        //----------------------------------------
         // Reason
-        //------------------------------------------------
-
-        int reasonIndex = 0;
+        //----------------------------------------
 
         foreach (PatchReason reason in history.GetReasons())
         {
-            Debug.Log(reason);
-            Instantiate(patchReason, patchReasonParent.transform).GetComponent<PatchReasonUI>().Initialize(reason);
-            reasonIndex++;
-        }
-
-        while (reasonIndex < patchReasons.Length)
-        {
-            patchReasons[reasonIndex].gameObject.SetActive(false);
-            reasonIndex++;
+            Instantiate(patchReason, patchReasonParent)
+                .GetComponent<PatchReasonUI>()
+                .Initialize(reason);
         }
     }
 
     public void Toggle()
     {
-        SetOpen(!opened);
+        OnClicked?.Invoke(this);
     }
 
-    public void SetOpen(bool value)
+    public void SetOpen(bool value, bool instant = false)
     {
         opened = value;
 
-        arrow.text = value ? "▼" : "▶";
+        arrow.text = opened ? "▼" : "▶";
 
-        body.SetActive(value);
+        if (animationCoroutine != null)
+            StopCoroutine(animationCoroutine);
+
+        if (instant)
+        {
+            body.SetActive(opened);
+
+            layoutElement.preferredHeight = opened ? GetOpenHeight() : closedHeight;
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(transform.parent as RectTransform);
+
+            return;
+        }
+
+        animationCoroutine = StartCoroutine(Animate(opened));
+    }
+
+    private float GetOpenHeight()
+    {
+        int patchCount = specificPatchParent.childCount;
+        int reasonCount = patchReasonParent.childCount;
+
+        float patchHeight = patchCount * patchItemHeight;
+
+        float reasonHeight = reasonCount * reasonItemHeight;
+
+        float bodyHeight = bodyHeaderHeight + Mathf.Max(patchHeight, reasonHeight) + bodyPadding;
+
+        return closedHeight + bodyHeight;
+    }
+
+    private IEnumerator Animate(bool open)
+    {
+        float startHeight = layoutElement.preferredHeight;
+        float targetHeight = open ? GetOpenHeight() : closedHeight;
+
+        if (open)
+        {
+            body.SetActive(true);
+        }
+        else
+        {
+            body.SetActive(false);
+        }
+
+        float elapsed = 0f;
+
+        while (elapsed < animationTime)
+        {
+            elapsed += Time.deltaTime;
+
+            float t = Mathf.Clamp01(elapsed / animationTime);
+            t = 1f - Mathf.Pow(1f - t, 3f);
+
+            layoutElement.preferredHeight = Mathf.Lerp(startHeight, targetHeight, t);
+
+            OnHeightChanged?.Invoke(this);
+
+            yield return null;
+        }
+
+        layoutElement.preferredHeight = targetHeight;
+        OnHeightChanged?.Invoke(this);
     }
 }

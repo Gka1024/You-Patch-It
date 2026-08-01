@@ -10,7 +10,7 @@ public class UnlockData : ScriptableObject
 
     public UnlockCategory category;
 
-    public int cost;
+    public int costResource;
     public Sprite icon;
     public UnlockData[] prerequisites;
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AnalysisManager : MonoBehaviour
@@ -9,6 +10,18 @@ public class AnalysisManager : MonoBehaviour
 
     private readonly Dictionary<bool, Dictionary<AnalysisItem, Dictionary<int, int>>> rankCache = new();
     private Dictionary<(bool past, int characterid, AnalysisItem item), float> valueCache = new();
+
+    [Header("Tier")]
+    [SerializeField] private float pickrateWeight = 1f;
+    [SerializeField] private float winrateWeight = 1f;
+    [SerializeField] private float banrateWeight = 1f;
+
+    [SerializeField] private float sTierScore = 80;
+    [SerializeField] private float aTierScore = 60;
+    [SerializeField] private float bTierScore = 40;
+    [SerializeField] private float cTierScore = 20;
+
+
     private void Awake()
     {
         Instance = this;
@@ -31,14 +44,7 @@ public class AnalysisManager : MonoBehaviour
 
     public float GetPickRate(RuntimeCharacter character)
     {
-        StatisticsManager statisticsManager = StatisticsManager.Instance;
-
-        if (statisticsManager.TotalBattles == 0)
-            return 0f;
-
-        CharacterStatistics stat = statisticsManager.GetCurrentStatistics(character);
-
-        return (float)stat.MatchCount / statisticsManager.TotalBattles * 100f;
+        return GetValue(character, AnalysisItem.Pickrate, false);
     }
 
     public float GetAveragePickRate(CharacterRole role)
@@ -53,6 +59,18 @@ public class AnalysisManager : MonoBehaviour
         }
 
         return value / count;
+    }
+
+    public CharacterTier GetTier(RuntimeCharacter character, bool past = false)
+    {
+        float score = GetTierScore(character, past);
+
+        if (score >= sTierScore) return CharacterTier.S;
+        if (score >= aTierScore) return CharacterTier.A;
+        if (score >= bTierScore) return CharacterTier.B;
+        if (score >= cTierScore) return CharacterTier.C;
+
+        return CharacterTier.D;
     }
 
     public MatchUpData GetMatchupData(RuntimeCharacter self, RuntimeCharacter enemy)
@@ -190,6 +208,15 @@ public class AnalysisManager : MonoBehaviour
         return max;
     }
 
+    private float GetTierScore(RuntimeCharacter character, bool past = false)
+    {
+        float pickrate = GetPickRate(character);
+        float winrate = GetValue(character, AnalysisItem.Winrate, past);
+        //float banrate = GetValue(character, AnalysisItem.Banrate, past);
+
+        return pickrate * pickrateWeight + (winrate - 50f) * winrateWeight;
+    }
+
     // ===== Rank Cache =====
 
     private void BuildRankCache(bool past)
@@ -283,4 +310,15 @@ public enum AnalysisItem
     AverageAttackCount,
     AverageSkillCount,
     MatchCount,
+    CharacterTier,
+    Banrate
+}
+
+public enum CharacterTier
+{
+    D,
+    C,
+    B,
+    A,
+    S
 }

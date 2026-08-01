@@ -29,6 +29,7 @@ public class DashBoardUI : MonoBehaviour
     {
         CharacterButton.onClick.AddListener(ShowCharacter);
         PatchNoteButton.onClick.AddListener(ShowPatchNote);
+        UnlockButton.onClick.AddListener(ShowUnlock);
         GoalButton.onClick.AddListener(ShowGoals);
     }
 
@@ -54,6 +55,12 @@ public class DashBoardUI : MonoBehaviour
     {
         RemoveAll();
         PatchNotes.SetActive(true);
+    }
+
+    public void ShowUnlock()
+    {
+        RemoveAll();
+        UnlockUI.SetActive(true);
     }
 
     public void ShowGoals()

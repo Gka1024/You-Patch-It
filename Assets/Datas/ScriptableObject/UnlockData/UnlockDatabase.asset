@@ -10,6 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 935ed59fdbb724b4e8edb3aca8973956, type: 3}
-  m_Name: New Unlock Data Base
+  m_Name: UnlockDatabase
   m_EditorClassIdentifier: 
-  unlocks: []
+  unlocks:
+  - {fileID: 11400000, guid: d0f84e38e2026794389b80923851facd, type: 2}

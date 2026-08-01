@@ -8,8 +8,12 @@ public class CharacterRowUI : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text winRateText;
     [SerializeField] private TMP_Text pickRateText;
-    [SerializeField] private TMP_Text damageText;
+    [SerializeField] private TMP_Text tierText;
+    [SerializeField] private TMP_Text banRateText;
     [SerializeField] private TMP_Text DPSText;
+    [SerializeField] private TMP_Text damageText;
+    [SerializeField] private TMP_Text livetimeText;
+
     [SerializeField] private Button button;
 
     [SerializeField] private RuntimeCharacter runtimeCharacter;
@@ -41,10 +45,16 @@ public class CharacterRowUI : MonoBehaviour
 
         pickRateText.text = $"{AnalysisManager.Instance.GetPickRate(runtimeCharacter):F1}%";
 
+        tierText.text = $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}";
+
+        banRateText.text = $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}"; // 밴 추가 후 수정
+
         damageText.text = $"{stat.AverageDamage:F0}";
 
         float dps = stat.AverageSurvivalTime <= 0f ? 0f : stat.AverageDamage / stat.AverageSurvivalTime;
         DPSText.text = $"{dps:F1}";
+
+        livetimeText.text = $"{(AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue * 5f):F1}";
     }
 
     private void OnClick()

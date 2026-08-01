@@ -82,8 +82,8 @@ public class BattleSimulator : MonoBehaviour
             }
 
             // 행동 실행
-            ExecuteAction(red, blue, redAction, tick);
-            ExecuteAction(blue, red, blueAction, tick);
+            ExecuteAction(red, blue, redAction, tick, battleRandom);
+            ExecuteAction(blue, red, blueAction, tick, battleRandom);
 
             battleTime += tick;
 
@@ -134,9 +134,9 @@ public class BattleSimulator : MonoBehaviour
         return character.aiState.ReactionTime * multiplier;
     }
 
-    private void ExecuteAction(BattleCharacter self, BattleCharacter enemy, BattleAction action, float tick)
+    private void ExecuteAction(BattleCharacter self, BattleCharacter enemy, BattleAction action, float tick, System.Random random)
     {
-        action = ApplyDecisionAccuracy(self, action);
+        action = ApplyDecisionAccuracy(self, action, random);
 
         switch (action)
         {
@@ -203,24 +203,24 @@ public class BattleSimulator : MonoBehaviour
         return UnityEngine.Random.Range(1f - variance, 1f + variance);
     }
 
-    private BattleAction ApplyDecisionAccuracy(BattleCharacter self, BattleAction action)
+    private BattleAction ApplyDecisionAccuracy(BattleCharacter self, BattleAction action, System.Random random)
     {
         float failChance = Mathf.Lerp(0.3f, 0f, self.player.DecisionAccuracy / 100f);
 
-        if (UnityEngine.Random.value > failChance)
+        if (random.NextDouble() > failChance)
         {
             return action;
         }
 
         BattleAction[] actions =
         {
-            BattleAction.MoveAway,
-            BattleAction.MoveTowards,
-            BattleAction.Attack,
-            BattleAction.None
-        };
+        BattleAction.MoveAway,
+        BattleAction.MoveTowards,
+        BattleAction.Attack,
+        BattleAction.None
+    };
 
-        return actions[UnityEngine.Random.Range(0, actions.Length)];
+        return actions[random.Next(actions.Length)];
     }
 }
 

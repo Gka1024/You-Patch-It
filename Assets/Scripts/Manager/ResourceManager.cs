@@ -9,7 +9,7 @@ public class ResourceManager : MonoBehaviour
 
     [Header("Trust")]
     [SerializeField]
-    [Range(0,100)]
+    [Range(0, 100)]
     private float trust = 50f;
 
     public int TrustPoint => Mathf.RoundToInt(trust);
@@ -30,7 +30,7 @@ public class ResourceManager : MonoBehaviour
 
     public void CheckReward()
     {
-        if(trust <= 0)
+        if (trust <= 0)
         {
             GameManager.Instance.GameOver();
         }

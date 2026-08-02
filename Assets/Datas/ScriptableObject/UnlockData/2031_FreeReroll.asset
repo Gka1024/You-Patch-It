@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
+  m_Name: 2031_FreeReroll
+  m_EditorClassIdentifier: 
+  id: 2031
+  unlockName: "\uBAA9\uD45C \uBB34\uB8CC \uB9AC\uB864"
+  description: "\uB9E4 \uC2DC\uC98C\uB2F9 \uBAA9\uD45C\uB97C \uD55C\uBC88 \uBB34\uB8CC\uB85C
+    \uBCC0\uACBD\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  category: 1
+  costResource: 10
+  icon: {fileID: 0}
+  prerequisites: []

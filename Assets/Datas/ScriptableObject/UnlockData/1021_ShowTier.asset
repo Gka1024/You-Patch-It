@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
-  m_Name: New Unlock Data
+  m_Name: 1021_ShowTier
   m_EditorClassIdentifier: 
-  id: 100
-  unlockName: "\uB354\uBBF8"
-  description: "\uB354\uBBF8 \uB370\uC774\uD130\uC785\uB2C8\uB2E4. \uB85C\uB818\uC785\uC12C"
+  id: 1021
+  unlockName: "\uD2F0\uC5B4 \uD655\uC778"
+  description: "\uCE90\uB9AD\uD130\uC758 \uD2F0\uC5B4\uB97C \uACF5\uAC1C\uD569\uB2C8\uB2E4."
   category: 0
   costResource: 10
   icon: {fileID: 0}

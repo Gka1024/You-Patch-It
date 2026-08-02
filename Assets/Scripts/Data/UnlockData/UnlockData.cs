@@ -19,6 +19,5 @@ public enum UnlockCategory
 {
     Patch,
     Goal,
-    Information,
     Operation 
 }

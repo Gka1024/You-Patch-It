@@ -22,7 +22,7 @@ public class PatchManager : MonoBehaviour
     private readonly Stack<PatchRecord> undoStack = new();
     public bool CanUndo => undoStack.Count > 0;
 
-    private const int PATCH_REQUIRE_RESOURCE = 10;
+    private const int PATCH_REQUIRE_RESOURCE = 50;
 
     private void Awake()
     {

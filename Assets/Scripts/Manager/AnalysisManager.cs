@@ -16,10 +16,12 @@ public class AnalysisManager : MonoBehaviour
     [SerializeField] private float winrateWeight = 1f;
     [SerializeField] private float banrateWeight = 1f;
 
-    [SerializeField] private float sTierScore = 80;
-    [SerializeField] private float aTierScore = 60;
-    [SerializeField] private float bTierScore = 40;
-    [SerializeField] private float cTierScore = 20;
+    [Header("Tier Cache")]
+    private float currentTierAverage;
+    private float currentTierStandardDeviation;
+
+    private float pastTierAverage;
+    private float pastTierStandardDeviation;
 
 
     private void Awake()
@@ -33,10 +35,14 @@ public class AnalysisManager : MonoBehaviour
         valueCache.Clear();
 
         BuildRankCache(false);
+        BuildTierCache(false);
+
 
         if (StatisticsManager.Instance.HasPastSeasonData)
         {
             BuildRankCache(true);
+            BuildTierCache(true);
+
         }
     }
 
@@ -65,12 +71,48 @@ public class AnalysisManager : MonoBehaviour
     {
         float score = GetTierScore(character, past);
 
-        if (score >= sTierScore) return CharacterTier.S;
-        if (score >= aTierScore) return CharacterTier.A;
-        if (score >= bTierScore) return CharacterTier.B;
-        if (score >= cTierScore) return CharacterTier.C;
+        float average = past
+            ? pastTierAverage
+            : currentTierAverage;
+
+        float standardDeviation = past
+            ? pastTierStandardDeviation
+            : currentTierStandardDeviation;
+
+        if (standardDeviation < 0.0001f)
+            return CharacterTier.B;
+
+        float z = (score - average) / standardDeviation;
+
+        if (z >= 1.5f)
+            return CharacterTier.S;
+
+        if (z >= 0.5f)
+            return CharacterTier.A;
+
+        if (z >= -0.5f)
+            return CharacterTier.B;
+
+        if (z >= -1.5f)
+            return CharacterTier.C;
 
         return CharacterTier.D;
+    }
+
+    public float GetTierZScore(RuntimeCharacter character, bool past = false)
+    {
+        float average = past
+        ? pastTierAverage
+        : currentTierAverage;
+
+        float standardDeviation = past
+            ? pastTierStandardDeviation
+            : currentTierStandardDeviation;
+
+        if (standardDeviation < 0.0001f)
+            return 0f;
+
+        return (GetTierScore(character, past) - average) / standardDeviation;
     }
 
     public MatchUpData GetMatchupData(RuntimeCharacter self, RuntimeCharacter enemy)
@@ -188,6 +230,7 @@ public class AnalysisManager : MonoBehaviour
             AnalysisItem.AverageSkillCount => stat.AverageSkillCount,
             AnalysisItem.MatchCount => stat.MatchCount,
             AnalysisItem.AverageDPS => stat.AverageSurvivalTime <= 0f ? 0f : stat.AverageDamage / stat.AverageSurvivalTime,
+            AnalysisItem.CharacterTier => GetTierScore(character, past),
             _ => 0f
         };
 
@@ -285,6 +328,45 @@ public class AnalysisManager : MonoBehaviour
 
         return list;
     }
+
+    private void BuildTierCache(bool past)
+    {
+        List<RuntimeCharacter> characters =
+            RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+
+        float average = 0f;
+
+        foreach (RuntimeCharacter character in characters)
+        {
+            average += GetTierScore(character, past);
+        }
+
+        average /= characters.Count;
+
+        float variance = 0f;
+
+        foreach (RuntimeCharacter character in characters)
+        {
+            float diff = GetTierScore(character, past) - average;
+            variance += diff * diff;
+        }
+
+        variance /= characters.Count;
+
+        float standardDeviation = Mathf.Sqrt(variance);
+
+        if (past)
+        {
+            pastTierAverage = average;
+            pastTierStandardDeviation = standardDeviation;
+        }
+        else
+        {
+            currentTierAverage = average;
+            currentTierStandardDeviation = standardDeviation;
+        }
+    }
+
 }
 
 [Serializable]

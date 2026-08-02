@@ -37,23 +37,28 @@ public class UnlockManager : MonoBehaviour
         return unlocked.Contains(data.id);
     }
 
+    public bool IsUnlocked(int id)
+    {
+        return unlocked.Contains(id);
+    }
+
     public bool CanUnlock(UnlockData data)
     {
         if (IsUnlocked(data)) return false;
-
-        if (!ResourceManager.Instance.SpendDevelopResource(data.costResource)) return false;
 
         foreach (UnlockData pre in data.prerequisites)
         {
             if (!IsUnlocked(pre)) return false;
         }
 
+        if (!ResourceManager.Instance.SpendDevelopResource(data.costResource)) return false;
+
         return true;
     }
 
     public bool Unlock(UnlockData data)
     {
-        Debug.Log($"Unlocked : {data.unlockName}");
+        //Debug.Log($"Unlocked : {data.unlockName}");
 
         if (!CanUnlock(data)) return false;
 

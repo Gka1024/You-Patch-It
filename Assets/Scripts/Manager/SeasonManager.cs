@@ -182,6 +182,7 @@ public class SeasonManager : MonoBehaviour
                 GoalManager.Instance.EvaluateAllGoals();
                 PatchHistoryManager.Instance.SaveCurrentSeason();
                 UIManager.Instance.patchNoteUI.Refresh();
+                UIManager.Instance.characterTableUI.ReArrangetable();
                 break;
 
             case SeasonState.Trust:
@@ -198,7 +199,7 @@ public class SeasonManager : MonoBehaviour
                 if (RuntimeCharacterManager.Instance.HasLockedCharacter())
                 {
                     RuntimeCharacterManager.Instance.AddRandomCharacter(SeasonRandom);
-                UIManager.Instance.patchNoteUI.InitializeDropdown();
+                    UIManager.Instance.patchNoteUI.InitializeDropdown();
                     UIManager.Instance.characterTableUI.GenerateTable();
                 }
                 PlayerManager.Instance.UpdatePlayerCount(SeasonRandom);

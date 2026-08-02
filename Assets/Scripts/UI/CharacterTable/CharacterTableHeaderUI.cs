@@ -45,7 +45,6 @@ public class CharacterTableHeaderUI : MonoBehaviour, IPointerDownHandler
         sortArrow.text = direction == SortDirection.Descending ? "▼" : "▲";
     }
 
-
 }
 
 public enum SortDirection

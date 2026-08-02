@@ -10,7 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 935ed59fdbb724b4e8edb3aca8973956, type: 3}
-  m_Name: UnlockDatabase
+  m_Name: 0_UnlockDatabase
   m_EditorClassIdentifier: 
   unlocks:
   - {fileID: 11400000, guid: d0f84e38e2026794389b80923851facd, type: 2}
+  - {fileID: 11400000, guid: c445561ed8b3bec41b98d7f37f082a28, type: 2}
+  - {fileID: 11400000, guid: 84b5c18d7e9754e478c66d7dae0a8a8f, type: 2}
+  - {fileID: 11400000, guid: 685d76f92c9096445aff112cecd7c691, type: 2}
+  - {fileID: 11400000, guid: 6b5611cd56cdcf54ba08c2dcf281e66a, type: 2}
+  - {fileID: 11400000, guid: 51748172b4e98dc418a2b16f6ab7dd68, type: 2}

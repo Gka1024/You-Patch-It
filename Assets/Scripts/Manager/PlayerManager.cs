@@ -156,7 +156,7 @@ public class PlayerManager : MonoBehaviour
 
         currentPlayerCount = Mathf.RoundToInt(currentPlayerCount * (1f + finalRate));
 
-        currentPlayerCount = Mathf.Clamp(currentPlayerCount, 10000, 1000000);
+        currentPlayerCount = Mathf.Clamp(currentPlayerCount, 0, 1000000);
     }
 }
 

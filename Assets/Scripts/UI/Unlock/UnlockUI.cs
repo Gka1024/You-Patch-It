@@ -60,7 +60,6 @@ public class UnlockUI : MonoBehaviour
         {
             UnlockCategory.Patch => patchParent,
             UnlockCategory.Goal => goalParent,
-            UnlockCategory.Information => informationParent,
             UnlockCategory.Operation => operationParent,
             _ => null,
         };

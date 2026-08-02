@@ -18,6 +18,11 @@ public class CharacterRowUI : MonoBehaviour
 
     [SerializeField] private RuntimeCharacter runtimeCharacter;
 
+    private const int UnlockShowTier = 1021;
+    private const int UnlockShowBan = 1022;
+    private const int UnlockShowLivetime = 1023;
+    private const int UnlockShowDPS = 1024;
+
     public void Initialize(RuntimeCharacter character)
     {
         runtimeCharacter = character;
@@ -27,12 +32,15 @@ public class CharacterRowUI : MonoBehaviour
         button.onClick.AddListener(OnClick);
 
         runtimeCharacter.OnStatChanged += Refresh;
+        UnlockManager.Instance.OnUnlockChanged += Refresh;
     }
 
     private void OnDestroy()
     {
         if (runtimeCharacter != null)
             runtimeCharacter.OnStatChanged -= Refresh;
+
+        UnlockManager.Instance.OnUnlockChanged -= Refresh;
     }
 
     public void Refresh()
@@ -45,16 +53,17 @@ public class CharacterRowUI : MonoBehaviour
 
         pickRateText.text = $"{AnalysisManager.Instance.GetPickRate(runtimeCharacter):F1}%";
 
-        tierText.text = $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}";
+        tierText.text = UnlockManager.Instance.IsUnlocked(UnlockShowTier) ? $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}" : " - "; // 티어 확인
 
-        banRateText.text = $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}"; // 밴 추가 후 수정
+        banRateText.text = UnlockManager.Instance.IsUnlocked(UnlockShowBan) ? $" - " : $" - "; // 밴 추가 후 수정
 
         damageText.text = $"{stat.AverageDamage:F0}";
 
         float dps = stat.AverageSurvivalTime <= 0f ? 0f : stat.AverageDamage / stat.AverageSurvivalTime;
-        DPSText.text = $"{dps:F1}";
+        DPSText.text = UnlockManager.Instance.IsUnlocked(UnlockShowDPS) ? $"{dps:F1}" : " - ";
 
-        livetimeText.text = $"{(AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue * 5f):F1}";
+        livetimeText.text = UnlockManager.Instance.IsUnlocked(UnlockShowLivetime) ?
+        $"{AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue:F1}" : " - ";
     }
 
     private void OnClick()

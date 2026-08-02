@@ -56,11 +56,14 @@ public class CharacterTableUI : MonoBehaviour
         DisplayRankNumber(rowList.Count);
     }
 
+    public void ReArrangetable()
+    {
+        ArrangeTable(currentSortItem, currentDirection);
+    }
+
     private void ArrangeTable(AnalysisItem item, SortDirection direction)
     {
         List<RuntimeCharacter> characters = AnalysisManager.Instance.GetSortedCharacters(item, direction);
-
-        Debug.Log(item);
 
         for (int i = characters.Count - 1; i >= 0; i--)
         {
@@ -69,6 +72,7 @@ public class CharacterTableUI : MonoBehaviour
 
         RefreshTable();
     }
+
     public void AddCharacter(RuntimeCharacter runtimeCharacter)
     {
         CharacterRowUI row = Instantiate(rowPrefab, content);

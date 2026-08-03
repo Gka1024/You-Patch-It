@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
   m_Name: 1032_PredictMeta
   m_EditorClassIdentifier: 
-  id: 1024
-  unlockName: "DPS \uD655\uC778"
-  description: "\uCE90\uB9AD\uD130\uC758 DPS\uC744 \uD655\uC778\uD569\uB2C8\uB2E4."
+  id: 1032
+  unlockName: "\uBA54\uD0C0 \uC608\uCE21"
+  description: "\uAC00\uC7A5 \uC2B9\uB960\uC774 \uB192\uC740 \uCE90\uB9AD\uD130\uB97C
+    \uC608\uCE21\uD569\uB2C8\uB2E4."
   category: 0
   costResource: 20
   icon: {fileID: 0}
   prerequisites:
-  - {fileID: 11400000, guid: 6b5611cd56cdcf54ba08c2dcf281e66a, type: 2}
+  - {fileID: 11400000, guid: 5612e4d5d7bc8e64e8626a99aae0ca0f, type: 2}

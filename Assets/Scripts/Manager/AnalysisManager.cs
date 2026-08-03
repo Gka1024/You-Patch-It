@@ -115,25 +115,90 @@ public class AnalysisManager : MonoBehaviour
         return (GetTierScore(character, past) - average) / standardDeviation;
     }
 
-    public MatchUpData GetMatchupData(RuntimeCharacter self, RuntimeCharacter enemy)
+    public MatchUpData GetMatchupData(RuntimeCharacter self, RuntimeCharacter enemy = null, PlayerTier? tier = null)
     {
         StatisticsManager statisticsManager = StatisticsManager.Instance;
 
-        MatchupStatistics current = statisticsManager.GetCurrentMatchup(self.OriginCharacter.id, enemy.OriginCharacter.id);
-
         MatchUpData data = new()
         {
-            HasPastData = statisticsManager.HasPastSeasonData,
-            CurrentMatchCount = current.MatchCount,
-            CurrentWinRate = current.WinRate
+            HasPastData = statisticsManager.HasPastSeasonData
         };
+
+        // ===========================
+        // 전체 데이터
+        // ===========================
+        if (enemy == null)
+        {
+            CharacterStatistics currentCharacter = statisticsManager.GetCurrentStatistics(self);
+
+            if (tier.HasValue)
+            {
+                TierStatistics currentTier = currentCharacter.TierStatistics[tier.Value];
+
+                data.CurrentMatchCount = currentTier.MatchCount;
+                data.CurrentWinRate = currentTier.WinRate;
+            }
+            else
+            {
+                data.CurrentMatchCount = currentCharacter.MatchCount;
+                data.CurrentWinRate = currentCharacter.WinRate;
+            }
+
+            if (statisticsManager.HasPastSeasonData)
+            {
+                CharacterStatistics pastCharacter = statisticsManager.GetPastStatistics(self);
+
+                if (tier.HasValue)
+                {
+                    TierStatistics pastTier = pastCharacter.TierStatistics[tier.Value];
+
+                    data.PastMatchCount = pastTier.MatchCount;
+                    data.PastWinRate = pastTier.WinRate;
+                }
+                else
+                {
+                    data.PastMatchCount = pastCharacter.MatchCount;
+                    data.PastWinRate = pastCharacter.WinRate;
+                }
+            }
+
+            return data;
+        }
+
+        // ===========================
+        // 특정 상대 데이터
+        // ===========================
+        MatchupStatistics currentMatchup = statisticsManager.GetCurrentMatchup(self.OriginCharacter.id, enemy.OriginCharacter.id);
+
+        if (tier.HasValue)
+        {
+            TierMatchupStatistics currentTier = currentMatchup.TierStatistics[tier.Value];
+
+            data.CurrentMatchCount = currentTier.MatchCount;
+            data.CurrentWinRate = currentTier.WinRate;
+        }
+        else
+        {
+            data.CurrentMatchCount = currentMatchup.MatchCount;
+            data.CurrentWinRate = currentMatchup.WinRate;
+        }
 
         if (statisticsManager.HasPastSeasonData)
         {
-            MatchupStatistics past = statisticsManager.GetPastMatchup(self.OriginCharacter.id, enemy.OriginCharacter.id);
+            MatchupStatistics pastMatchup = statisticsManager.GetPastMatchup(self.OriginCharacter.id, enemy.OriginCharacter.id);
 
-            data.PastMatchCount = past.MatchCount;
-            data.PastWinRate = past.WinRate;
+            if (tier.HasValue)
+            {
+                TierMatchupStatistics pastTier = pastMatchup.TierStatistics[tier.Value];
+
+                data.PastMatchCount = pastTier.MatchCount;
+                data.PastWinRate = pastTier.WinRate;
+            }
+            else
+            {
+                data.PastMatchCount = pastMatchup.MatchCount;
+                data.PastWinRate = pastMatchup.WinRate;
+            }
         }
 
         return data;
@@ -155,6 +220,39 @@ public class AnalysisManager : MonoBehaviour
             data.PastValue = GetValue(character, item, true);
             data.PastRank = GetRank(character, item, true);
         }
+
+        return data;
+    }
+
+    public MatchUpTierData GetTierMatchupData(RuntimeCharacter self, CharacterTier tier)
+    {
+        MatchUpTierData data = new();
+
+        List<RuntimeCharacter> targets =
+            RuntimeCharacterManager.Instance
+            .GetAllCharacters()
+            .Where(x => x != self)
+            .Where(x => GetTier(x) == tier)
+            .ToList();
+
+        data.CharacterCount = targets.Count;
+
+        if (targets.Count == 0)
+            return data;
+
+        foreach (RuntimeCharacter target in targets)
+        {
+            MatchUpData match = GetMatchupData(self, target);
+
+            data.CurrentAverageWinRate += match.CurrentWinRate;
+            data.CurrentMatchCount += match.CurrentMatchCount;
+
+            data.PastAverageWinRate += match.PastWinRate;
+            data.PastMatchCount += match.PastMatchCount;
+        }
+
+        data.CurrentAverageWinRate /= targets.Count;
+        data.PastAverageWinRate /= targets.Count;
 
         return data;
     }
@@ -379,6 +477,17 @@ public class AnalysisData
 
     public int CurrentRank;
     public int PastRank;
+}
+
+public class MatchUpTierData
+{
+    public float CurrentAverageWinRate;
+    public int CurrentMatchCount;
+
+    public float PastAverageWinRate;
+    public int PastMatchCount;
+
+    public int CharacterCount;
 }
 
 public enum AnalysisItem

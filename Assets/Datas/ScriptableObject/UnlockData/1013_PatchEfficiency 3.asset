@@ -10,12 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
-  m_Name: 3011_ReduceTrustDecrease
+  m_Name: 1013_PatchEfficiency 3
   m_EditorClassIdentifier: 
-  id: 2041
-  unlockName: "\uBAA9\uD45C \uCD94\uAC00 I"
-  description: "\uC0C8\uB85C\uC6B4 \uBAA9\uD45C\uB4E4\uC744 \uCD94\uAC00\uD569\uB2C8\uB2E4."
-  category: 1
+  id: 1013
+  unlockName: "\uD328\uCE58 \uD6A8\uC728 \uC99D\uAC00 III"
+  description: "\uCE90\uB9AD\uD130\uB97C \uD328\uCE58\uD560 \uB54C \uB9AC\uC18C\uC2A4\uAC00
+    \uB4E4\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+  category: 0
   costResource: 10
   icon: {fileID: 0}
   prerequisites: []
+  NextData: {fileID: 0}

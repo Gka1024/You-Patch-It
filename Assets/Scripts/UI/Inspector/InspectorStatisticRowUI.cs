@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InspectorAnalysisRowUI : MonoBehaviour
+public class InspectorStatisticRowUI : MonoBehaviour
 {
     [Header("Stat")]
     [SerializeField] private AnalysisItem analysisItem;

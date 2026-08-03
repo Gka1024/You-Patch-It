@@ -51,7 +51,12 @@ public class UnlockItemUI : MonoBehaviour
 
     public void Unlock()
     {
-        UnlockManager.Instance.Unlock(UnlockData);
+        if(UnlockManager.Instance.Unlock(UnlockData) && UnlockData.NextData != null)
+        {
+            this.UnlockData = UnlockData.NextData;
+            SelfClick();
+            Refresh();
+        }
     }
 
 }

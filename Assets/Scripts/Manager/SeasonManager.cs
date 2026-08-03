@@ -170,7 +170,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Simulation:
-                StatisticsManager.Instance.ResetSeason(true);
+                StatisticsManager.Instance.ResetSeason();
                 results = BattleSimulator.Instance.StartSimulation(matches, SeasonRandom);
                 FinishSimulation();
                 break;

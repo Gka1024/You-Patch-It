@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
   m_Name: 2043_AdditionalGoal 3
   m_EditorClassIdentifier: 
-  id: 2041
-  unlockName: "\uBAA9\uD45C \uCD94\uAC00 I"
+  id: 2043
+  unlockName: "\uBAA9\uD45C \uCD94\uAC00 III"
   description: "\uC0C8\uB85C\uC6B4 \uBAA9\uD45C\uB4E4\uC744 \uCD94\uAC00\uD569\uB2C8\uB2E4."
   category: 1
   costResource: 10

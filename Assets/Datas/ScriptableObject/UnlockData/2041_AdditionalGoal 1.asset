@@ -19,3 +19,4 @@ MonoBehaviour:
   costResource: 10
   icon: {fileID: 0}
   prerequisites: []
+  NextData: {fileID: 11400000, guid: 760058a1de0bd84469a2a8d14f9bb9bf, type: 2}

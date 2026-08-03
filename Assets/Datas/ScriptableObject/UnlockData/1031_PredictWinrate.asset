@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
   m_Name: 1031_PredictWinrate
   m_EditorClassIdentifier: 
-  id: 1024
-  unlockName: "DPS \uD655\uC778"
-  description: "\uCE90\uB9AD\uD130\uC758 DPS\uC744 \uD655\uC778\uD569\uB2C8\uB2E4."
+  id: 1031
+  unlockName: "\uC2B9\uB9AC \uC608\uCE21"
+  description: "\uD2B9\uC815 \uCE90\uB9AD\uD130\uC758 \uC2B9\uB960\uC744 \uC608\uCE21\uD569\uB2C8\uB2E4."
   category: 0
   costResource: 20
   icon: {fileID: 0}

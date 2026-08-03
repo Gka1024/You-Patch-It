@@ -90,13 +90,13 @@ public class InspectorUI : MonoBehaviour
     {
         foreach (var row in AnalysisRows)
         {
-            row.GetComponent<InspectorAnalysisRowUI>().Initialize(currentCharacter);
+            row.GetComponent<InspectorStatisticRowUI>().Initialize(currentCharacter);
         }
     }
 
     private void InitializeWinrate()
     {
-        Winrate.GetComponent<InspectorWinrateUI>().Initialize(currentCharacter);
+        Winrate.GetComponent<InspectorCombatAnalysisUI>().Initialize(currentCharacter);
     }
 
     private void ShowPatchReason()

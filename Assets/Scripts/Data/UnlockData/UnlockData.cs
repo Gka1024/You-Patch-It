@@ -13,6 +13,7 @@ public class UnlockData : ScriptableObject
     public int costResource;
     public Sprite icon;
     public UnlockData[] prerequisites;
+    public UnlockData NextData;
 }
 
 public enum UnlockCategory

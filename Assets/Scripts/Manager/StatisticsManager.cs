@@ -107,8 +107,7 @@ public class StatisticsManager : MonoBehaviour
         RecordCharacter(result.statistics.Blue, result.bluePlayer.Tier);
 
         // 같은 캐릭터끼리의 대전은 승률/매치업만 제외
-        if (result.statistics.Red.runtimeCharacter.OriginCharacter.id ==
-            result.statistics.Blue.runtimeCharacter.OriginCharacter.id)
+        if (result.statistics.Red.runtimeCharacter.OriginCharacter.id == result.statistics.Blue.runtimeCharacter.OriginCharacter.id)
         {
             return;
         }
@@ -120,8 +119,8 @@ public class StatisticsManager : MonoBehaviour
         RecordWinLose(result.statistics.Red.runtimeCharacter, result.redPlayer.Tier, redWin);
         RecordWinLose(result.statistics.Blue.runtimeCharacter, result.bluePlayer.Tier, !redWin);
 
-        RecordMatchup(result.statistics.Red.runtimeCharacter, result.statistics.Blue.runtimeCharacter, redWin);
-        RecordMatchup(result.statistics.Blue.runtimeCharacter, result.statistics.Red.runtimeCharacter, !redWin);
+        RecordMatchup(result.statistics.Red.runtimeCharacter, result.statistics.Blue.runtimeCharacter, result.redPlayer.Tier, redWin);
+        RecordMatchup(result.statistics.Blue.runtimeCharacter, result.statistics.Red.runtimeCharacter, result.bluePlayer.Tier, !redWin);
     }
 
     private void RecordCharacter(CharacterBattleStatistics battleStat, PlayerTier tier)
@@ -159,7 +158,7 @@ public class StatisticsManager : MonoBehaviour
         if (isWinner) tierStat.WinCount++;
     }
 
-    private void RecordMatchup(RuntimeCharacter self, RuntimeCharacter enemy, bool isWinner)
+    private void RecordMatchup(RuntimeCharacter self, RuntimeCharacter enemy, PlayerTier tier, bool isWinner)
     {
         int selfId = self.OriginCharacter.id;
         int enemyId = enemy.OriginCharacter.id;
@@ -168,18 +167,30 @@ public class StatisticsManager : MonoBehaviour
             return;
 
         MatchupStatistics matchup = currentMatchDatas[(selfId, enemyId)];
+        TierMatchupStatistics tierStat = matchup.TierStatistics[tier];
 
         matchup.MatchCount++;
+        tierStat.MatchCount++;
 
         if (isWinner)
+        {
             matchup.WinCount++;
+            tierStat.WinCount++;
+        }
     }
 
     // ===== Season =====
 
-    public void ResetSeason(bool past)
+    public void ResetSeason()
     {
-        if (past) MakePast();
+        if (!HasPastSeasonData)
+        {
+            HasPastSeasonData = true;
+        }
+        else
+        {
+            MakePast();
+        }
 
         TotalBattles = 0;
 
@@ -190,12 +201,17 @@ public class StatisticsManager : MonoBehaviour
         {
             matchup.MatchCount = 0;
             matchup.WinCount = 0;
+
+            foreach (TierMatchupStatistics tier in matchup.TierStatistics.Values)
+            {
+                tier.Reset();
+            }
         }
     }
 
     public void MakePast()
     {
-        HasPastSeasonData = true;
+        Debug.Log("MakePast");
 
         pastStatistics.Clear();
         PastTotalBattles = TotalBattles;
@@ -220,16 +236,53 @@ public class MatchupStatistics
     public int MatchCount;
     public int WinCount;
 
-    public float WinRate =>
-        MatchCount == 0
-            ? 0f
-            : (float)WinCount / MatchCount * 100f;
+    public Dictionary<PlayerTier, TierMatchupStatistics> TierStatistics = new();
 
-    public MatchupStatistics() { }
+    public float WinRate => MatchCount == 0 ?
+    0f : (float)WinCount / MatchCount * 100f;
 
+    public MatchupStatistics()
+    {
+        foreach (PlayerTier tier in Enum.GetValues(typeof(PlayerTier)))
+        {
+            TierStatistics.Add(tier, new TierMatchupStatistics());
+        }
+    }
     public MatchupStatistics(MatchupStatistics other)
     {
         MatchCount = other.MatchCount;
         WinCount = other.WinCount;
+
+        TierStatistics = new();
+
+        foreach (var pair in other.TierStatistics)
+        {
+            TierStatistics.Add(
+                pair.Key,
+                new TierMatchupStatistics(pair.Value));
+        }
+    }
+}
+
+public class TierMatchupStatistics
+{
+    public int MatchCount;
+    public int WinCount;
+
+    public float WinRate =>
+        MatchCount == 0 ? 0f : (float)WinCount / MatchCount * 100f;
+
+    public TierMatchupStatistics() { }
+
+    public TierMatchupStatistics(TierMatchupStatistics other)
+    {
+        MatchCount = other.MatchCount;
+        WinCount = other.WinCount;
+    }
+
+    public void Reset()
+    {
+        MatchCount = 0;
+        WinCount = 0;
     }
 }

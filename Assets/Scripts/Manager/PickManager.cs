@@ -47,6 +47,37 @@ public class PickManager : MonoBehaviour
         return matches;
     }
 
+    public List<MatchData> StartPick(IReadOnlyList<RuntimePlayer> players, System.Random random, RuntimeCharacter baseCharacter, RuntimeCharacter opponentCharacter)
+    {
+        Dictionary<PlayerTier, Queue<RuntimePlayer>> queues = CreateQueues(players, random);
+
+        List<MatchData> matches = new();
+
+        while (true)
+        {
+            RuntimePlayer player = GetNextPlayer(queues);
+
+            if (player == null)
+                break;
+
+            RuntimePlayer opponent = FindOpponent(player, queues);
+
+            if (opponent == null)
+                continue;
+
+            RuntimeCharacter redCharacter = baseCharacter;
+            RuntimeCharacter blueCharacter = opponentCharacter;
+
+            matches.Add(new MatchData(
+                player,
+                opponent,
+                redCharacter,
+                blueCharacter));
+        }
+
+        return matches;
+    }
+
     private Dictionary<PlayerTier, Queue<RuntimePlayer>> CreateQueues(IReadOnlyList<RuntimePlayer> players, System.Random random)
     {
         Dictionary<PlayerTier, Queue<RuntimePlayer>> queues = new();
@@ -190,5 +221,5 @@ public class PickManager : MonoBehaviour
 
         return (preference - 30f) * weight;
     }
-   
+
 }

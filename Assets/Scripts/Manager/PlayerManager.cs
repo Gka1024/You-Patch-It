@@ -67,6 +67,19 @@ public class PlayerManager : MonoBehaviour
         return players;
     }
 
+    public IReadOnlyList<RuntimePlayer> GeneratePlayers(System.Random random, int playerCount)
+    {
+        List<RuntimePlayer> tempPlayers = new();
+        tempPlayers.Clear();
+
+        for (int i = 0; i < playerCount; i++)
+        {
+            tempPlayers.Add(GenerateRandomPlayer(random));
+        }
+
+        return tempPlayers;
+    }
+
     public RuntimePlayer GenerateRandomPlayer(System.Random random)
     {
         PlayerTier tier = GetRandomTier(random);
@@ -75,10 +88,15 @@ public class PlayerManager : MonoBehaviour
         return GeneratePlayer(tier, profile, random);
     }
 
-    public RuntimePlayer GeneratePlayer(
-        PlayerTier tier,
-        PlayerProfile profile,
-        System.Random random)
+    public RuntimePlayer GenerateRandomPlayer(System.Random random, PlayerTier tierPreset)
+    {
+        PlayerTier tier = tierPreset;
+        PlayerProfile profile = GetRandomProfile(random);
+
+        return GeneratePlayer(tier, profile, random);
+    }
+
+    public RuntimePlayer GeneratePlayer(PlayerTier tier, PlayerProfile profile, System.Random random)
     {
         if (!settingTable.TryGetValue(tier, out TierSetting setting))
         {

@@ -18,27 +18,29 @@ public class ResultManager : MonoBehaviour
     }
 
 
-    public void GenerateResult()
+    public void GenerateResult(bool ShowinConsole)
     {
-        Debug.Log("===== Season Result =====");
-
-        foreach (var pair in StatisticsManager.Instance.GetAllStatistics())
+        if (ShowinConsole)
         {
-            Character character = database.GetCharacter(pair.Key);
-            CharacterStatistics stat = pair.Value;
+            Debug.Log("===== Season Result =====");
+            foreach (var pair in StatisticsManager.Instance.GetAllStatistics())
+            {
+                Character character = database.GetCharacter(pair.Key);
+                CharacterStatistics stat = pair.Value;
 
-            float winRate = stat.WinRate;
-            float averageDamage = stat.AverageDamage;
-            float averageSurvivalTime = stat.AverageSurvivalTime;
-            float totalDamage = stat.TotalDamage;
+                float winRate = stat.WinRate;
+                float averageDamage = stat.AverageDamage;
+                float averageSurvivalTime = stat.AverageSurvivalTime;
+                float totalDamage = stat.TotalDamage;
 
-            Debug.Log(
-                $"{character.name} | " +
-                $"WinRate : {winRate:F1}% | " +
-                $"Match : {stat.MatchCount} | " +
-                $"Damage : {averageDamage:F1} | " +
-                $"DamageT : {totalDamage:F1} | " +
-                $"Survival : {averageSurvivalTime:F1}s");
+                Debug.Log(
+                    $"{character.name} | " +
+                    $"WinRate : {winRate:F1}% | " +
+                    $"Match : {stat.MatchCount} | " +
+                    $"Damage : {averageDamage:F1} | " +
+                    $"DamageT : {totalDamage:F1} | " +
+                    $"Survival : {averageSurvivalTime:F1}s");
+            }
         }
 
         characterTableUI.RefreshTable();

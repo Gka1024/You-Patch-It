@@ -40,7 +40,8 @@ public class CharacterRowUI : MonoBehaviour
         if (runtimeCharacter != null)
             runtimeCharacter.OnStatChanged -= Refresh;
 
-        UnlockManager.Instance.OnUnlockChanged -= Refresh;
+        if (UnlockManager.Instance != null)
+            UnlockManager.Instance.OnUnlockChanged -= Refresh;
     }
 
     public void Refresh()
@@ -70,6 +71,6 @@ public class CharacterRowUI : MonoBehaviour
     {
         Debug.Log(runtimeCharacter.OriginCharacter.name);
         InspectorUI.Instance.Show(runtimeCharacter);
-        //InspectorUI.Instance.ShowStats();
+        InspectorUI.Instance.ShowStats();
     }
 }

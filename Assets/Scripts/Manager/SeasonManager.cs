@@ -178,7 +178,7 @@ public class SeasonManager : MonoBehaviour
             case SeasonState.Result:
                 StatisticsManager.Instance.RecordBattle(results);
                 AnalysisManager.Instance.AnalyzeSeason();
-                ResultManager.Instance.GenerateResult();
+                ResultManager.Instance.GenerateResult(false);
                 GoalManager.Instance.EvaluateAllGoals();
                 PatchHistoryManager.Instance.SaveCurrentSeason();
                 UIManager.Instance.patchNoteUI.Refresh();

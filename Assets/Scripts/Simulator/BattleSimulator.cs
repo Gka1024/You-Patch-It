@@ -24,7 +24,8 @@ public class BattleSimulator : MonoBehaviour
 
         foreach (MatchData match in matches)
         {
-            results.Add(StartSimulation(match, SeasonManager.Instance.SeasonSeed));
+            int battleSeed = random.Next();
+            results.Add(StartSimulation(match, battleSeed));
         }
 
         return results;

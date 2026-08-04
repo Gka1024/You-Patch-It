@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1031
   unlockName: "\uC2B9\uB9AC \uC608\uCE21"
-  description: "\uD2B9\uC815 \uCE90\uB9AD\uD130\uC758 \uC2B9\uB960\uC744 \uC608\uCE21\uD569\uB2C8\uB2E4."
+  description: "\uD2B9\uC815 \uB450 \uCE90\uB9AD\uD130 \uC804\uD22C\uC758 \uC2B9\uB960\uC744
+    \uC608\uCE21\uD569\uB2C8\uB2E4."
   category: 0
   costResource: 20
   icon: {fileID: 0}
   prerequisites:
   - {fileID: 11400000, guid: 6b5611cd56cdcf54ba08c2dcf281e66a, type: 2}
+  NextData: {fileID: 0}

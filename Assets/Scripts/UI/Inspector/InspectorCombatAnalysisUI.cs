@@ -3,37 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InspectorCombatAnalysisUI : MonoBehaviour
 {
     private List<RuntimeCharacter> characters;
-
-    [SerializeField] private TMP_Text baseCharacterText;
-
-    [SerializeField] private TMP_Dropdown opponentDropdown;
-    [SerializeField] private TMP_Dropdown tierDropdown;
 
     private RuntimeCharacter baseCharacter;
     private RuntimeCharacter opponentCharacter;
     private PlayerTier? selectedTier;
 
     [Header("UI")]
+    [SerializeField] private TMP_Text baseCharacterText;
+
+    [SerializeField] private TMP_Dropdown opponentDropdown;
+    [SerializeField] private TMP_Dropdown tierDropdown;
+
     [SerializeField] private TMP_Text currentWinrate;
     [SerializeField] private TMP_Text currentMatchCount;
 
     [SerializeField] private TMP_Text pastWinrate;
     [SerializeField] private TMP_Text pastMatchCount;
 
+    [SerializeField] private Button predictButton;
+    [SerializeField] private TMP_Text predictWinrate;
+
+
     public void Initialize(RuntimeCharacter character)
     {
         baseCharacter = character;
         baseCharacterText.text = character.OriginCharacter.characterName;
 
-        characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
-        //characters = RuntimeCharacterManager.Instance.GetAllCharacters().Where(x => x != character).ToList();
+        //characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+        characters = RuntimeCharacterManager.Instance.GetAllCharacters().Where(x => x != character).ToList();
 
         RegisterOpponentDropdown();
         RegisterTierDropdown();
+
+        predictButton.onClick.AddListener(ExpectWinrate);
 
         opponentCharacter = null;
         selectedTier = null;
@@ -112,6 +119,20 @@ public class InspectorCombatAnalysisUI : MonoBehaviour
             pastWinrate.text = "-";
             pastMatchCount.text = "-";
         }
+    }
+
+    private void ExpectWinrate()
+    {
+        if (baseCharacter != null && opponentCharacter != null)
+        {
+            float rate = BattlePredictor.Instance.PredictBattle(baseCharacter, opponentCharacter, 100);
+            SetExpectWinrateText(rate);
+        }
+    }
+
+    private void SetExpectWinrateText(float rate)
+    {
+        predictWinrate.text = $"{rate} %";
     }
 }
 

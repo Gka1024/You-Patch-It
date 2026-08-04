@@ -137,6 +137,7 @@ public class AnalysisManager : MonoBehaviour
 
                 data.CurrentMatchCount = currentTier.MatchCount;
                 data.CurrentWinRate = currentTier.WinRate;
+                Debug.Log($"win : {currentTier.WinCount} | lose : {currentTier.LoseCount}");
             }
             else
             {

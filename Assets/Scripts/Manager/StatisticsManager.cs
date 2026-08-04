@@ -112,9 +112,7 @@ public class StatisticsManager : MonoBehaviour
             return;
         }
 
-        bool redWin = ReferenceEquals(
-            result.winner,
-            result.statistics.Red.runtimeCharacter);
+        bool redWin = ReferenceEquals(result.winner, result.statistics.Red.runtimeCharacter);
 
         RecordWinLose(result.statistics.Red.runtimeCharacter, result.redPlayer.Tier, redWin);
         RecordWinLose(result.statistics.Blue.runtimeCharacter, result.bluePlayer.Tier, !redWin);
@@ -156,6 +154,7 @@ public class StatisticsManager : MonoBehaviour
         TierStatistics tierStat = stat.TierStatistics[tier];
 
         if (isWinner) tierStat.WinCount++;
+        else tierStat.LoseCount++;
     }
 
     private void RecordMatchup(RuntimeCharacter self, RuntimeCharacter enemy, PlayerTier tier, bool isWinner)

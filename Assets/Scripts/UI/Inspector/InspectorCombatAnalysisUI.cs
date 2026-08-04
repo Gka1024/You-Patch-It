@@ -29,7 +29,8 @@ public class InspectorCombatAnalysisUI : MonoBehaviour
         baseCharacter = character;
         baseCharacterText.text = character.OriginCharacter.characterName;
 
-        characters = RuntimeCharacterManager.Instance.GetAllCharacters().Where(x => x != character).ToList();
+        characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+        //characters = RuntimeCharacterManager.Instance.GetAllCharacters().Where(x => x != character).ToList();
 
         RegisterOpponentDropdown();
         RegisterTierDropdown();

@@ -6,6 +6,7 @@ public class TierStatistics
 {
     public int MatchCount;
     public int WinCount;
+    public int LoseCount;
 
     public float TotalDamage;
     public float TotalSurvivalTime;
@@ -13,10 +14,7 @@ public class TierStatistics
     public int AttackCount;
     public int SkillCount;
 
-    public float WinRate =>
-        MatchCount == 0
-            ? 0
-            : (float)WinCount / MatchCount * 100f;
+    public float WinRate => MatchCount == 0 ? 0 : (float)WinCount / (WinCount + LoseCount) * 100f;
 
     public float AverageDamage =>
         MatchCount == 0 ? 0 : TotalDamage / MatchCount;
@@ -37,6 +35,7 @@ public class TierStatistics
     {
         MatchCount = 0;
         WinCount = 0;
+        LoseCount = 0;
 
         TotalDamage = 0;
         TotalSurvivalTime = 0;
@@ -54,6 +53,7 @@ public class TierStatistics
     {
         MatchCount = other.MatchCount;
         WinCount = other.WinCount;
+        LoseCount = other.LoseCount;
 
         TotalDamage = other.TotalDamage;
         TotalSurvivalTime = other.TotalSurvivalTime;

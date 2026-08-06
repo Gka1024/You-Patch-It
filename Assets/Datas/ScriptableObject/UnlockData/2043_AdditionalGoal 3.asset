@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: 2043_AdditionalGoal 3
   m_EditorClassIdentifier: 
   id: 2043
-  unlockName: "\uBAA9\uD45C \uCD94\uAC00 III"
+  unlockName: "\uBAA9\uD45C \uCD94\uAC00 III (\uAC1C\uBC1C\uC548\uB428)"
   description: "\uC0C8\uB85C\uC6B4 \uBAA9\uD45C\uB4E4\uC744 \uCD94\uAC00\uD569\uB2C8\uB2E4."
   category: 1
-  costResource: 10
+  costResource: -1
   icon: {fileID: 0}
   prerequisites: []
+  NextData: {fileID: 0}

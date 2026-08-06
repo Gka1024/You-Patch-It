@@ -19,14 +19,10 @@ public class TrustManager : MonoBehaviour
         int developResource = CalculateSeasonDevelopResource();
         float trust = CalculateSeasonTrust();
 
-        ResourceManager.Instance.GiveSeasonReward(
-            developResource,
-            trust);
+        ResourceManager.Instance.GiveSeasonReward(developResource, trust);
 
-        Debug.Log(
-            $"Reward : +{developResource} Develop / {trust:+0;-0;0} Trust");
+        Debug.Log($"Reward : +{developResource} Develop / {trust:+0;-0;0} Trust");
 
-            
     }
 
     //====================================================

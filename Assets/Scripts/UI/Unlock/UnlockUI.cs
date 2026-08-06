@@ -26,6 +26,8 @@ public class UnlockUI : MonoBehaviour
     [SerializeField] private TMP_Text unlockCost;
     [SerializeField] private Button UnlockButton;
 
+    public Sprite UnlockSprite;
+
     void Start()
     {
         RegisterItems();

@@ -28,6 +28,8 @@ public class InspectorCombatAnalysisUI : MonoBehaviour
     [SerializeField] private Button predictButton;
     [SerializeField] private TMP_Text predictWinrate;
 
+    private const int PREDICT_WINRATE = 1031;
+
 
     public void Initialize(RuntimeCharacter character)
     {
@@ -123,6 +125,8 @@ public class InspectorCombatAnalysisUI : MonoBehaviour
 
     private void ExpectWinrate()
     {
+        if (!UnlockManager.Instance.IsUnlocked(PREDICT_WINRATE)) return;
+
         if (baseCharacter != null && opponentCharacter != null)
         {
             float rate = BattlePredictor.Instance.PredictBattle(baseCharacter, opponentCharacter, 100);
@@ -131,7 +135,7 @@ public class InspectorCombatAnalysisUI : MonoBehaviour
     }
 
     private void SetExpectWinrateText(float rate)
-    {
+    { 
         predictWinrate.text = $"{rate} %";
     }
 }

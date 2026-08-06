@@ -37,6 +37,11 @@ public class DeveloperGoalUI : MonoBehaviour
         RefreshUI();
     }
 
+    public void SetGoals(DeveloperGoal goal , int index)
+    {
+        goalsUI[index].Initialize(goal);
+    }
+
     public void RefreshUI()
     {
         int index = 0;
@@ -45,6 +50,8 @@ public class DeveloperGoalUI : MonoBehaviour
 
         foreach (DeveloperGoalItemUI goal in goalsUI)
         {
+            if (goal.Goal == null) continue;
+
             TitleText[index++].text = goal.Goal.Title;
 
             if (goal.Goal.IsComplete)

@@ -17,7 +17,7 @@ MonoBehaviour:
   description: "\uCE90\uB9AD\uD130 \uD328\uCE58\uC5D0 \uC0AC\uC6A9\uB418\uB294 \uB9AC\uC18C\uC2A4\uAC00
     \uB9CE\uC774 \uAC10\uC18C\uD569\uB2C8\uB2E4."
   category: 0
-  costResource: 10
+  costResource: 400
   icon: {fileID: 0}
   prerequisites: []
   NextData: {fileID: 11400000, guid: 167fd5ad0a9d77644974f7d65166e51d, type: 2}

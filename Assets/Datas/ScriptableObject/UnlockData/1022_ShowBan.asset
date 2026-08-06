@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: 1022_ShowBan
   m_EditorClassIdentifier: 
   id: 1022
-  unlockName: "\uBC34 \uD655\uC778"
+  unlockName: "\uBC34 \uD655\uC778 (\uAC1C\uBC1C\uC548\uB428)"
   description: "\uCE90\uB9AD\uD130\uC758 \uBC34\uB960\uC744 \uD655\uC778\uD569\uB2C8\uB2E4."
   category: 0
-  costResource: 20
+  costResource: -1
   icon: {fileID: 0}
   prerequisites: []
+  NextData: {fileID: 0}

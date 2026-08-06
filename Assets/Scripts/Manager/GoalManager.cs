@@ -10,7 +10,7 @@ public class GoalManager : MonoBehaviour
     public DeveloperGoalUI GoalUI;
 
     private List<DeveloperGoal> GoalList = new();
-    private List<DeveloperGoal> currentGoals = new();
+    private List<DeveloperGoal> shuffledGoals = new();
     private Dictionary<GoalDifficulty, GoalReward> RewardTable = new();
 
     private int rerollCount;
@@ -18,6 +18,14 @@ public class GoalManager : MonoBehaviour
 
     private bool isRerollAvailable;
     private bool isGoalConfirmed;
+
+    private const int GOAL_REWARD = 2011;
+    private const int ADDITIONAL_SLOT = 2021;
+    private const int FREE_REROLL = 2031;
+
+    private const int ADDITIONAL_GOAL_I = 2041;
+    private const int ADDITIONAL_GOAL_II = 2042;
+    private const int ADDITIONAL_GOAL_III = 2043;
 
     void Awake()
     {
@@ -30,7 +38,8 @@ public class GoalManager : MonoBehaviour
     {
         GenerateGoals();
         SetGoals();
-        GoalUI.Initialize(currentGoals, this);
+        GoalUI.Initialize(shuffledGoals, this);
+        UnlockManager.Instance.OnUnlockChanged += CheckThirdGoal;
     }
 
     public void GenerateGoals()
@@ -59,8 +68,24 @@ public class GoalManager : MonoBehaviour
 
     public void SetGoals()
     {
-        currentGoals.Clear();
+        shuffledGoals.Clear();
 
+        int goalCount = 2;
+        if (UnlockManager.Instance != null)
+        {
+            goalCount = UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT) ? 3 : 2;
+        }
+
+        ShuffleGoals();
+
+        shuffledGoals = GetGoals(goalCount);
+
+        GoalUI.SetGoals(shuffledGoals);
+    }
+
+    private void ShuffleGoals()
+    {
+        shuffledGoals.Clear();
         List<DeveloperGoal> shuffled = new(GoalList);
 
         for (int i = shuffled.Count - 1; i > 0; i--)
@@ -70,12 +95,22 @@ public class GoalManager : MonoBehaviour
             (shuffled[i], shuffled[j]) = (shuffled[j], shuffled[i]);
         }
 
-        for (int i = 0; i < Mathf.Min(3, shuffled.Count); i++)
+        for (int i = 0; i < shuffled.Count; i++)
         {
-            currentGoals.Add(shuffled[i]);
+            shuffledGoals.Add(shuffled[i]);
+        }
+    }
+
+    private List<DeveloperGoal> GetGoals(int count)
+    {
+        List<DeveloperGoal> result = new();
+
+        for (int i = 0; i < count; i++)
+        {
+            result.Add(shuffledGoals[i]);
         }
 
-        GoalUI.SetGoals(currentGoals);
+        return result;
     }
 
     public void ChangeGoals()
@@ -86,6 +121,17 @@ public class GoalManager : MonoBehaviour
         GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * (rerollCount + 1));
         rerollCount++;
         SetGoals();
+    }
+
+    private void CheckThirdGoal()
+    {
+        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT))
+        {
+            UnlockManager.Instance.OnUnlockChanged -= CheckThirdGoal;
+
+            if (shuffledGoals.Count < 3) ShuffleGoals();
+            GoalUI.SetGoals(shuffledGoals[2], 2);
+        }
     }
 
     public void ConfirmGoals()
@@ -108,7 +154,15 @@ public class GoalManager : MonoBehaviour
     {
         isRerollAvailable = true;
         isGoalConfirmed = false;
-        rerollCount = 0;
+
+        if (UnlockManager.Instance == null)
+        {
+            rerollCount = 1;
+        }
+        else
+        {
+            rerollCount = UnlockManager.Instance.IsUnlocked(FREE_REROLL) ? 0 : 1;
+        }
     }
 
     private void GenerateRewards()
@@ -122,12 +176,16 @@ public class GoalManager : MonoBehaviour
     public GoalReward GetReward(GoalDifficulty difficulty)
     {
         RewardTable.TryGetValue(difficulty, out GoalReward reward);
+
+        reward.DevelopResource *= (int)(UnlockManager.Instance.IsUnlocked(GOAL_REWARD) ? 1.2f : 1f);
+        reward.TrustPoint *= (int)(UnlockManager.Instance.IsUnlocked(GOAL_REWARD) ? 1.2f : 1f);
+
         return reward;
     }
 
     public void EvaluateAllGoals()
     {
-        foreach (DeveloperGoal goal in currentGoals)
+        foreach (DeveloperGoal goal in shuffledGoals)
         {
             goal.Evaluate();
         }
@@ -141,7 +199,7 @@ public class GoalManager : MonoBehaviour
         Debug.Log("CalculateGoals");
         EvaluateAllGoals();
 
-        foreach (DeveloperGoal goal in currentGoals)
+        foreach (DeveloperGoal goal in shuffledGoals)
         {
             if (goal.IsComplete)
             {

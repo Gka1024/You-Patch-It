@@ -16,6 +16,7 @@ MonoBehaviour:
   unlockName: "\uBAA9\uD45C \uC2AC\uB86F \uD655\uC7A5"
   description: "\uAC1C\uBC1C \uBAA9\uD45C\uC758 \uC2AC\uB86F\uC774 \uD558\uB098 \uCD94\uAC00\uB429\uB2C8\uB2E4."
   category: 1
-  costResource: 10
+  costResource: 300
   icon: {fileID: 0}
   prerequisites: []
+  NextData: {fileID: 0}

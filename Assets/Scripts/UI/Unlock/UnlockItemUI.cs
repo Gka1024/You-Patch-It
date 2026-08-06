@@ -10,8 +10,9 @@ public class UnlockItemUI : MonoBehaviour
 
     [SerializeField] private Button selfClickButton;
 
-    [SerializeField] private Image icon;
-    [SerializeField] private Image UnlockImage;
+    [SerializeField] private Image BackgroundImage;
+    [SerializeField] private Image Icon;
+    [SerializeField] private Sprite UnlockSprite;
 
     [SerializeField] private UnlockCategory category;
 
@@ -20,28 +21,20 @@ public class UnlockItemUI : MonoBehaviour
     private void Awake()
     {
         selfClickButton.onClick.AddListener(SelfClick);
+        BackgroundImage = gameObject.GetComponentInChildren<Image>();
     }
 
     public void Register(UnlockUI ui)
     {
         unlockUI = ui;
         UnlockData = UnlockManager.Instance.GetUnlockData(unlockID);
+        UnlockSprite = ui.UnlockSprite;
         Refresh();
     }
 
     public void Refresh()
     {
-        if(UnlockData == null) return;
-
-        if(icon != null)
-        {
-            icon.sprite = UnlockData.icon;
-        }
-
-        if(UnlockImage != null)
-        {
-            UnlockImage.enabled = !UnlockManager.Instance.IsUnlocked(UnlockData);
-        }
+        if (UnlockData == null) return;
     }
 
     private void SelfClick()
@@ -49,11 +42,24 @@ public class UnlockItemUI : MonoBehaviour
         unlockUI.SetInspector(this);
     }
 
+    private void SetUnlockedImage()
+    {
+        BackgroundImage.sprite = UnlockSprite;
+    }
+
     public void Unlock()
     {
-        if(UnlockManager.Instance.Unlock(UnlockData) && UnlockData.NextData != null)
+        if (UnlockManager.Instance.Unlock(UnlockData))
         {
-            this.UnlockData = UnlockData.NextData;
+            if (UnlockData.NextData != null)
+            {
+                this.UnlockData = UnlockData.NextData;
+            }
+            else
+            {
+                SetUnlockedImage();
+            }
+
             SelfClick();
             Refresh();
         }

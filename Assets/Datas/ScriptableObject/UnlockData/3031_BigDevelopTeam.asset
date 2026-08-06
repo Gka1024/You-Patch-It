@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
-  m_Name: 3012_ReduceTrustDecrease 2
+  m_Name: 3031_BigDevelopTeam
   m_EditorClassIdentifier: 
-  id: 3012
-  unlockName: "\uC2E0\uB8B0\uB3C4 \uD558\uB77D \uAC10\uC18C II"
-  description: "\uC2E0\uB8B0\uB3C4\uAC00 \uB5A8\uC5B4\uC9C0\uB294 \uBE44\uC728\uC744
-    \uB354\uC6B1 \uC904\uC785\uB2C8\uB2E4."
-  category: 1
-  costResource: 600
+  id: 3031
+  unlockName: "\uB354 \uD070 \uAC1C\uBC1C\uD300 (\uAC1C\uBC1C\uC548\uB428)"
+  description: "\uC6B4\uC601\uBE44\uB97C \uC870\uAE08 \uB354 \uB9CE\uC774 \uC4F0\uC9C0\uB9CC,
+    \uB9AC\uC18C\uC2A4\uB97C \uCD94\uAC00\uB85C \uB354 \uC5BB\uC2B5\uB2C8\uB2E4."
+  category: 2
+  costResource: -1
   icon: {fileID: 0}
   prerequisites: []
   NextData: {fileID: 0}

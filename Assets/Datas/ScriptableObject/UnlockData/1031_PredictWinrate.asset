@@ -15,9 +15,10 @@ MonoBehaviour:
   id: 1031
   unlockName: "\uC2B9\uB9AC \uC608\uCE21"
   description: "\uD2B9\uC815 \uB450 \uCE90\uB9AD\uD130 \uC804\uD22C\uC758 \uC2B9\uB960\uC744
-    \uC608\uCE21\uD569\uB2C8\uB2E4."
+    \uC608\uCE21\uD569\uB2C8\uB2E4. \uC804\uD22C \uBD84\uC11D\uC5D0\uC11C \uC0C1\uB300
+    \uCE90\uB9AD\uD130\uB97C \uC120\uD0DD\uD558\uC5EC \uC9C4\uD589\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   category: 0
-  costResource: 20
+  costResource: 800
   icon: {fileID: 0}
   prerequisites:
   - {fileID: 11400000, guid: 6b5611cd56cdcf54ba08c2dcf281e66a, type: 2}

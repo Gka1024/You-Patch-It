@@ -385,6 +385,6 @@ MonoBehaviour:
   unlockUI: {fileID: 0}
   unlockID: 0
   selfClickButton: {fileID: 1763701907508265919}
-  icon: {fileID: 0}
-  UnlockImage: {fileID: 0}
+  icon: {fileID: 8570507558207887564}
+  UnlockSprite: {fileID: 0}
   category: 0

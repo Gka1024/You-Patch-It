@@ -51,6 +51,7 @@ public class UnlockManager : MonoBehaviour
             if (!IsUnlocked(pre)) return false;
         }
 
+        if (data.costResource < 0) return false;
         if (!ResourceManager.Instance.SpendDevelopResource(data.costResource)) return false;
 
         return true;
@@ -63,6 +64,7 @@ public class UnlockManager : MonoBehaviour
         if (!CanUnlock(data)) return false;
 
         unlocked.Add(data.id);
+        OnUnlockChanged?.Invoke();
 
         return true;
     }

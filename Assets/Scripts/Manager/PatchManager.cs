@@ -23,6 +23,13 @@ public class PatchManager : MonoBehaviour
     public bool CanUndo => undoStack.Count > 0;
 
     private const int PATCH_REQUIRE_RESOURCE = 50;
+    private const int PATCH_REQUIRE_RESOURCE_I = 40;
+    private const int PATCH_REQUIRE_RESOURCE_II = 25;
+    private const int PATCH_REQUIRE_RESOURCE_III = 0;
+
+    private const int PATCH_EFFICIENCY_I = 1011;
+    private const int PATCH_EFFICIENCY_II = 1012;
+    private const int PATCH_EFFICIENCY_III = 1013;
 
     private void Awake()
     {
@@ -48,7 +55,7 @@ public class PatchManager : MonoBehaviour
 
     public void ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
     {
-        if (!ResourceManager.Instance.SpendDevelopResource(PATCH_REQUIRE_RESOURCE))
+        if (!ResourceManager.Instance.SpendDevelopResource(GetRequieredResource()))
             return;
 
         if (character == null)
@@ -70,6 +77,20 @@ public class PatchManager : MonoBehaviour
         undoStack.Push(record);
 
         OnPatchApplied?.Invoke(record);
+    }
+
+    private int GetRequieredResource()
+    {
+        if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_III))
+            return PATCH_REQUIRE_RESOURCE_III;
+
+        if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_II))
+            return PATCH_REQUIRE_RESOURCE_II;
+
+        if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_I))
+            return PATCH_REQUIRE_RESOURCE_I;
+
+        return PATCH_REQUIRE_RESOURCE;
     }
 
     public void Undo()

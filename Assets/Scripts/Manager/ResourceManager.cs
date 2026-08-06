@@ -16,6 +16,9 @@ public class ResourceManager : MonoBehaviour
 
     public int DevelopResource => developResource;
 
+    private const int REDUCE_TRUST_DECREASE_I = 3011;
+    private const int REDUCE_TRUST_DECREASE_II = 3012;
+
     private void Awake()
     {
         Instance = this;
@@ -36,9 +39,7 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    public void GiveSeasonReward(
-        int develop,
-        float trustPoint)
+    public void GiveSeasonReward(int develop, float trustPoint)
     {
         AddDevelopResource(develop);
         AddTrust(trustPoint);
@@ -64,17 +65,16 @@ public class ResourceManager : MonoBehaviour
     {
         if (amount >= 0)
         {
-            float multiplier =
-                Mathf.Pow(
-                    (100f - trust) / 100f,
-                    1.5f);
-
+            float multiplier = Mathf.Pow((100f - trust) / 100f, 1.5f);
             trust += amount * multiplier;
         }
         else
         {
-            // 감소는 감쇠 없음
-            trust += amount;
+            float value = amount;
+            value += UnlockManager.Instance.IsUnlocked(REDUCE_TRUST_DECREASE_I) ?
+            UnlockManager.Instance.IsUnlocked(REDUCE_TRUST_DECREASE_II) ? 0.8f : 0.9f : 1.0f;
+
+            trust += value;
         }
 
         trust = Mathf.Clamp(trust, 0, 100);

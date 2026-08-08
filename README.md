@@ -227,7 +227,7 @@ C 픽률 증가
 
 ### Play
 
-[itch.io](https://itch.io/)
+[itch.io](https://gka1024.itch.io/you-patch-it)
 
 ### Source Code
 

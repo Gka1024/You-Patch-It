@@ -66,6 +66,10 @@ public class BattleSimulator : MonoBehaviour
             TickCharacter(red);
             TickCharacter(blue);
 
+            // 체력 회복
+            HealCharacter(red, redCharacter.GetStat(CharacterStatType.HealthRegen) / 10f);
+            HealCharacter(blue, blueCharacter.GetStat(CharacterStatType.HealthRegen) / 10f);
+
             // 행동 결정
             BattleAction redAction = BattleAction.None;
             BattleAction blueAction = BattleAction.None;
@@ -197,13 +201,6 @@ public class BattleSimulator : MonoBehaviour
         return Mathf.Lerp(0.8f, 1.2f, self.player.ExecutionSkill / 100f);
     }
 
-    private float GetConsistencyModifier(BattleCharacter self)
-    {
-        float variance = Mathf.Lerp(0.35f, 0.05f, self.player.Consistency / 100f);
-
-        return UnityEngine.Random.Range(1f - variance, 1f + variance);
-    }
-
     private BattleAction ApplyDecisionAccuracy(BattleCharacter self, BattleAction action, System.Random random)
     {
         float failChance = Mathf.Lerp(0.3f, 0f, self.player.DecisionAccuracy / 100f);
@@ -222,6 +219,11 @@ public class BattleSimulator : MonoBehaviour
     };
 
         return actions[random.Next(actions.Length)];
+    }
+
+    private void HealCharacter(BattleCharacter character, float amount)
+    {
+        character.currentHealth = Math.Min(character.currentHealth + amount, character.runtimeCharacter.GetStat(CharacterStatType.Health));
     }
 }
 

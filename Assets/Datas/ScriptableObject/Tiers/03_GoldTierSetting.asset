@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tier: 2
   spawnWeight: 240
-  reactionTime: 58
-  consistency: 55
-  executionSkill: 58
-  decisionAccuracy: 55
-  metaKnowledge: 60
+  reactionTime: 29
+  consistency: 25
+  executionSkill: 28
+  decisionAccuracy: 22
+  metaKnowledge: 35
   combatVariance: 34
   knowledgeVariance: 40
   preferenceVariance: 45

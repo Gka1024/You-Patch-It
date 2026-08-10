@@ -16,9 +16,9 @@ public enum CharacterStatType
     MoveSpeed,
     AttackSpeed,
     AttackRange,
+    HealthRegen,
 
-    GainManaPerSecond,
-    GainManaPerAttack,
+    GainMana,
     MaxMana,
     ManaCost,
     SkillCoefficient

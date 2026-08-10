@@ -107,7 +107,7 @@ public class InspectorUI : MonoBehaviour
     }
 
     private void ApplyPatch()
-    {
+    { // 실제로 패치를 하는 부분
         if (currentCharacter == null)
             return;
 

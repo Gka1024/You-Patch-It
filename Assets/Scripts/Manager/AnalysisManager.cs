@@ -503,7 +503,9 @@ public enum AnalysisItem
     AverageSkillCount,
     MatchCount,
     CharacterTier,
-    Banrate
+    Banrate,
+    ExpectWinrate,
+    ExpectRank
 }
 
 public enum CharacterTier

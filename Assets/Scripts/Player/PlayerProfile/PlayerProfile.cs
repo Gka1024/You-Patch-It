@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "ScriptableObject/PlayerProfile")]
+[CreateAssetMenu(menuName = "ScriptableObject/Player/Profile")]
 public class PlayerProfile : ScriptableObject
 {
     [Header("Spawn")]

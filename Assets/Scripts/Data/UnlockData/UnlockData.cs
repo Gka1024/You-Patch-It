@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName ="ScriptableObject/UnlockData/Data")]
+[CreateAssetMenu(menuName ="ScriptableObject/Data/UnlockData/Data")]
 public class UnlockData : ScriptableObject
 {
     public int id;

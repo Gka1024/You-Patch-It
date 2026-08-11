@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d69d0ebeac54ac4e8e0a4e1f0c627bb, type: 3}
+  m_Name: 101_Warrior
+  m_EditorClassIdentifier: 
+  id: 101
+  characterName: "\uAE30\uC0AC"
+  role: 0
+  stats:
+  - statType: 0
+    value: 21
+  - statType: 1
+    value: 430
+  - statType: 2
+    value: 25
+  - statType: 3
+    value: 3.8
+  - statType: 4
+    value: 9
+  - statType: 5
+    value: 1.8
+  - statType: 6
+    value: 4
+  - statType: 7
+    value: 10
+  - statType: 8
+    value: 100
+  - statType: 9
+    value: 100
+  - statType: 10
+    value: 2.3
+  skill: {fileID: 11400000, guid: 27abb7025d660f84491f8baa068d33f4, type: 2}
+  defaultEditableStats: 00000000010000000200000004000000
+  battleAI: {fileID: 11400000, guid: 93fae18e31d78e848998b4d770c11ca3, type: 2}

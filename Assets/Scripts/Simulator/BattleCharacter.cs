@@ -7,13 +7,17 @@ public class BattleCharacter
     public RuntimePlayer player;
     public CharacterBattleStatistics statistics;
 
+    public CharacterSkill skill;
+
     public float currentHealth;
+    public float currentMana;
 
     public float attack;
     public float defence;
     public float attackSpeed;
     public float moveSpeed;
     public float attackRange;
+    public float maxMana;
 
     public float position;
 
@@ -22,16 +26,20 @@ public class BattleCharacter
     public float attackCooldown;
     public float actionLockTime;
     public float reactionTimer;
+    public float skillDelayTimer;
+    public bool isSkillReady;
 
     public bool CanAttack => attackCooldown <= 0f;
     public bool CanThink => reactionTimer <= 0f;
     public bool CanAct => actionLockTime <= 0f;
+    public bool CanUseSkill => currentMana >= maxMana && isSkillReady && skillDelayTimer <= 0f;
 
     public BattleCharacter(RuntimeCharacter runtimeCharacter, RuntimePlayer player, BattleAIState ai, float startPosition)
     {
         this.runtimeCharacter = runtimeCharacter;
         this.statistics = new CharacterBattleStatistics { runtimeCharacter = runtimeCharacter };
         this.player = player;
+        this.skill = runtimeCharacter.OriginCharacter.skill;
         aiState = ai;
 
         attack = runtimeCharacter.GetStat(CharacterStatType.Attack);
@@ -39,6 +47,7 @@ public class BattleCharacter
         attackSpeed = runtimeCharacter.GetStat(CharacterStatType.AttackSpeed);
         moveSpeed = runtimeCharacter.GetStat(CharacterStatType.MoveSpeed);
         attackRange = runtimeCharacter.GetStat(CharacterStatType.AttackRange);
+        maxMana = runtimeCharacter.GetStat(CharacterStatType.MaxMana);
 
         currentHealth = runtimeCharacter.GetStat(CharacterStatType.Health);
 

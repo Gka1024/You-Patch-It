@@ -21,6 +21,8 @@ public class Character : ScriptableObject
 
     public List<CharacterStat> stats = new();
 
+    public CharacterSkill skill;
+
     // 직업 기본 수정 가능 스탯
     public List<CharacterStatType> defaultEditableStats = new();
 

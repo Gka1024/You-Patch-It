@@ -13,7 +13,7 @@ public class UpDisplayUI : MonoBehaviour
     public void Refresh()
     {
         Debug.Log("UpdisplayUI refresh");
-        SeasonText.text = $"시즌 {SeasonManager.Instance.DisplaySeason} - {SeasonManager.Instance.DisplaySubSeason}";
+        SeasonText.text = $"시즌 데이터 : {SeasonManager.Instance.DisplaySeason} - {SeasonManager.Instance.DisplaySubSeason}";
         TrustPointText.text = $"{ResourceManager.Instance.TrustPoint}%";
         DevelopResourceText.text = $"{ResourceManager.Instance.DevelopResource}";
         PlayersCountText.text = $"{PlayerManager.Instance.GetCurrentPlayer}";

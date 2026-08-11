@@ -10,6 +10,8 @@ public class PatchManager : MonoBehaviour
     public event Action<PatchRecord> OnPatchApplied;
     public event Action<PatchRecord> OnPatchUndone;
 
+    [SerializeField] private int patchRequireResource;
+
     /// <summary>
     /// 현재 적용되어 있는 패치
     /// </summary>

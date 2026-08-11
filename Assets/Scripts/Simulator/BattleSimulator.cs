@@ -10,7 +10,7 @@ public class BattleSimulator : MonoBehaviour
 
     public StatisticsManager statisticsManager;
 
-    private const float tick = 0.05f;
+    private const float TICK = 0.05f;
     private const float BATTLE_TIME_LIMIT = 300f;
 
     private void Awake()
@@ -67,8 +67,7 @@ public class BattleSimulator : MonoBehaviour
             TickCharacter(blue);
 
             // 체력 회복
-            HealCharacter(red, redCharacter.GetStat(CharacterStatType.HealthRegen) / 10f);
-            HealCharacter(blue, blueCharacter.GetStat(CharacterStatType.HealthRegen) / 10f);
+
 
             // 행동 결정
             BattleAction redAction = BattleAction.None;
@@ -87,10 +86,10 @@ public class BattleSimulator : MonoBehaviour
             }
 
             // 행동 실행
-            ExecuteAction(red, blue, redAction, tick, battleRandom);
-            ExecuteAction(blue, red, blueAction, tick, battleRandom);
+            BattleActionExecutor.ExecuteAction(red, blue, redAction, TICK, battleRandom);
+            BattleActionExecutor.ExecuteAction(blue, red, blueAction, TICK, battleRandom);
 
-            battleTime += tick;
+            battleTime += TICK;
 
             if (battleTime > BATTLE_TIME_LIMIT)
             {
@@ -127,9 +126,38 @@ public class BattleSimulator : MonoBehaviour
 
     private void TickCharacter(BattleCharacter character)
     {
-        character.attackCooldown = Mathf.Max(0, character.attackCooldown - tick);
-        character.actionLockTime = Mathf.Max(0, character.actionLockTime - tick);
-        character.reactionTimer = Mathf.Max(0, character.reactionTimer - tick);
+        character.attackCooldown = Mathf.Max(0, character.attackCooldown - TICK);
+        character.actionLockTime = Mathf.Max(0, character.actionLockTime - TICK);
+        character.reactionTimer = Mathf.Max(0, character.reactionTimer - TICK);
+
+        HealCharacter(character, character.runtimeCharacter.GetStat(CharacterStatType.HealthRegen) / 100f);
+        RegenManaOnTick(character, character.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 100f);
+
+        if (character.isSkillReady)
+        {
+            character.skillDelayTimer = Mathf.Max(0, character.skillDelayTimer - TICK);
+        }
+
+        UpdateSkillReady(character);
+    }
+
+    private void UpdateSkillReady(BattleCharacter character)
+    {
+        if (character.isSkillReady) return;
+
+        if (character.currentMana < character.maxMana) return;
+
+        character.isSkillReady = true;
+    }
+
+    private void HealCharacter(BattleCharacter character, float amount)
+    {
+        character.currentHealth = Math.Min(character.currentHealth + amount, character.runtimeCharacter.GetStat(CharacterStatType.Health));
+    }
+
+    private void RegenManaOnTick(BattleCharacter character, float amount)
+    {
+        character.currentMana = Math.Min(character.currentMana + amount, character.maxMana);
     }
 
     private float GetReactionTime(BattleCharacter character)
@@ -139,91 +167,6 @@ public class BattleSimulator : MonoBehaviour
         return character.aiState.ReactionTime * multiplier;
     }
 
-    private void ExecuteAction(BattleCharacter self, BattleCharacter enemy, BattleAction action, float tick, System.Random random)
-    {
-        action = ApplyDecisionAccuracy(self, action, random);
 
-        switch (action)
-        {
-            case BattleAction.MoveTowards:
-                MoveTowards(self, enemy, tick);
-                break;
-
-            case BattleAction.MoveAway:
-                MoveAway(self, enemy, tick);
-                break;
-
-            case BattleAction.Attack:
-                Attack(self, enemy);
-                break;
-        }
-    }
-
-    private void MoveTowards(BattleCharacter self, BattleCharacter enemy, float tick)
-    {
-        float direction = Mathf.Sign(enemy.position - self.position);
-        Move(self, direction, tick);
-    }
-
-    private void MoveAway(BattleCharacter self, BattleCharacter enemy, float tick)
-    {
-        float direction = -Mathf.Sign(enemy.position - self.position);
-        Move(self, direction, tick);
-    }
-
-    private void Move(BattleCharacter self, float direction, float tick)
-    {
-        float moveDistance = self.moveSpeed * tick;
-
-        self.position += direction * moveDistance;
-
-        self.statistics.moveDistance += moveDistance;
-    }
-
-    private void Attack(BattleCharacter self, BattleCharacter enemy)
-    {
-        float damage = self.attack * GetDamageMultiplier(self);
-        damage *= 100f / (100f + enemy.defence);
-
-        enemy.currentHealth -= damage;
-
-        self.attackCooldown = 1f / self.attackSpeed;
-
-        self.actionLockTime = 0.4f / self.attackSpeed;
-
-        self.statistics.damageDealt += damage;
-        self.statistics.attackCount++;
-        enemy.statistics.damageTaken += damage;
-    }
-
-    private float GetDamageMultiplier(BattleCharacter self)
-    {
-        return Mathf.Lerp(0.8f, 1.2f, self.player.ExecutionSkill / 100f);
-    }
-
-    private BattleAction ApplyDecisionAccuracy(BattleCharacter self, BattleAction action, System.Random random)
-    {
-        float failChance = Mathf.Lerp(0.3f, 0f, self.player.DecisionAccuracy / 100f);
-
-        if (random.NextDouble() > failChance)
-        {
-            return action;
-        }
-
-        BattleAction[] actions =
-        {
-        BattleAction.MoveAway,
-        BattleAction.MoveTowards,
-        BattleAction.Attack,
-        BattleAction.None
-    };
-
-        return actions[random.Next(actions.Length)];
-    }
-
-    private void HealCharacter(BattleCharacter character, float amount)
-    {
-        character.currentHealth = Math.Min(character.currentHealth + amount, character.runtimeCharacter.GetStat(CharacterStatType.Health));
-    }
 }
 

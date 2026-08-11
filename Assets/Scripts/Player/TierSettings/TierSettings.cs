@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "ScriptableObject/TierSetting")]
+[CreateAssetMenu(menuName = "ScriptableObject/Player/TierSetting")]
 public class TierSetting : ScriptableObject
 {
     public PlayerTier tier;

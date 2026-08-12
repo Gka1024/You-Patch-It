@@ -7,9 +7,12 @@ public class TrustManager : MonoBehaviour
 {
     public static TrustManager Instance;
 
+    [SerializeField] private List<TierWeight> tierWeights = new();
+
     private void Awake()
     {
         Instance = this;
+        InitializeTierWeights();
     }
 
     public void CalculateTrust()
@@ -65,30 +68,124 @@ public class TrustManager : MonoBehaviour
     //====================================================
 
     private int EvaluateWinRate()
-    {
-        var characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+    { // 각 캐릭터의 티어별 승률을 기준으로 신뢰도 평가
+        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
 
         if (characters.Count == 0)
             return 0;
 
-        float total = 0;
+        float totalScore = 0f;
+        float totalWeight = 0f;
 
         foreach (RuntimeCharacter character in characters)
         {
-            CharacterStatistics stat =
-                StatisticsManager.Instance.GetCurrentStatistics(character);
+            CharacterStatistics stat = StatisticsManager.Instance.GetCurrentStatistics(character);
 
-            float delta = Mathf.Abs(stat.WinRate - 50f);
+            foreach (PlayerTier tier in Enum.GetValues(typeof(PlayerTier)))
+            {
+                TierStatistics tierStat = stat.TierStatistics[tier];
 
-            float score =
-                10f *
-                (1f - Mathf.Pow(delta / 50f, 2f));
+                // 해당 티어에서 전투가 없으면 평가하지 않음
+                if (tierStat.MatchCount <= 0)
+                    continue;
 
-            total += Mathf.Clamp(score, 0f, 10f);
+                // ----------------------------------------
+                // 승률 -> 0 ~ 10점
+                // ----------------------------------------
+
+                float score = CalculateWinRateScore(tierStat.WinRate);
+
+                score = Mathf.Clamp(score, -20f, 10f);
+
+                // ----------------------------------------
+                // 티어 가중치
+                // ----------------------------------------
+
+                float tierWeight = GetTierWeight(tier);
+
+                // ----------------------------------------
+                // 표본 수 보정
+                //
+                // 경기 수가 많을수록 신뢰도 증가
+                // 단, sqrt를 사용해서 완만하게 증가
+                // ----------------------------------------
+
+                float sampleWeight = Mathf.Sqrt(tierStat.WinCount + tierStat.LoseCount);
+
+                float weight = tierWeight * sampleWeight;
+
+                // ----------------------------------------
+                // 가중 평균
+                // ----------------------------------------
+
+                totalScore += score * weight;
+                totalWeight += weight;
+
+                Debug.Log(
+    $"Character : {character.OriginCharacter.characterName} | " +
+    $"Tier : {tier} | " +
+    $"WinRate : {tierStat.WinRate:F1}% | " +
+    $"Score : {score:F2} | " +
+    $"TierWeight : {tierWeight:F2} | " +
+    $"SampleWeight : {sampleWeight:F2} | " +
+    $"Weight : {weight:F2} | " +
+    $"CumulativeScore : {(totalScore / totalWeight):F2}"
+);
+            }
         }
 
-        return Mathf.RoundToInt(total / characters.Count);
+        if (totalWeight <= 0f)
+            return 0;
+
+        float finalScore = totalScore / totalWeight;
+
+        return Mathf.RoundToInt(finalScore);
     }
+
+    private float GetTierWeight(PlayerTier tier)
+    {
+        TierWeight tierWeight = tierWeights.FirstOrDefault(x => x.tier == tier);
+
+        return tierWeight != null ? Mathf.Max(0f, tierWeight.weight) : 1f;
+    }
+
+    private void InitializeTierWeights()
+    {
+        if (tierWeights.Count > 0)
+            return;
+
+        tierWeights = new List<TierWeight>
+    {
+        new TierWeight { tier = PlayerTier.Bronze, weight = 1.0f },
+        new TierWeight { tier = PlayerTier.Silver, weight = 1.1f },
+        new TierWeight { tier = PlayerTier.Gold, weight = 1.25f },
+        new TierWeight { tier = PlayerTier.Platinum, weight = 1.5f },
+        new TierWeight { tier = PlayerTier.Diamond, weight = 1.75f },
+        new TierWeight { tier = PlayerTier.Master, weight = 2.0f },
+        new TierWeight { tier = PlayerTier.Challenger, weight = 2.5f }
+    };
+    }
+
+    private float CalculateWinRateScore(float winRate)
+    {
+        float delta = Mathf.Abs(winRate - 50f);
+
+        if (delta <= 10f)
+            return 10f - delta;
+
+        if (delta <= 20f)
+            return Mathf.Lerp(0f, -4f, (delta - 10f) / 10f);
+
+        if (delta <= 30f)
+            return Mathf.Lerp(-4f, -7f, (delta - 20f) / 10f);
+
+        if (delta <= 40f)
+            return Mathf.Lerp(-7f, -13f, (delta - 30f) / 10f);
+
+        return Mathf.Lerp(-13f, -20f, (delta - 40f) / 10f);
+    }
+
+    // ----------------------------------------
 
     private int EvaluateCharacterIdentity()
     {
@@ -98,27 +195,31 @@ public class TrustManager : MonoBehaviour
         if (characters.Count < 2)
             return 10;
 
-        float totalDistance = 0;
+        float totalDistance = 0f;
         int pairCount = 0;
 
         for (int i = 0; i < characters.Count; i++)
         {
             for (int j = i + 1; j < characters.Count; j++)
             {
-                totalDistance += GetCharacterDistance(characters[i], characters[j]);
+                totalDistance += GetCharacterDistance(
+                    characters[i],
+                    characters[j]);
+
                 pairCount++;
             }
         }
 
         float averageDistance = totalDistance / pairCount;
 
-        float score =
-            Mathf.InverseLerp(
-                1.5f,
-                4.5f,
-                averageDistance);
+        float score = CalculateIdentityScore(averageDistance);
 
-        return Mathf.RoundToInt(score * 10f);
+        Debug.Log(
+            $"Character Identity | " +
+            $"Average Distance : {averageDistance:F2} | " +
+            $"Score : {score:F1}");
+
+        return Mathf.RoundToInt(score);
     }
 
     private float GetCharacterDistance(RuntimeCharacter a, RuntimeCharacter b)
@@ -135,8 +236,40 @@ public class TrustManager : MonoBehaviour
         return distance;
     }
 
-    private int EvaluateMetaDiversity()
+    private float CalculateIdentityScore(float distance)
     {
+        // 캐릭터가 거의 동일하면 강한 페널티
+        if (distance <= 1f)
+        {
+            return Mathf.Lerp(-20f, -8f, distance / 1f);
+        }
+
+        // 1 ~ 2
+        if (distance <= 2f)
+        {
+            return Mathf.Lerp(-8f, 2f, (distance - 1f) / 1f);
+        }
+
+        // 2 ~ 3
+        if (distance <= 3f)
+        {
+            return Mathf.Lerp(2f, 7f, (distance - 2f) / 1f);
+        }
+
+        // 3 ~ 4
+        if (distance <= 4f)
+        {
+            return Mathf.Lerp(7f, 9f, (distance - 3f) / 1f);
+        }
+
+        // 4 이상이면 거의 만점
+        return 10f;
+    }
+
+    // ----------------------------------------
+
+    private int EvaluateMetaDiversity()
+    { // 모든 캐릭터의 픽률에 기반한 신뢰도 평가
         List<RuntimeCharacter> characters =
             RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
 
@@ -165,8 +298,10 @@ public class TrustManager : MonoBehaviour
         return Mathf.RoundToInt(score * 10f);
     }
 
+    // ----------------------------------------
+
     private int EvaluateRoleBalance()
-    {
+    { // 특정 직업군 편향에 따른 신뢰도 평가
         int score = 0;
 
         foreach (CharacterRole role in Enum.GetValues(typeof(CharacterRole)))
@@ -210,4 +345,11 @@ public class TrustManager : MonoBehaviour
 
         return score;
     }
+}
+
+[Serializable]
+public class TierWeight
+{
+    public PlayerTier tier;
+    public float weight = 1f;
 }

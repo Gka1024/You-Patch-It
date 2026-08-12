@@ -1,8 +1,9 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CharacterRowUI : MonoBehaviour
+public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("UI")]
     [SerializeField] private TMP_Text nameText;
@@ -13,6 +14,8 @@ public class CharacterRowUI : MonoBehaviour
     [SerializeField] private TMP_Text DPSText;
     [SerializeField] private TMP_Text damageText;
     [SerializeField] private TMP_Text livetimeText;
+
+    [SerializeField] private GameObject backgroundImage;
 
     [SerializeField] private Button button;
 
@@ -71,6 +74,16 @@ public class CharacterRowUI : MonoBehaviour
     {
         Debug.Log(runtimeCharacter.OriginCharacter.name);
         InspectorUI.Instance.Show(runtimeCharacter);
-        InspectorUI.Instance.ShowStats();
+        //InspectorUI.Instance.ShowStats();
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        backgroundImage.SetActive(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        backgroundImage.SetActive(false);
     }
 }

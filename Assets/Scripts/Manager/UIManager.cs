@@ -17,6 +17,8 @@ public class UIManager: MonoBehaviour
     public PatchNoteUI patchNoteUI;
 
     public GameObject GameOverUI;
+    public GameObject GoalUnsetAlert;
+
 
     void Awake()
     {

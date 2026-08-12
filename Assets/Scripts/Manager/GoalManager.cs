@@ -18,6 +18,7 @@ public class GoalManager : MonoBehaviour
 
     private bool isRerollAvailable;
     private bool isGoalConfirmed;
+    public bool IsGoalSet => isGoalConfirmed;
 
     private const int GOAL_REWARD = 2011;
     private const int ADDITIONAL_SLOT = 2021;
@@ -39,7 +40,11 @@ public class GoalManager : MonoBehaviour
         GenerateGoals();
         SetGoals();
         GoalUI.Initialize(shuffledGoals, this);
+        GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * rerollCount);
         UnlockManager.Instance.OnUnlockChanged += CheckThirdGoal;
+        UnlockManager.Instance.OnUnlockChanged += CheckGoalsTier1;
+        UnlockManager.Instance.OnUnlockChanged += CheckGoalsTier2;
+        UnlockManager.Instance.OnUnlockChanged += CheckGoalsTier3;
     }
 
     public void GenerateGoals()
@@ -64,6 +69,33 @@ public class GoalManager : MonoBehaviour
         GoalList.Add(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
         GoalList.Add(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
         GoalList.Add(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
+    }
+
+    private void CheckGoalsTier1()
+    {
+        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_I))
+        {
+            UnlockManager.Instance.OnUnlockChanged -= CheckGoalsTier1;
+
+        }
+    }
+
+    private void CheckGoalsTier2()
+    {
+        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_II))
+        {
+            UnlockManager.Instance.OnUnlockChanged -= CheckGoalsTier2;
+
+        }
+    }
+
+    private void CheckGoalsTier3()
+    {
+        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_III))
+        {
+            UnlockManager.Instance.OnUnlockChanged -= CheckGoalsTier3;
+
+        }
     }
 
     public void SetGoals()
@@ -118,8 +150,7 @@ public class GoalManager : MonoBehaviour
         if (!isRerollAvailable) return;
         if (!ResourceManager.Instance.SpendDevelopResource(REROLL_REQUIRE_RESOURCE * rerollCount)) return;
 
-        GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * (rerollCount + 1));
-        rerollCount++;
+        GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * ++rerollCount);
         SetGoals();
     }
 
@@ -163,14 +194,16 @@ public class GoalManager : MonoBehaviour
         {
             rerollCount = UnlockManager.Instance.IsUnlocked(FREE_REROLL) ? 0 : 1;
         }
+
+        GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * rerollCount);
     }
 
     private void GenerateRewards()
     {
-        RewardTable.Add(GoalDifficulty.Easy, new GoalReward(30, 5));
-        RewardTable.Add(GoalDifficulty.Normal, new GoalReward(40, 7));
-        RewardTable.Add(GoalDifficulty.Hard, new GoalReward(60, 10));
-        RewardTable.Add(GoalDifficulty.Impossible, new GoalReward(80, 15));
+        RewardTable.Add(GoalDifficulty.Easy, new GoalReward(100, 25));
+        RewardTable.Add(GoalDifficulty.Normal, new GoalReward(150, 35));
+        RewardTable.Add(GoalDifficulty.Hard, new GoalReward(300, 50));
+        RewardTable.Add(GoalDifficulty.Impossible, new GoalReward(500, 75));
     }
 
     public GoalReward GetReward(GoalDifficulty difficulty)

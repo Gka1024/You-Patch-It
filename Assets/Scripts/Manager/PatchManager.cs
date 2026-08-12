@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class PatchManager : MonoBehaviour
@@ -24,9 +25,8 @@ public class PatchManager : MonoBehaviour
     private readonly Stack<PatchRecord> undoStack = new();
     public bool CanUndo => undoStack.Count > 0;
 
-    private const int PATCH_REQUIRE_RESOURCE = 50;
-    private const int PATCH_REQUIRE_RESOURCE_I = 40;
-    private const int PATCH_REQUIRE_RESOURCE_II = 25;
+    private const float PATCH_REQUIRE_RESOURCE_I = 0.75f;
+    private const float PATCH_REQUIRE_RESOURCE_II = 0.3f;
     private const int PATCH_REQUIRE_RESOURCE_III = 0;
 
     private const int PATCH_EFFICIENCY_I = 1011;
@@ -52,7 +52,15 @@ public class PatchManager : MonoBehaviour
 
     public void ConfirmPatch()
     {
-        SeasonManager.Instance.FinishPatch();
+        if (!GoalManager.Instance.IsGoalSet)
+        {
+            UIManager.Instance.GoalUnsetAlert.GetComponent<TextMeshProUGUI>().color = Color.red;
+        }
+        else
+        {
+            UIManager.Instance.GoalUnsetAlert.GetComponent<TextMeshProUGUI>().color = Color.white;
+            SeasonManager.Instance.FinishPatch();
+        }
     }
 
     public void ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
@@ -83,16 +91,20 @@ public class PatchManager : MonoBehaviour
 
     private int GetRequieredResource()
     {
+        float multiflier = 1f;
+
         if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_III))
-            return PATCH_REQUIRE_RESOURCE_III;
+            multiflier = PATCH_REQUIRE_RESOURCE_III;
 
         if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_II))
-            return PATCH_REQUIRE_RESOURCE_II;
+            multiflier = PATCH_REQUIRE_RESOURCE_II;
 
         if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_I))
-            return PATCH_REQUIRE_RESOURCE_I;
+            multiflier = PATCH_REQUIRE_RESOURCE_I;
 
-        return PATCH_REQUIRE_RESOURCE;
+        Debug.Log(multiflier);
+
+        return (int)multiflier * patchRequireResource;
     }
 
     public void Undo()

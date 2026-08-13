@@ -7,7 +7,7 @@ public class BattleAI_Warrior : BattleAI
     {
         float distance = Mathf.Abs(self.position - enemy.position);
 
-        if (distance > self.attackRange)
+        if (distance > self.GetStat(CharacterStatType.AttackRange))
         {
             if (self.CanUseSkill && self.skill.ignoreDistance)
             {

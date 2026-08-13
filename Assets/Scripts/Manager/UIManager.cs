@@ -11,6 +11,7 @@ public class UIManager: MonoBehaviour
 
     public InspectorUI inspectorUI;
     public PatchReasonPopupUI patchReasonPopupUI;
+    public GameObject ShowLackResource;
     
     public DeveloperGoalUI developerGoalUI;
 

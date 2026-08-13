@@ -26,6 +26,16 @@ public class UnlockManager : MonoBehaviour
         }
     }
 
+    public void UnlockAll()
+    {
+        foreach (UnlockData data in dataBase.unlocks)
+        {
+            unlocked.Add(data.id);
+        }
+
+        OnUnlockChanged?.Invoke();
+    }
+
     public UnlockData GetUnlockData(int id)
     {
         unlockDictionary.TryGetValue(id, out UnlockData data);

@@ -145,7 +145,7 @@ public class BattleSimulator : MonoBehaviour
     {
         if (character.isSkillReady) return;
 
-        if (character.currentMana < character.maxMana) return;
+        if (character.currentMana < character.GetStat(CharacterStatType.MaxMana)) return;
 
         character.isSkillReady = true;
     }
@@ -157,7 +157,7 @@ public class BattleSimulator : MonoBehaviour
 
     private void RegenManaOnTick(BattleCharacter character, float amount)
     {
-        character.currentMana = Math.Min(character.currentMana + amount, character.maxMana);
+        character.currentMana = Math.Min(character.currentMana + amount, character.GetStat(CharacterStatType.MaxMana));
     }
 
     private float GetReactionTime(BattleCharacter character)

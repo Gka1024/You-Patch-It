@@ -6,6 +6,7 @@ public class PatchReasonPopupUI : MonoBehaviour
 {
     [SerializeField] private List<PatchReasonToggleUI> toggles;
     [SerializeField] private Button confirmButton;
+    public GameObject ResourceLackAlert;
 
     private void Awake()
     {

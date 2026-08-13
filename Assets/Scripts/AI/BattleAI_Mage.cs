@@ -13,7 +13,7 @@ public class BattleAI_Mage : BattleAI
     {
         float distance = Mathf.Abs(self.position - enemy.position);
 
-        if (distance > self.attackRange)
+        if (distance > self.GetStat(CharacterStatType.AttackRange))
             return BattleAction.MoveTowards;
 
         if (distance < state.PreferredDistance)

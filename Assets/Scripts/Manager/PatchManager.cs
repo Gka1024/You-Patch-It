@@ -63,19 +63,19 @@ public class PatchManager : MonoBehaviour
         }
     }
 
-    public void ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
+    public bool ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
     {
         if (!ResourceManager.Instance.SpendDevelopResource(GetRequieredResource()))
-            return;
+        {
+            UIManager.Instance.patchReasonPopupUI.ResourceLackAlert.SetActive(true);
+            return false;
+        }
 
-        if (character == null)
-            return;
+        if (character == null) return false;
 
-        if (patches == null || patches.Count == 0)
-            return;
+        if (patches == null || patches.Count == 0) return false;
 
-        RuntimeCharacterSnapshot before =
-            new RuntimeCharacterSnapshot(character);
+        RuntimeCharacterSnapshot before = new RuntimeCharacterSnapshot(character);
 
         character.Patch(patches);
 
@@ -87,6 +87,8 @@ public class PatchManager : MonoBehaviour
         undoStack.Push(record);
 
         OnPatchApplied?.Invoke(record);
+
+        return true;
     }
 
     private int GetRequieredResource()
@@ -102,7 +104,7 @@ public class PatchManager : MonoBehaviour
         if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_I))
             multiflier = PATCH_REQUIRE_RESOURCE_I;
 
-        Debug.Log(multiflier);
+        Debug.Log((int)multiflier * patchRequireResource);
 
         return (int)multiflier * patchRequireResource;
     }

@@ -104,6 +104,7 @@ public class InspectorUI : MonoBehaviour
         if (currentCharacter == null) return;
         patchReason.Show(true);
         patchConfirmButton.interactable = false;
+        patchReason.ResourceLackAlert.SetActive(false);
     }
 
     private void ApplyPatch()
@@ -121,10 +122,12 @@ public class InspectorUI : MonoBehaviour
 
         List<PatchReason> reasons = patchReason.GetComponent<PatchReasonPopupUI>().GetPatchReasons();
 
-        PatchManager.Instance.ApplyPatch(currentCharacter, patches, reasons);
+        if (PatchManager.Instance.ApplyPatch(currentCharacter, patches, reasons))
+        {
+            InitializeStats();
+            patchReason.Show(false);
+        }
 
-        InitializeStats();
-        patchReason.Show(false);
         Refresh();
     }
 

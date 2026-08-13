@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 101_Skill_Warrior
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: 
-  skillDescription: 
+  skillName: "\uD604\uC6D4\uC218\uD638"
+  skillDescription: "\uADF8\uAC70 \uC544\uC2DC\uB098\uC694? \uC2E0\uC9DC\uC624 \uAD81\uADF9\uAE30
+    \uC774\uB984\uC740 \uD604\uC6D4\uC218\uD638\uB78D\uB2C8\uB2E4!"
   ignoreDistance: 0

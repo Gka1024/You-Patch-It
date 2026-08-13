@@ -168,7 +168,8 @@ public class GoalManager : MonoBehaviour
     public void ConfirmGoals()
     {
         GoalUI.ShowAlert(false);
-        isGoalConfirmed = true;
+        BottomDisplayUI.Instance.GoalPreview.SetText(shuffledGoals);
+        isGoalConfirmed = true; 
         isRerollAvailable = false;
         SeasonManager.Instance.FinishStart();
     }

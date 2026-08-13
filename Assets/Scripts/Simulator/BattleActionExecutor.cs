@@ -43,7 +43,7 @@ public static class BattleActionExecutor
 
     private static void Move(BattleCharacter self, float direction, float tick)
     {
-        float moveDistance = self.moveSpeed * tick;
+        float moveDistance = self.GetStat(CharacterStatType.MoveSpeed) * tick;
 
         self.position += direction * moveDistance;
 
@@ -52,16 +52,16 @@ public static class BattleActionExecutor
 
     private static void Attack(BattleCharacter self, BattleCharacter enemy)
     {
-        float damage = self.attack * GetDamageMultiplier(self);
-        damage *= 100f / (100f + enemy.defence);
+        float damage = self.GetStat(CharacterStatType.Attack) * GetDamageMultiplier(self);
+        damage *= 100f / (100f + enemy.GetStat(CharacterStatType.Defence));
 
         self.currentMana += self.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 20f;
 
         enemy.currentHealth -= damage;
 
-        self.attackCooldown = 1f / self.attackSpeed;
+        self.attackCooldown = 1f / self.GetStat(CharacterStatType.AttackSpeed);
 
-        self.actionLockTime = 0.4f / self.attackSpeed;
+        self.actionLockTime = 0.4f / self.GetStat(CharacterStatType.AttackSpeed);
 
         self.statistics.damageDealt += damage;
         self.statistics.attackCount++;

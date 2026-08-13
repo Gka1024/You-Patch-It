@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5815a28dc98e76e449128b65eb47ef5c, type: 3}
-  m_Name: 502_Skill_Solar Knight
+  m_Name: 502_Skill_SolarKnight
   m_EditorClassIdentifier: 
   skillOwner: 0
   skillName: 

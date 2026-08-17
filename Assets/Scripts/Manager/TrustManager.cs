@@ -321,7 +321,7 @@ public class TrustManager : MonoBehaviour
                 CharacterStatistics stat =
                     StatisticsManager.Instance.GetCurrentStatistics(character);
 
-                averageWinrate += stat.WinRate;
+                averageWinrate += stat.Winrate;
             }
 
             averageWinrate /= characters.Count;

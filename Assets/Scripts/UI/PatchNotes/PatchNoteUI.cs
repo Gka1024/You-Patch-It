@@ -15,15 +15,21 @@ public class PatchNoteUI : MonoBehaviour
 
     private RuntimeCharacter currentCharacter;
 
+    private bool isStarted = false;
+
     private void Awake()
     {
         characterDropdown.onValueChanged.AddListener(OnCharacterChanged);
     }
 
-    private void Start()
+    public void Start()
     {
-        InitializeDropdown();
-        currentCharacter = RuntimeCharacterManager.Instance.GetRuntimeCharacter(101);
+        if (!isStarted)
+        {
+            isStarted = true;
+            InitializeDropdown();
+            currentCharacter = RuntimeCharacterManager.Instance.GetRuntimeCharacter(101);
+        }
     }
 
     public void InitializeDropdown()
@@ -51,6 +57,11 @@ public class PatchNoteUI : MonoBehaviour
             .OrderBy(x => x.OriginCharacter.id)
             .ElementAt(index);
 
+        ShowCharacter(character);
+    }
+
+    public void ShowCharacterOnSeasonReport(RuntimeCharacter character)
+    {
         ShowCharacter(character);
     }
 

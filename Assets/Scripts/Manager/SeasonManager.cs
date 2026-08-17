@@ -30,6 +30,9 @@ public class SeasonManager : MonoBehaviour
     public int SeasonSeed { get; private set; }
     private System.Random SeasonRandom;
 
+    private bool isSeasonFinished = false;
+    public bool IsSeasonFinished => isSeasonFinished;
+
     List<RuntimePlayer> players;
     List<MatchData> matches;
     List<BattleResult> results;
@@ -89,6 +92,8 @@ public class SeasonManager : MonoBehaviour
 
     public void NextSeason()
     {
+        isSeasonFinished = false;
+
         CurrentSeason++;
         CurrentSubSeason = 1;
 
@@ -175,6 +180,7 @@ public class SeasonManager : MonoBehaviour
 
             case SeasonState.Result:
                 StatisticsManager.Instance.RecordBattle(results);
+                StatisticsManager.Instance.SaveCurrentSubSeason(CurrentSeason, CurrentSubSeason);
                 AnalysisManager.Instance.AnalyzeSeason();
                 ResultManager.Instance.GenerateResult(false);
                 GoalManager.Instance.EvaluateAllGoals();
@@ -184,6 +190,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Trust:
+                ResourceManager.Instance.ResetCurrentSeason();
                 GoalManager.Instance.CalculateGoals();
                 TrustManager.Instance.CalculateTrust();
                 FinishTrust();
@@ -191,17 +198,22 @@ public class SeasonManager : MonoBehaviour
 
             case SeasonState.Reward:
                 ResourceManager.Instance.CheckReward();
-                break;
-
-            case SeasonState.End:
                 if (RuntimeCharacterManager.Instance.HasLockedCharacter())
                 {
                     RuntimeCharacterManager.Instance.AddRandomCharacter(SeasonRandom);
                     UIManager.Instance.patchNoteUI.InitializeDropdown();
                     UIManager.Instance.characterTableUI.GenerateTable();
                 }
+
+                FinishReward();
+                break;
+
+            case SeasonState.End:
+                isSeasonFinished = true;
                 PlayerManager.Instance.UpdatePlayerCount(SeasonRandom);
-                NextSeason();
+                UIManager.Instance.dashBoardUI.ShowSeasonReports();
+                UIManager.Instance.seasonReportUI.Initialize(CurrentSeason);
+                UIManager.Instance.bottomDisplayUI.GoalPreview.Reset();
                 break;
         }
     }

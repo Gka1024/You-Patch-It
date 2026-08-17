@@ -53,7 +53,7 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         nameText.text = runtimeCharacter.OriginCharacter.characterName;
 
-        winRateText.text = $"{stat.WinRate:F1}%";
+        winRateText.text = $"{stat.Winrate:F1}%";
 
         pickRateText.text = $"{AnalysisManager.Instance.GetPickRate(runtimeCharacter):F1}%";
 

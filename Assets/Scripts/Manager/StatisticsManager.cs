@@ -7,11 +7,13 @@ public class StatisticsManager : MonoBehaviour
 {
     public static StatisticsManager Instance { get; private set; }
 
-    private Dictionary<int, CharacterStatistics> currentStatistics = new();
+    private Dictionary<int, CharacterStatistics> currentStatistics = new(); // id
     private Dictionary<int, CharacterStatistics> pastStatistics = new();
 
-    private Dictionary<(int, int), MatchupStatistics> currentMatchDatas = new();
+    private Dictionary<(int, int), MatchupStatistics> currentMatchDatas = new(); // id, id
     private Dictionary<(int, int), MatchupStatistics> pastMatchDatas = new();
+
+    private Dictionary<int, Dictionary<int, Dictionary<int, CharacterStatistics>>> seasonStatistics = new(); // id, Season, Subseason
 
     public bool HasPastSeasonData { get; private set; }
 
@@ -37,6 +39,7 @@ public class StatisticsManager : MonoBehaviour
         {
             currentStatistics.Add(character.id, new CharacterStatistics());
             pastStatistics.Add(character.id, new CharacterStatistics());
+            seasonStatistics.Add(character.id, new Dictionary<int, Dictionary<int, CharacterStatistics>>());
         }
 
         foreach (Character self in characters)
@@ -90,6 +93,19 @@ public class StatisticsManager : MonoBehaviour
     public TierStatistics GetPastTierStatistics(RuntimeCharacter character, PlayerTier tier)
     {
         return pastStatistics[character.OriginCharacter.id].TierStatistics[tier];
+    }
+
+    public List<CharacterStatistics> GetSeasonStatistics(int characterid, int season)
+    {
+        if (seasonStatistics.TryGetValue(characterid, out var seasonData))
+        {
+            if (seasonData.TryGetValue(season, out var data))
+            {
+                return data.Values.ToList();
+            }
+        }
+
+        return new List<CharacterStatistics>();
     }
 
     // ===== Record =====
@@ -179,6 +195,29 @@ public class StatisticsManager : MonoBehaviour
     }
 
     // ===== Season =====
+
+    public void SaveCurrentSubSeason(int season, int subSeason)
+    {
+        foreach (var pair in currentStatistics)
+        {
+            int id = pair.Key;
+            CharacterStatistics stat = pair.Value;
+
+            if (!seasonStatistics.TryGetValue(id, out var seasonData))
+            {
+                seasonData = new Dictionary<int, Dictionary<int, CharacterStatistics>>();
+                seasonStatistics.Add(id, seasonData);
+            }
+
+            if (!seasonData.TryGetValue(season, out var subSeasonData))
+            {
+                subSeasonData = new Dictionary<int, CharacterStatistics>();
+                seasonData.Add(season, subSeasonData);
+            }
+
+            subSeasonData[subSeason] = new CharacterStatistics(stat);
+        }
+    }
 
     public void ResetSeason()
     {

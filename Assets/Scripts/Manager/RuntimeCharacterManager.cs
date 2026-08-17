@@ -13,6 +13,9 @@ public class RuntimeCharacterManager : MonoBehaviour
     public int LockedCharacterCount => lockedCharacters.Count;
 
     [SerializeField] private Dictionary<int, RuntimeCharacter> runtimeCharacters = new();
+    public int CharacterCount => runtimeCharacters.Count;
+
+    public RuntimeCharacter AddedRuntimeCharacter;
 
     private void Awake()
     {
@@ -51,7 +54,10 @@ public class RuntimeCharacterManager : MonoBehaviour
     public RuntimeCharacter AddRandomCharacter(System.Random random)
     {
         if (lockedCharacters.Count == 0)
+        {
+            AddedRuntimeCharacter = null;
             return null;
+        }
 
         int index = random.Next(lockedCharacters.Count);
 
@@ -62,6 +68,7 @@ public class RuntimeCharacterManager : MonoBehaviour
         RuntimeCharacter runtime = new RuntimeCharacter(selected);
 
         runtimeCharacters.Add(selected.id, runtime);
+        AddedRuntimeCharacter = runtime;
 
         Debug.Log($"새 캐릭터 추가 : {selected.characterName}");
 

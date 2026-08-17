@@ -4,7 +4,7 @@ public class MinPickRateGoal : DeveloperGoal
 {
     private readonly float minPickRate;
 
-    public override string Title => "평등 신성화";
+    public override string Title => "죽은 고인의 사회";
     public override string Description =>
     $"가장 픽률이 낮은 캐릭터의 픽률을 {minPickRate}% 이상으로 유지하세요.";
 

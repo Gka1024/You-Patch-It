@@ -13,8 +13,10 @@ public class ResourceManager : MonoBehaviour
     private float trust = 50f;
 
     public int TrustPoint => Mathf.RoundToInt(trust);
-
     public int DevelopResource => developResource;
+
+    public float curSeasonTrust;
+    public int curSeasonResource;
 
     private const int REDUCE_TRUST_DECREASE_I = 3011;
     private const int REDUCE_TRUST_DECREASE_II = 3012;
@@ -24,7 +26,13 @@ public class ResourceManager : MonoBehaviour
         Instance = this;
 
         trust = 50f;
-        developResource = 200;
+        developResource = 300;
+    }
+
+    public void ResetCurrentSeason()
+    {
+        curSeasonResource = 0;
+        curSeasonTrust = 0;
     }
 
     //====================================================
@@ -41,18 +49,16 @@ public class ResourceManager : MonoBehaviour
 
     public void GiveSeasonReward(int develop, float trustPoint)
     {
-        AddDevelopResource(develop);
-        AddTrust(trustPoint);
+        curSeasonResource += AddDevelopResource(develop);
+        curSeasonTrust += AddTrust(trustPoint);
 
         UIManager.Instance.upDisplayUI.Refresh();
-
-        SeasonManager.Instance.FinishReward();
     }
 
     public void AddReward(GoalReward reward)
     {
-        AddDevelopResource(reward.DevelopResource);
-        AddTrust(reward.TrustPoint);
+        curSeasonResource += AddDevelopResource(reward.DevelopResource);
+        curSeasonTrust += AddTrust(reward.TrustPoint);
 
         UIManager.Instance.upDisplayUI.Refresh();
     }

@@ -142,7 +142,7 @@ public class AnalysisManager : MonoBehaviour
             else
             {
                 data.CurrentMatchCount = currentCharacter.MatchCount;
-                data.CurrentWinRate = currentCharacter.WinRate;
+                data.CurrentWinRate = currentCharacter.Winrate;
             }
 
             if (statisticsManager.HasPastSeasonData)
@@ -159,7 +159,7 @@ public class AnalysisManager : MonoBehaviour
                 else
                 {
                     data.PastMatchCount = pastCharacter.MatchCount;
-                    data.PastWinRate = pastCharacter.WinRate;
+                    data.PastWinRate = pastCharacter.Winrate;
                 }
             }
 
@@ -320,7 +320,7 @@ public class AnalysisManager : MonoBehaviour
 
         value = item switch
         {
-            AnalysisItem.Winrate => stat.WinRate,
+            AnalysisItem.Winrate => stat.Winrate,
             AnalysisItem.Pickrate => battleCount == 0 ? 0f : (float)stat.MatchCount / battleCount * 100f,
             AnalysisItem.AverageDamage => stat.AverageDamage,
             AnalysisItem.AverageLiveTime => stat.AverageSurvivalTime,

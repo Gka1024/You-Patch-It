@@ -42,59 +42,61 @@ public class GoalManager : MonoBehaviour
         GoalUI.Initialize(shuffledGoals, this);
         GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * rerollCount);
         UnlockManager.Instance.OnUnlockChanged += CheckThirdGoal;
-        UnlockManager.Instance.OnUnlockChanged += CheckGoalsTier1;
-        UnlockManager.Instance.OnUnlockChanged += CheckGoalsTier2;
-        UnlockManager.Instance.OnUnlockChanged += CheckGoalsTier3;
+        UnlockManager.Instance.OnUnlockChanged += AddGoalsTier1;
+        UnlockManager.Instance.OnUnlockChanged += AddGoalsTier2;
+        UnlockManager.Instance.OnUnlockChanged += AddGoalsTier3;
     }
 
     public void GenerateGoals()
     {
         GoalList.Clear();
 
-        GoalList.Add(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
-        GoalList.Add(new VeteranMakerGoal(57f, GoalDifficulty.Normal, GoalType.Balance));
-        GoalList.Add(new WinrateBandGoal(49f, 54f, 4, GoalDifficulty.Hard, GoalType.Balance));
-        GoalList.Add(new WinrateRangeGoal(45f, 55f, GoalDifficulty.Impossible, GoalType.Balance));
+        GoalList.Add(new SingleStarGoal(57f, GoalDifficulty.Normal, GoalType.Balance));
+        GoalList.Add(new SpecificCharacterWinrateGoal(40, 60, RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, GoalDifficulty.Normal, GoalType.Challenge));
 
-        GoalList.Add(new PredictCharacterWinrateRank(RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, Random.Range(1, 9), GoalDifficulty.Impossible, GoalType.Challenge));
-        GoalList.Add(new SpecificCharacterWinrateGoal(40, 60, RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, GoalDifficulty.Hard, GoalType.Challenge));
 
-        GoalList.Add(new MaxPickRateGoal(12f, GoalDifficulty.Hard, GoalType.Meta));
-        GoalList.Add(new MinPickRateGoal(4f, GoalDifficulty.Hard, GoalType.Meta));
-        GoalList.Add(new ReverseMetaGoal(GoalDifficulty.Hard, GoalType.Meta));
-        GoalList.Add(new RolePickrateGoal(6f, GoalDifficulty.Easy, GoalType.Meta));
-
-        GoalList.Add(new MobilityPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
-        GoalList.Add(new NoAttackPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
-        GoalList.Add(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
-        GoalList.Add(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
-        GoalList.Add(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
     }
 
-    private void CheckGoalsTier1()
+    private void AddGoalsTier1()
     {
         if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_I))
         {
-            UnlockManager.Instance.OnUnlockChanged -= CheckGoalsTier1;
+            UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier1;
+            GoalList.Add(new WinrateBandGoal(49f, 54f, 3, GoalDifficulty.Hard, GoalType.Balance));
+
+            GoalList.Add(new MobilityPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
+            GoalList.Add(new NoAttackPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
+            GoalList.Add(new MinPickRateGoal((100f / RuntimeCharacterManager.Instance.CharacterCount) * 0.65f, GoalDifficulty.Hard, GoalType.Meta));
 
         }
     }
 
-    private void CheckGoalsTier2()
+    private void AddGoalsTier2()
     {
         if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_II))
         {
-            UnlockManager.Instance.OnUnlockChanged -= CheckGoalsTier2;
+            UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier2;
+
+            GoalList.Add(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
+
+            GoalList.Add(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
+            GoalList.Add(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
+            GoalList.Add(new MaxPickRateGoal((100f / RuntimeCharacterManager.Instance.CharacterCount) * 1.15f, GoalDifficulty.Hard, GoalType.Meta));
 
         }
     }
 
-    private void CheckGoalsTier3()
+    private void AddGoalsTier3()
     {
         if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_III))
         {
-            UnlockManager.Instance.OnUnlockChanged -= CheckGoalsTier3;
+            UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier3;
 
+            GoalList.Add(new PredictCharacterWinrateRank(RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter,
+            Random.Range(2, RuntimeCharacterManager.Instance.CharacterCount - 1), GoalDifficulty.Impossible, GoalType.Challenge));
+
+            GoalList.Add(new ReverseMetaGoal(GoalDifficulty.Hard, GoalType.Meta));
+            GoalList.Add(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
         }
     }
 
@@ -169,7 +171,8 @@ public class GoalManager : MonoBehaviour
     {
         GoalUI.ShowAlert(false);
         BottomDisplayUI.Instance.GoalPreview.SetText(shuffledGoals);
-        isGoalConfirmed = true; 
+        BottomDisplayUI.Instance.ShowPreview();
+        isGoalConfirmed = true;
         isRerollAvailable = false;
         SeasonManager.Instance.FinishStart();
     }

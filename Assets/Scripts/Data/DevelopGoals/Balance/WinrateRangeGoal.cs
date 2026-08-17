@@ -21,8 +21,8 @@ public class WinrateRangeGoal : DeveloperGoal
 
             if (stat.MatchCount == 0) continue;
 
-            if (stat.WinRate < minWinrate) return false;
-            if (stat.WinRate > maxWinrate) return false;
+            if (stat.Winrate < minWinrate) return false;
+            if (stat.Winrate > maxWinrate) return false;
         }
 
         return true;

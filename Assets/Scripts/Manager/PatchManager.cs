@@ -52,6 +52,11 @@ public class PatchManager : MonoBehaviour
 
     public void ConfirmPatch()
     {
+        if(SeasonManager.Instance.IsSeasonFinished)
+        {
+            return;
+        }
+
         if (!GoalManager.Instance.IsGoalSet)
         {
             UIManager.Instance.GoalUnsetAlert.GetComponent<TextMeshProUGUI>().color = Color.red;

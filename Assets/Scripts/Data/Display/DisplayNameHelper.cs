@@ -10,7 +10,7 @@ public static class DisplayNameHelper
             CharacterStatType.AttackSpeed => "공격 속도",
             CharacterStatType.MoveSpeed => "이동 속도",
             CharacterStatType.AttackRange => "사거리",
-            CharacterStatType.HealthRegen => "10초당 체력 재생",
+            CharacterStatType.HealthRegen => "체력 재생",
             CharacterStatType.GainMana => "마나 회복",
             CharacterStatType.MaxMana => "최대 마나",
             CharacterStatType.ManaCost => "사용 마나",

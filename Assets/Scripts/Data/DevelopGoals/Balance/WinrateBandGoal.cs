@@ -38,7 +38,7 @@ public class WinrateBandGoal : DeveloperGoal
             float winrate =
                 StatisticsManager.Instance
                     .GetCurrentStatistics(character)
-                    .WinRate;
+                    .Winrate;
 
             if (winrate >= minWinrate &&
                 winrate <= maxWinrate)

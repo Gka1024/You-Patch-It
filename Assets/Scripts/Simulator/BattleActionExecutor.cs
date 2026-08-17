@@ -33,6 +33,12 @@ public static class BattleActionExecutor
     {
         float direction = Mathf.Sign(enemy.position - self.position);
         Move(self, direction, tick);
+        float directionAfter = Mathf.Sign(enemy.position - self.position);
+
+        if (directionAfter != direction)
+        {
+            self.position = enemy.position - 0.01f;
+        }
     }
 
     private static void MoveAway(BattleCharacter self, BattleCharacter enemy, float tick)

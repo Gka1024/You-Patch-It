@@ -1,15 +1,15 @@
 using UnityEngine;
 
-public class VeteranMakerGoal : DeveloperGoal
+public class SingleStarGoal : DeveloperGoal
 {
     public readonly float winrate;
 
-    public override string Title => "고인물 제조기";
+    public override string Title => "단 하나의 별";
 
     public override string Description =>
         $"승률이 {winrate}% 이상인 캐릭터를 단 하나만 만드세요.";
 
-    public VeteranMakerGoal(float winrate, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
+    public SingleStarGoal(float winrate, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
     {
         this.winrate = winrate;
     }
@@ -23,7 +23,7 @@ public class VeteranMakerGoal : DeveloperGoal
             float winrate =
                 StatisticsManager.Instance
                     .GetCurrentStatistics(character)
-                    .WinRate;
+                    .Winrate;
 
             if (winrate >= 55f)
                 count++;
@@ -41,7 +41,7 @@ public class VeteranMakerGoal : DeveloperGoal
             float winrate =
                 StatisticsManager.Instance
                     .GetCurrentStatistics(character)
-                    .WinRate;
+                    .Winrate;
 
             if (winrate >= 55f)
                 count++;

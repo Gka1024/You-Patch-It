@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UpDisplayUI : MonoBehaviour
 {
@@ -8,7 +9,15 @@ public class UpDisplayUI : MonoBehaviour
     [SerializeField] private TMP_Text DevelopResourceText;
     [SerializeField] private TMP_Text PlayersCountText;
 
+    [SerializeField] private Button ExitButton;
+    [SerializeField] private GameObject ExitPopup;
+
     public GameObject GameOverUI;
+
+    void Awake()
+    {
+        ExitButton.onClick.AddListener(ShowExitPopup);
+    }
 
     public void Refresh()
     {
@@ -19,5 +28,8 @@ public class UpDisplayUI : MonoBehaviour
         PlayersCountText.text = $"{PlayerManager.Instance.GetCurrentPlayer}";
     }
 
-
+    private void ShowExitPopup()
+    {
+        ExitPopup.SetActive(true);
+    }
 }

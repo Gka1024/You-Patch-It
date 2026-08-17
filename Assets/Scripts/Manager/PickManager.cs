@@ -188,7 +188,7 @@ public class PickManager : MonoBehaviour
     private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
     {
         float winRate =
-            StatisticsManager.Instance.GetCurrentStatistics(character).WinRate;
+            StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;
 
         float delta = winRate - 50f;
 

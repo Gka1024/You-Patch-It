@@ -37,19 +37,19 @@ public class BottomDisplayUI : MonoBehaviour
         GoalPreviewObject.SetActive(false);
     }
 
-    private void ShowReaction()
+    public void ShowReaction()
     {
         Removeall();
         UserReactionObject.SetActive(true);
     }
 
-    private void ShowDescription()
+    public void ShowDescription()
     {
         Removeall();
         SkillDescriptionObject.SetActive(true);
     }
 
-    private void ShowPreview()
+    public void ShowPreview()
     {
         Removeall();
         GoalPreviewObject.SetActive(true);

@@ -69,14 +69,19 @@ public class PatchHistoryManager : MonoBehaviour
         currentSeasonRecords.Clear();
     }
 
-    public IReadOnlyList<PatchHistory> GetHistory(RuntimeCharacter character)
+    public IReadOnlyList<PatchHistory> GetHistory(RuntimeCharacter character, int season)
     {
-        int id = character.OriginCharacter.id;
+        List<PatchHistory> result = new();
 
-        if (histories.TryGetValue(id, out List<PatchHistory> result))
-            return result;
+        foreach (PatchHistory history in GetHistories(character))
+        {
+            if (history.Season == season)
+            {
+                result.Add(history);
+            }
+        }
 
-        return System.Array.Empty<PatchHistory>();
+        return result;
     }
 
     public IReadOnlyList<PatchHistory> GetHistories(RuntimeCharacter character)

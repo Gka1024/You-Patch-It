@@ -28,7 +28,7 @@ public class ResultManager : MonoBehaviour
                 Character character = database.GetCharacter(pair.Key);
                 CharacterStatistics stat = pair.Value;
 
-                float winRate = stat.WinRate;
+                float winRate = stat.Winrate;
                 float averageDamage = stat.AverageDamage;
                 float averageSurvivalTime = stat.AverageSurvivalTime;
                 float totalDamage = stat.TotalDamage;

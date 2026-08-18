@@ -187,6 +187,7 @@ public class SeasonManager : MonoBehaviour
                 PatchHistoryManager.Instance.SaveCurrentSeason();
                 UIManager.Instance.patchNoteUI.Refresh();
                 UIManager.Instance.characterTableUI.ReArrangetable();
+                if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn) UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();
                 break;
 
             case SeasonState.Trust:

@@ -22,9 +22,29 @@ public class UIManager : MonoBehaviour
     public GameObject GameOverText;
     public GameObject GoalUnsetAlert;
 
+    public GameObject InstantDescription;
+
 
     void Awake()
     {
         Instance = this;
+    }
+
+    public GameObject SpawnInstantDesc(string name, string desc)
+    {
+        InstantDescription.SetActive(true);
+
+        InstantDescriptionUI descriptionUI =
+            InstantDescription.GetComponent<InstantDescriptionUI>();
+
+        descriptionUI.Initialize(name, desc);
+        descriptionUI.SetPosition(Input.mousePosition);
+
+        return InstantDescription;
+    }
+
+    public void DespawnInstantDesc()
+    {
+        InstantDescription.SetActive(false);
     }
 }

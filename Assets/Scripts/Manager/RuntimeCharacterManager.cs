@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RuntimeCharacterManager : MonoBehaviour
@@ -8,6 +9,7 @@ public class RuntimeCharacterManager : MonoBehaviour
     [SerializeField] private CharacterDatabase characterDatabase;
 
     [SerializeField] private List<int> startingCharacterIds = new();
+    [SerializeField] private List<int> primalAdditionalCharacterIds = new();
 
     private readonly HashSet<Character> lockedCharacters = new();
     public int LockedCharacterCount => lockedCharacters.Count;
@@ -40,9 +42,11 @@ public class RuntimeCharacterManager : MonoBehaviour
         {
             if (startingCharacterIds.Contains(character.id))
             {
-                RuntimeCharacter runtime = new RuntimeCharacter(character);
-
-                runtimeCharacters.Add(character.id, runtime);
+                AddRuntimeCharacter(character.id);
+            }
+            else if(primalAdditionalCharacterIds.Contains(character.id))
+            {
+                continue;
             }
             else
             {
@@ -53,6 +57,13 @@ public class RuntimeCharacterManager : MonoBehaviour
 
     public RuntimeCharacter AddRandomCharacter(System.Random random)
     {
+        if (primalAdditionalCharacterIds.Count > 0)
+        {
+            RuntimeCharacter character = AddRuntimeCharacter(primalAdditionalCharacterIds[0]);
+            primalAdditionalCharacterIds.RemoveAt(0);
+            return character;
+        }
+
         if (lockedCharacters.Count == 0)
         {
             AddedRuntimeCharacter = null;
@@ -65,12 +76,17 @@ public class RuntimeCharacterManager : MonoBehaviour
 
         lockedCharacters.Remove(selected);
 
-        RuntimeCharacter runtime = new RuntimeCharacter(selected);
+        return AddRuntimeCharacter(selected.id, true);
+    }
 
-        runtimeCharacters.Add(selected.id, runtime);
+    private RuntimeCharacter AddRuntimeCharacter(int id, bool Showlog = false)
+    {
+        RuntimeCharacter runtime = new RuntimeCharacter(characterDatabase.GetCharacter(id));
+
+        runtimeCharacters.Add(id, runtime);
         AddedRuntimeCharacter = runtime;
 
-        Debug.Log($"새 캐릭터 추가 : {selected.characterName}");
+        if (Showlog) Debug.Log($"새 캐릭터 추가 : {runtime.OriginCharacter.characterName}");
 
         return runtime;
     }

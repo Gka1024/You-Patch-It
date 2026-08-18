@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,10 +12,28 @@ public class BottomUserReactionUI : MonoBehaviour
     public Toggle Toggle => toggle;
     public bool IsOn => toggle.isOn;
 
+    public bool LoopOn { get; private set; }
+    private Coroutine autoRefreshCoroutine;
+
     void Awake()
     {
+        LoopOn = false;
         button.onClick.AddListener(Refresh);
         ResetToggle();
+    }
+
+    private void OnEnable()
+    {
+        autoRefreshCoroutine = StartCoroutine(AutoRefresh());
+    }
+
+    private void OnDisable()
+    {
+        if (autoRefreshCoroutine != null)
+        {
+            StopCoroutine(autoRefreshCoroutine);
+            autoRefreshCoroutine = null;
+        }
     }
 
     public void ResetToggle()
@@ -23,13 +43,19 @@ public class BottomUserReactionUI : MonoBehaviour
 
     private void Refresh()
     {
-        if(SeasonManager.Instance.CurrentSeason == 1 && SeasonManager.Instance.CurrentSubSeason == 1) return;
+        if (SeasonManager.Instance.CurrentSeason == 1 && SeasonManager.Instance.CurrentSubSeason == 1) return;
+
+        HashSet<int> usedReactionIds = new();
 
         for (int i = 0; i < reactions.Length; i++)
         {
             RuntimeCharacter character = RuntimeCharacterManager.Instance.GetRandomCharacter();
+
             UserReactionCategory category = UserReactionManager.Instance.GetCategory(AnalysisManager.Instance.GetTier(character));
-            SetText(reactions[i], UserReactionManager.Instance.GetReaction(character, category, IsOn));
+
+            string reaction = UserReactionManager.Instance.GetReaction(character, category, IsOn, usedReactionIds);
+
+            SetText(reactions[i], reaction);
         }
     }
 
@@ -38,7 +64,19 @@ public class BottomUserReactionUI : MonoBehaviour
         text.text = content;
     }
 
+    public void TurnOnLoop()
+    {
+        LoopOn = true;
+    }
 
+    private IEnumerator AutoRefresh()
+    {
+        while (LoopOn)
+        {
+            Refresh();
+            yield return new WaitForSeconds(3f);
+        }
+    }
 
 }
 

@@ -1,17 +1,19 @@
+using System.Collections.Generic;
+
 public class BattleResult
 {
-    public RuntimePlayer redPlayer;
-    public RuntimePlayer bluePlayer;
+    public List<RuntimePlayer> redPlayer;
+    public List<RuntimePlayer> bluePlayer;
 
-    public RuntimeCharacter winner;
-    public RuntimeCharacter loser;
+    public List<RuntimeCharacter> winner;
+    public List<RuntimeCharacter> loser;
 
     public bool isDraw;
     public float battleTime;
 
     public BattleStatistics statistics;
 
-    public BattleResult(RuntimePlayer redPlayer, RuntimePlayer bluePlayer, RuntimeCharacter winner, RuntimeCharacter loser, BattleStatistics statistics)
+    public BattleResult(List<RuntimePlayer> redPlayer, List<RuntimePlayer> bluePlayer, List<RuntimeCharacter> winner, List<RuntimeCharacter> loser, BattleStatistics statistics)
     {
         this.redPlayer = redPlayer;
         this.bluePlayer = bluePlayer;
@@ -22,19 +24,20 @@ public class BattleResult
         this.statistics = statistics;
     }
 }
+
 public class BattleStatistics
 {
     public float battleDuration;
-    public CharacterBattleStatistics Red { get; private set; }
-    public CharacterBattleStatistics Blue { get; private set; }
+    public List<CharacterBattleStatistics> Red { get; private set; } = new();
+    public List<CharacterBattleStatistics> Blue { get; private set; } = new();
 
     public void RegisterRed(CharacterBattleStatistics statistics)
     {
-        Red = statistics;
+        Red.Add(statistics);
     }
 
     public void RegisterBlue(CharacterBattleStatistics statistics)
     {
-        Blue = statistics;
+        Blue.Add(statistics);
     }
 }

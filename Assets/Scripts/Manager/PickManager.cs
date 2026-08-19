@@ -7,6 +7,8 @@ public class PickManager : MonoBehaviour
 {
     public static PickManager Instance;
 
+    private const int TEAM_SIZE = 3;
+
     private void Awake()
     {
         Instance = this;
@@ -19,60 +21,50 @@ public class PickManager : MonoBehaviour
     public List<MatchData> StartPick(IReadOnlyList<RuntimePlayer> players, System.Random random)
     {
         Dictionary<PlayerTier, Queue<RuntimePlayer>> queues = CreateQueues(players, random);
-
         List<MatchData> matches = new();
 
         while (true)
         {
-            RuntimePlayer player = GetNextPlayer(queues);
+            List<RuntimePlayer> redPlayers = GetNextTeam(queues);
 
-            if (player == null)
+            if (redPlayers == null)
                 break;
 
-            RuntimePlayer opponent = FindOpponent(player, queues);
+            List<RuntimePlayer> bluePlayers = FindOpponentTeam(redPlayers[0], queues);
 
-            if (opponent == null)
+            if (bluePlayers == null)
                 continue;
 
-            RuntimeCharacter redCharacter = PickCharacter(player, random);
-            RuntimeCharacter blueCharacter = PickCharacter(opponent, random);
+            List<RuntimeCharacter> redCharacters = PickTeamCharacters(redPlayers, random);
+            List<RuntimeCharacter> blueCharacters = PickTeamCharacters(bluePlayers, random);
 
-            matches.Add(new MatchData(
-                player,
-                opponent,
-                redCharacter,
-                blueCharacter));
+            matches.Add(new MatchData(redPlayers, bluePlayers, redCharacters, blueCharacters));
         }
 
         return matches;
     }
 
-    public List<MatchData> StartPick(IReadOnlyList<RuntimePlayer> players, System.Random random, RuntimeCharacter baseCharacter, RuntimeCharacter opponentCharacter)
+    public List<MatchData> StartPick(IReadOnlyList<RuntimePlayer> players, System.Random random, List<RuntimeCharacter> baseCharacters, List<RuntimeCharacter> opponentCharacters)
     {
         Dictionary<PlayerTier, Queue<RuntimePlayer>> queues = CreateQueues(players, random);
-
         List<MatchData> matches = new();
 
         while (true)
         {
-            RuntimePlayer player = GetNextPlayer(queues);
+            List<RuntimePlayer> redPlayers = GetNextTeam(queues);
 
-            if (player == null)
+            if (redPlayers == null)
                 break;
 
-            RuntimePlayer opponent = FindOpponent(player, queues);
+            List<RuntimePlayer> bluePlayers = FindOpponentTeam(redPlayers[0], queues);
 
-            if (opponent == null)
+            if (bluePlayers == null)
                 continue;
 
-            RuntimeCharacter redCharacter = baseCharacter;
-            RuntimeCharacter blueCharacter = opponentCharacter;
+            List<RuntimeCharacter> redCharacters = new(baseCharacters);
+            List<RuntimeCharacter> blueCharacters = new(opponentCharacters);
 
-            matches.Add(new MatchData(
-                player,
-                opponent,
-                redCharacter,
-                blueCharacter));
+            matches.Add(new MatchData(redPlayers, bluePlayers, redCharacters, blueCharacters));
         }
 
         return matches;
@@ -83,54 +75,55 @@ public class PickManager : MonoBehaviour
         Dictionary<PlayerTier, Queue<RuntimePlayer>> queues = new();
 
         foreach (PlayerTier tier in Enum.GetValues(typeof(PlayerTier)))
-        {
             queues[tier] = new Queue<RuntimePlayer>();
-        }
 
         foreach (RuntimePlayer player in players.OrderBy(_ => random.Next()))
-        {
             queues[player.Tier].Enqueue(player);
-        }
 
         return queues;
     }
 
-    private RuntimePlayer GetNextPlayer(Dictionary<PlayerTier, Queue<RuntimePlayer>> queues)
+    private List<RuntimePlayer> GetNextTeam(Dictionary<PlayerTier, Queue<RuntimePlayer>> queues)
     {
         foreach (Queue<RuntimePlayer> queue in queues.Values)
         {
-            if (queue.Count > 0)
-                return queue.Dequeue();
+            if (queue.Count < TEAM_SIZE)
+                continue;
+
+            List<RuntimePlayer> team = new();
+
+            for (int i = 0; i < TEAM_SIZE; i++)
+                team.Add(queue.Dequeue());
+
+            return team;
         }
 
         return null;
     }
 
-    private RuntimePlayer FindOpponent(RuntimePlayer player,
-        Dictionary<PlayerTier, Queue<RuntimePlayer>> queues)
+    private List<RuntimePlayer> FindOpponentTeam(RuntimePlayer player, Dictionary<PlayerTier, Queue<RuntimePlayer>> queues)
     {
         int tier = (int)player.Tier;
 
-        // 같은 티어
-        if (queues[player.Tier].Count > 0)
-            return queues[player.Tier].Dequeue();
+        List<PlayerTier> searchTiers = new() { player.Tier };
 
-        // 아래 티어
         if (tier > 0)
-        {
-            PlayerTier lower = (PlayerTier)(tier - 1);
+            searchTiers.Add((PlayerTier)(tier - 1));
 
-            if (queues[lower].Count > 0)
-                return queues[lower].Dequeue();
-        }
-
-        // 위 티어
         if (tier < Enum.GetValues(typeof(PlayerTier)).Length - 1)
-        {
-            PlayerTier upper = (PlayerTier)(tier + 1);
+            searchTiers.Add((PlayerTier)(tier + 1));
 
-            if (queues[upper].Count > 0)
-                return queues[upper].Dequeue();
+        foreach (PlayerTier searchTier in searchTiers)
+        {
+            if (queues[searchTier].Count < TEAM_SIZE)
+                continue;
+
+            List<RuntimePlayer> team = new();
+
+            for (int i = 0; i < TEAM_SIZE; i++)
+                team.Add(queues[searchTier].Dequeue());
+
+            return team;
         }
 
         return null;
@@ -140,13 +133,34 @@ public class PickManager : MonoBehaviour
     // Pick
     //=========================================================
 
+    private List<RuntimeCharacter> PickTeamCharacters(List<RuntimePlayer> players, System.Random random)
+    {
+        List<RuntimeCharacter> characters = new();
+
+        foreach (RuntimePlayer player in players)
+        {
+            RuntimeCharacter character = PickCharacter(player, random, characters);
+
+            if (character != null)
+                characters.Add(character);
+        }
+
+        return characters;
+    }
+
     public RuntimeCharacter PickCharacter(RuntimePlayer player, System.Random random)
     {
-        List<RuntimeCharacter> characters =
-            RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+        return PickCharacter(player, random, new List<RuntimeCharacter>());
+    }
+
+    private RuntimeCharacter PickCharacter(RuntimePlayer player, System.Random random, List<RuntimeCharacter> pickedCharacters)
+    {
+        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().Where(character => !pickedCharacters.Contains(character)).ToList();
+
+        if (characters.Count == 0)
+            return null;
 
         List<float> scores = new();
-
         float totalScore = 0f;
 
         foreach (RuntimeCharacter character in characters)
@@ -158,8 +172,7 @@ public class PickManager : MonoBehaviour
         }
 
         double roll = random.NextDouble() * totalScore;
-
-        float accumulated = 0;
+        float accumulated = 0f;
 
         for (int i = 0; i < characters.Count; i++)
         {
@@ -174,52 +187,41 @@ public class PickManager : MonoBehaviour
 
     public float GetPickScore(RuntimeCharacter character, RuntimePlayer player)
     {
-        float score = 50;
+        float score = 50f;
 
         score += WinrateScore(character, player);
         score += PickRateScore(character);
         score += PreferenceScore(character, player);
 
-        return Mathf.Max(1, score);
+        return Mathf.Max(1f, score);
     }
 
     //---------------------------------------------------------
-
+    
     private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
     {
-        float winRate =
-            StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;
-
+        float winRate = StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;
         float delta = winRate - 50f;
 
-        float experimentWeight =
-            1f - player.RiskTaking / 200f;
+        float experimentWeight = 1f - player.RiskTaking / 200f;
 
-        return delta
-             * 2f
-             * (player.MetaKnowledge / 100f)
-             * experimentWeight;
+        return delta * 2f * (player.MetaKnowledge / 100f) * experimentWeight;
     }
 
     private float PickRateScore(RuntimeCharacter character)
     {
-        float pickRate =
-            AnalysisManager.Instance.GetPickRate(character);
+        float pickRate = AnalysisManager.Instance.GetPickRate(character);
 
         return pickRate * 0.3f;
     }
 
     private float PreferenceScore(RuntimeCharacter character, RuntimePlayer player)
     {
-        if (!player.ClassPreferences.TryGetValue(
-            character.OriginCharacter.role,
-            out float preference))
-            return 0;
+        if (!player.ClassPreferences.TryGetValue(character.OriginCharacter.role, out float preference))
+            return 0f;
 
-        float weight =
-            (100f - player.MetaDependence) / 100f;
+        float weight = (100f - player.MetaDependence) / 100f;
 
         return (preference - 30f) * weight;
     }
-
 }

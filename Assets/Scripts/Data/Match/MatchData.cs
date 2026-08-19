@@ -1,17 +1,19 @@
+using System.Collections.Generic;
+
 public class MatchData
 {
-    public RuntimePlayer redPlayer;
-    public RuntimePlayer bluePlayer;
+    public List<RuntimePlayer> redPlayers;
+    public List<RuntimePlayer> bluePlayers;
 
-    public RuntimeCharacter redCharacter;
-    public RuntimeCharacter blueCharacter;
+    public List<RuntimeCharacter> redCharacters;
+    public List<RuntimeCharacter> blueCharacters;
 
-    public MatchData(RuntimePlayer red, RuntimePlayer blue, RuntimeCharacter redCharacter, RuntimeCharacter blueCharacter)
+    public MatchData(List<RuntimePlayer> red, List<RuntimePlayer> blue, List<RuntimeCharacter> redCharacter, List<RuntimeCharacter> blueCharacter)
     {
-        this.redPlayer = red;
-        this.bluePlayer = blue;
+        this.redPlayers = red;
+        this.bluePlayers = blue;
 
-        this.redCharacter = redCharacter;
-        this.blueCharacter = blueCharacter;
+        this.redCharacters = redCharacter;
+        this.blueCharacters = blueCharacter;
     }
 }

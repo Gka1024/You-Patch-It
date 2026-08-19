@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class AnalysisManager : MonoBehaviour
 {
     public static AnalysisManager Instance { get; private set; }
 
+    private const int TEAM_SIZE = 3;
+
     private readonly Dictionary<bool, Dictionary<AnalysisItem, Dictionary<int, int>>> rankCache = new();
-    private Dictionary<(bool past, int characterid, AnalysisItem item), float> valueCache = new();
+    private readonly Dictionary<(bool past, int characterid, AnalysisItem item), float> valueCache = new();
 
     [Header("Tier")]
     [SerializeField] private float pickrateWeight = 1f;
@@ -23,30 +24,33 @@ public class AnalysisManager : MonoBehaviour
     private float pastTierAverage;
     private float pastTierStandardDeviation;
 
-
     private void Awake()
     {
         Instance = this;
     }
 
-    // 시즌 결과 기록 후 호출
+    //=========================================================
+    // Analyze
+    //=========================================================
+
     public void AnalyzeSeason()
     {
         valueCache.Clear();
+        rankCache.Clear();
 
         BuildRankCache(false);
         BuildTierCache(false);
-
 
         if (StatisticsManager.Instance.HasPastSeasonData)
         {
             BuildRankCache(true);
             BuildTierCache(true);
-
         }
     }
 
-    // ===== Public API =====
+    //=========================================================
+    // Public API
+    //=========================================================
 
     public float GetPickRate(RuntimeCharacter character)
     {
@@ -55,29 +59,25 @@ public class AnalysisManager : MonoBehaviour
 
     public float GetAveragePickRate(CharacterRole role)
     {
-        float value = 0;
-        int count = 0;
+        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetCharactersInRole(role).ToList();
 
-        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetCharactersInRole(role))
-        {
+        if (characters.Count == 0)
+            return 0f;
+
+        float value = 0f;
+
+        foreach (RuntimeCharacter character in characters)
             value += GetPickRate(character);
-            count++;
-        }
 
-        return value / count;
+        return value / characters.Count;
     }
 
     public CharacterTier GetTier(RuntimeCharacter character, bool past = false)
     {
         float score = GetTierScore(character, past);
 
-        float average = past
-            ? pastTierAverage
-            : currentTierAverage;
-
-        float standardDeviation = past
-            ? pastTierStandardDeviation
-            : currentTierStandardDeviation;
+        float average = past ? pastTierAverage : currentTierAverage;
+        float standardDeviation = past ? pastTierStandardDeviation : currentTierStandardDeviation;
 
         if (standardDeviation < 0.0001f)
             return CharacterTier.B;
@@ -101,13 +101,8 @@ public class AnalysisManager : MonoBehaviour
 
     public float GetTierZScore(RuntimeCharacter character, bool past = false)
     {
-        float average = past
-        ? pastTierAverage
-        : currentTierAverage;
-
-        float standardDeviation = past
-            ? pastTierStandardDeviation
-            : currentTierStandardDeviation;
+        float average = past ? pastTierAverage : currentTierAverage;
+        float standardDeviation = past ? pastTierStandardDeviation : currentTierStandardDeviation;
 
         if (standardDeviation < 0.0001f)
             return 0f;
@@ -124,9 +119,10 @@ public class AnalysisManager : MonoBehaviour
             HasPastData = statisticsManager.HasPastSeasonData
         };
 
-        // ===========================
+        //=====================================================
         // 전체 데이터
-        // ===========================
+        //=====================================================
+
         if (enemy == null)
         {
             CharacterStatistics currentCharacter = statisticsManager.GetCurrentStatistics(self);
@@ -137,7 +133,6 @@ public class AnalysisManager : MonoBehaviour
 
                 data.CurrentMatchCount = currentTier.MatchCount;
                 data.CurrentWinRate = currentTier.WinRate;
-                Debug.Log($"win : {currentTier.WinCount} | lose : {currentTier.LoseCount}");
             }
             else
             {
@@ -166,9 +161,10 @@ public class AnalysisManager : MonoBehaviour
             return data;
         }
 
-        // ===========================
+        //=====================================================
         // 특정 상대 데이터
-        // ===========================
+        //=====================================================
+
         MatchupStatistics currentMatchup = statisticsManager.GetCurrentMatchup(self.OriginCharacter.id, enemy.OriginCharacter.id);
 
         if (tier.HasValue)
@@ -229,9 +225,7 @@ public class AnalysisManager : MonoBehaviour
     {
         MatchUpTierData data = new();
 
-        List<RuntimeCharacter> targets =
-            RuntimeCharacterManager.Instance
-            .GetAllCharacters()
+        List<RuntimeCharacter> targets = RuntimeCharacterManager.Instance.GetAllCharacters()
             .Where(x => x != self)
             .Where(x => GetTier(x) == tier)
             .ToList();
@@ -296,7 +290,9 @@ public class AnalysisManager : MonoBehaviour
         return result;
     }
 
-    // ===== Value =====
+    //=========================================================
+    // Value
+    //=========================================================
 
     private float GetValue(RuntimeCharacter character, AnalysisItem item, bool past)
     {
@@ -321,15 +317,27 @@ public class AnalysisManager : MonoBehaviour
         value = item switch
         {
             AnalysisItem.Winrate => stat.Winrate,
-            AnalysisItem.Pickrate => battleCount == 0 ? 0f : (float)stat.MatchCount / battleCount * 100f,
+
+            AnalysisItem.Pickrate => GetPickRate(stat, battleCount),
+
             AnalysisItem.AverageDamage => stat.AverageDamage,
+
             AnalysisItem.AverageLiveTime => stat.AverageSurvivalTime,
+
             AnalysisItem.AverageMoveDistance => stat.AverageMoveDistance,
+
             AnalysisItem.AverageAttackCount => stat.AverageAttackCount,
+
             AnalysisItem.AverageSkillCount => stat.AverageSkillCount,
+
             AnalysisItem.MatchCount => stat.MatchCount,
-            AnalysisItem.AverageDPS => stat.AverageSurvivalTime <= 0f ? 0f : stat.AverageDamage / stat.AverageSurvivalTime,
+
+            AnalysisItem.AverageDPS => stat.AverageSurvivalTime <= 0f
+                ? 0f
+                : stat.AverageDamage / stat.AverageSurvivalTime,
+
             AnalysisItem.CharacterTier => GetTierScore(character, past),
+
             _ => 0f
         };
 
@@ -338,28 +346,41 @@ public class AnalysisManager : MonoBehaviour
         return value;
     }
 
+    private float GetPickRate(CharacterStatistics stat, int battleCount)
+    {
+        if (battleCount <= 0)
+            return 0f;
+
+        int totalCharacterSlots = battleCount * TEAM_SIZE * 2;
+
+        return (float)stat.MatchCount / totalCharacterSlots * 100f;
+    }
+
     public float GetMaxValue(AnalysisItem item, bool past = false)
     {
         float max = float.MinValue;
 
         foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
-        {
             max = Mathf.Max(max, GetValue(character, item, past));
-        }
 
         return max;
     }
 
+    //=========================================================
+    // Tier
+    //=========================================================
+
     private float GetTierScore(RuntimeCharacter character, bool past = false)
     {
-        float pickrate = GetPickRate(character);
+        float pickrate = GetValue(character, AnalysisItem.Pickrate, past);
         float winrate = GetValue(character, AnalysisItem.Winrate, past);
-        //float banrate = GetValue(character, AnalysisItem.Banrate, past);
 
         return pickrate * pickrateWeight + (winrate - 50f) * winrateWeight;
     }
 
-    // ===== Rank Cache =====
+    //=========================================================
+    // Rank Cache
+    //=========================================================
 
     private void BuildRankCache(bool past)
     {
@@ -376,7 +397,15 @@ public class AnalysisManager : MonoBehaviour
                 list.Add((id, GetValue(character, item, past)));
             }
 
-            list.Sort((a, b) => b.value.CompareTo(a.value));
+            list.Sort((a, b) =>
+            {
+                int compare = b.value.CompareTo(a.value);
+
+                if (compare == 0)
+                    compare = a.id.CompareTo(b.id);
+
+                return compare;
+            });
 
             Dictionary<int, int> ranks = new();
 
@@ -416,29 +445,29 @@ public class AnalysisManager : MonoBehaviour
             int compare = av.CompareTo(bv);
 
             if (compare == 0)
-            {
                 compare = a.OriginCharacter.id.CompareTo(b.OriginCharacter.id);
-            }
 
-            return direction == SortDirection.Descending
-                ? -compare
-                : compare;
+            return direction == SortDirection.Descending ? -compare : compare;
         });
 
         return list;
     }
 
+    //=========================================================
+    // Tier Cache
+    //=========================================================
+
     private void BuildTierCache(bool past)
     {
-        List<RuntimeCharacter> characters =
-            RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+
+        if (characters.Count == 0)
+            return;
 
         float average = 0f;
 
         foreach (RuntimeCharacter character in characters)
-        {
             average += GetTierScore(character, past);
-        }
 
         average /= characters.Count;
 
@@ -465,17 +494,14 @@ public class AnalysisManager : MonoBehaviour
             currentTierStandardDeviation = standardDeviation;
         }
     }
-
 }
 
 [Serializable]
 public class AnalysisData
 {
     public bool HasPastData;
-
     public float CurrentValue;
     public float PastValue;
-
     public int CurrentRank;
     public int PastRank;
 }
@@ -484,10 +510,8 @@ public class MatchUpTierData
 {
     public float CurrentAverageWinRate;
     public int CurrentMatchCount;
-
     public float PastAverageWinRate;
     public int PastMatchCount;
-
     public int CharacterCount;
 }
 

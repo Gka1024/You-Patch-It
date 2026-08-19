@@ -33,7 +33,7 @@ public class BattlePredictor : MonoBehaviour
 
             BattleResult result = BattleSimulator.Instance.Simulate(baseCharacter, redPlayer, opponentCharacter, bluePlayer, random.Next());
 
-            if (result.winner == baseCharacter)
+            if (result.winner[0] == baseCharacter)
                 winCount++;
         }
 

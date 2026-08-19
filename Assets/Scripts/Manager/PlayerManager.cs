@@ -23,7 +23,7 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        currentPlayerCount = 10000;
+        currentPlayerCount = 3000;
         Initialize();
     }
 
@@ -156,6 +156,8 @@ public class PlayerManager : MonoBehaviour
 
     public void UpdatePlayerCount(System.Random random)
     {
+        return;
+
         float trust = ResourceManager.Instance.TrustPoint;
 
         // 30을 기준으로 -1 ~ 1

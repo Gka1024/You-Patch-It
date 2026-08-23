@@ -10,15 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a216f32f5b25b04cac0f71869d9540a, type: 3}
-  m_Name: 3051_AddGame3vs3
+  m_Name: 2021_AdditionalSlot 1
   m_EditorClassIdentifier: 
-  id: 3051
-  unlockName: "3 vs 3 \uCD94\uAC00\uD558\uAE30"
-  description: "\uAC8C\uC784\uC5D0 3:3 \uBAA8\uB4DC\uB97C \uCD94\uAC00\uD569\uB2C8\uB2E4.
-    \uB354\uC6B1 \uB9CE\uC740 \uC2E0\uB8B0\uB3C4\uC640 \uB354\uC6B1 \uB9CE\uC740
-    \uB9AC\uC18C\uC2A4\uB97C \uC5BB\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
-  category: 2
-  costResource: -1
+  id: 2021
+  unlockName: "\uBAA9\uD45C \uC2AC\uB86F \uD655\uC7A5"
+  description: "\uAC1C\uBC1C \uBAA9\uD45C\uC758 \uC2AC\uB86F\uC774 \uD558\uB098 \uCD94\uAC00\uB429\uB2C8\uB2E4."
+  category: 1
+  costResource: 300
   icon: {fileID: 0}
   prerequisites: []
   NextData: {fileID: 0}

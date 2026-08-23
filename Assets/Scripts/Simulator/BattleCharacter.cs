@@ -39,6 +39,8 @@ public class BattleCharacter
 
     public bool CanUseSkill => currentMana >= GetStat(CharacterStatType.MaxMana) && isSkillReady && skillDelayTimer <= 0f;
 
+    public BattleCharacter() { }
+
     public BattleCharacter(RuntimeCharacter runtimeCharacter, RuntimePlayer player, BattleAIState ai, float startPosition)
     {
         this.runtimeCharacter = runtimeCharacter;
@@ -67,6 +69,30 @@ public class BattleCharacter
     // Initialization
     // ============================================================
 
+    public void Initialize(RuntimeCharacter runtimeCharacter, RuntimePlayer player, BattleAIState ai, float startPosition)
+    {
+        this.runtimeCharacter = runtimeCharacter;
+        this.statistics = new CharacterBattleStatistics { runtimeCharacter = runtimeCharacter };
+
+        this.player = player;
+        this.skill = runtimeCharacter.OriginCharacter.skill;
+        this.aiState = ai;
+
+        InitializeStats();
+
+        currentHealth = GetStat(CharacterStatType.Health);
+        currentMana = 0f;
+
+        position = startPosition;
+
+        attackCooldown = 0f;
+        actionLockTime = 0f;
+        reactionTimer = 0f;
+        skillDelayTimer = 0f;
+
+        isSkillReady = true;
+    }
+
     private void InitializeStats()
     {
         foreach (CharacterStatType statType in Enum.GetValues(typeof(CharacterStatType)))
@@ -78,6 +104,18 @@ public class BattleCharacter
 
             modifiers[statType] = new List<BattleStatModifier>();
         }
+    }
+
+    public void Reset()
+    {
+        currentMana = 0f;
+
+        attackCooldown = 0f;
+        actionLockTime = 0f;
+        reactionTimer = 0f;
+        skillDelayTimer = 0f;
+
+        isSkillReady = true;
     }
 
     // ============================================================

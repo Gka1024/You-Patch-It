@@ -11,6 +11,15 @@ public class BattleSimulator : MonoBehaviour
     private const float TICK = 0.05f;
     private const float BATTLE_TIME_LIMIT = 300f;
 
+    private readonly List<BattleCharacter> redTeam = new();
+    private readonly List<BattleCharacter> blueTeam = new();
+    private readonly List<BattleActionCommand> commands = new();
+    private readonly Stack<BattleActionCommand> commandPool = new();
+    private readonly Stack<BattleCharacter> characterPool = new();
+
+    public int CommandPoolCount => commandPool.Count;
+    public int CharacterPoolCount => characterPool.Count;
+
     private void Awake()
     {
         Instance = this;
@@ -18,7 +27,7 @@ public class BattleSimulator : MonoBehaviour
 
     public List<BattleResult> StartSimulation(List<MatchData> matches, System.Random random)
     {
-        List<BattleResult> results = new();
+        List<BattleResult> results = new(matches.Count);
 
         foreach (MatchData match in matches)
         {
@@ -31,36 +40,29 @@ public class BattleSimulator : MonoBehaviour
 
     public BattleResult StartSimulation(MatchData data, int simulationSeed)
     {
-        System.Random simulationRandom = new System.Random(simulationSeed);
+        System.Random simulationRandom = new(simulationSeed);
         int battleSeed = simulationRandom.Next();
 
         return Simulate(data.redCharacters, data.redPlayers, data.blueCharacters, data.bluePlayers, battleSeed);
     }
 
-    public BattleResult Simulate(RuntimeCharacter redcharacter, RuntimePlayer redplayer, RuntimeCharacter bluecharacter, RuntimePlayer blueplayer, int battleSeed)
+    public BattleResult Simulate(RuntimeCharacter redCharacter, RuntimePlayer redPlayer, RuntimeCharacter blueCharacter, RuntimePlayer bluePlayer, int battleSeed)
     {
-        List<RuntimeCharacter> redCs = new();
-        List<RuntimePlayer> redPs = new();
-        List<RuntimeCharacter> blueCs = new();
-        List<RuntimePlayer> bluePs = new();
+        List<RuntimeCharacter> redCharacters = new() { redCharacter };
+        List<RuntimePlayer> redPlayers = new() { redPlayer };
+        List<RuntimeCharacter> blueCharacters = new() { blueCharacter };
+        List<RuntimePlayer> bluePlayers = new() { bluePlayer };
 
-        redCs.Add(redcharacter);
-        redPs.Add(redplayer);
-        blueCs.Add(bluecharacter);
-        bluePs.Add(blueplayer);
-
-        return Simulate(redCs, redPs, blueCs, bluePs, battleSeed);
+        return Simulate(redCharacters, redPlayers, blueCharacters, bluePlayers, battleSeed);
     }
 
     public BattleResult Simulate(List<RuntimeCharacter> redCharacters, List<RuntimePlayer> redPlayers, List<RuntimeCharacter> blueCharacters, List<RuntimePlayer> bluePlayers, int battleSeed)
     {
-        System.Random battleRandom = new System.Random(battleSeed);
-        BattleStatistics statistics = new BattleStatistics();
+        System.Random battleRandom = new(battleSeed);
+        BattleStatistics statistics = new();
 
-        List<BattleCharacter> redTeam = CreateTeam(redCharacters, redPlayers, battleRandom, 0f);
-        List<BattleCharacter> blueTeam = CreateTeam(blueCharacters, bluePlayers, battleRandom, 10f);
-
-        RegisterStatistics(statistics, redTeam, blueTeam);
+        PrepareTeams(redCharacters, redPlayers, blueCharacters, bluePlayers, battleRandom);
+        RegisterStatistics(statistics);
 
         float battleTime = 0f;
 
@@ -69,12 +71,12 @@ public class BattleSimulator : MonoBehaviour
             TickTeam(redTeam);
             TickTeam(blueTeam);
 
-            List<BattleActionCommand> commands = new();
+            commands.Clear();
 
-            CollectTeamActions(redTeam, blueTeam, commands);
-            CollectTeamActions(blueTeam, redTeam, commands);
+            CollectTeamActions(redTeam, blueTeam);
+            CollectTeamActions(blueTeam, redTeam);
 
-            ExecuteActions(commands, battleRandom);
+            ExecuteActions(battleRandom);
 
             battleTime += TICK;
 
@@ -87,16 +89,13 @@ public class BattleSimulator : MonoBehaviour
 
         statistics.battleDuration = battleTime;
 
-        UpdateSurvivalTime(redTeam, battleTime);
-        UpdateSurvivalTime(blueTeam, battleTime);
-
         bool redAlive = IsTeamAlive(redTeam);
         bool blueAlive = IsTeamAlive(blueTeam);
 
         List<RuntimeCharacter> winner = new();
         List<RuntimeCharacter> loser = new();
 
-        BattleResult result = new BattleResult(redPlayers, bluePlayers, winner, loser, statistics);
+        bool isDraw = false;
 
         if (redAlive && !blueAlive)
         {
@@ -110,26 +109,34 @@ public class BattleSimulator : MonoBehaviour
         }
         else
         {
-            winner.AddRange(redCharacters);
-            winner.AddRange(blueCharacters);
-
-            result.isDraw = true;
+            isDraw = true;
         }
 
-        result.isDraw = redAlive && blueAlive;
+        BattleResult result = new BattleResult(redPlayers, bluePlayers, winner, loser, statistics);
+        result.isDraw = isDraw;
         result.battleTime = battleTime;
+
+        ReleaseCommands();
+        ReleaseTeams();
 
         return result;
     }
 
-    private List<BattleCharacter> CreateTeam(List<RuntimeCharacter> characters, List<RuntimePlayer> players, System.Random random, float startingPosition)
+    private void PrepareTeams(List<RuntimeCharacter> redCharacters, List<RuntimePlayer> redPlayers, List<RuntimeCharacter> blueCharacters, List<RuntimePlayer> bluePlayers, System.Random random)
     {
-        List<BattleCharacter> team = new();
+        redTeam.Clear();
+        blueTeam.Clear();
 
+        CreateTeam(redCharacters, redPlayers, random, 0f, redTeam);
+        CreateTeam(blueCharacters, bluePlayers, random, 10f, blueTeam);
+    }
+
+    private void CreateTeam(List<RuntimeCharacter> characters, List<RuntimePlayer> players, System.Random random, float startingPosition, List<BattleCharacter> team)
+    {
         if (characters == null || players == null || characters.Count != players.Count)
         {
             Debug.LogError("Character와 Player의 개수가 일치하지 않습니다.");
-            return team;
+            return;
         }
 
         for (int i = 0; i < characters.Count; i++)
@@ -141,56 +148,59 @@ public class BattleSimulator : MonoBehaviour
                 continue;
 
             BattleAIState aiState = new BattleAIState(runtimeCharacter.OriginCharacter.battleAI, runtimePlayer, random);
-            BattleCharacter character = new BattleCharacter(runtimeCharacter, runtimePlayer, aiState, startingPosition);
+            BattleCharacter character = GetBattleCharacter();
 
+            character.Initialize(runtimeCharacter, runtimePlayer, aiState, startingPosition);
             team.Add(character);
         }
-
-        return team;
     }
 
-    private List<RuntimeCharacter> GetAliveCharacters(List<BattleCharacter> team)
+    private BattleCharacter GetBattleCharacter()
     {
-        List<RuntimeCharacter> characters = new();
+        if (characterPool.Count > 0)
+            return characterPool.Pop();
 
-        foreach (BattleCharacter character in team)
+        return new BattleCharacter();
+    }
+
+    private void ReleaseTeams()
+    {
+        ReleaseTeam(redTeam);
+        ReleaseTeam(blueTeam);
+
+        redTeam.Clear();
+        blueTeam.Clear();
+    }
+
+    private void ReleaseTeam(List<BattleCharacter> team)
+    {
+        for (int i = 0; i < team.Count; i++)
         {
-            if (!character.IsDead)
-                characters.Add(character.runtimeCharacter);
+            BattleCharacter character = team[i];
+            character.Reset();
+            characterPool.Push(character);
         }
-
-        return characters;
     }
 
-    private List<RuntimeCharacter> GetDeadCharacters(List<BattleCharacter> team)
+    private void RegisterStatistics(BattleStatistics statistics)
     {
-        List<RuntimeCharacter> characters = new();
+        for (int i = 0; i < redTeam.Count; i++)
+            statistics.RegisterRed(redTeam[i].statistics);
 
-        foreach (BattleCharacter character in team)
-        {
-            if (character.IsDead)
-                characters.Add(character.runtimeCharacter);
-        }
-
-        return characters;
-    }
-
-    private void RegisterStatistics(BattleStatistics statistics, List<BattleCharacter> redTeam, List<BattleCharacter> blueTeam)
-    {
-        foreach (BattleCharacter character in redTeam)
-            statistics.RegisterRed(character.statistics);
-
-        foreach (BattleCharacter character in blueTeam)
-            statistics.RegisterBlue(character.statistics);
+        for (int i = 0; i < blueTeam.Count; i++)
+            statistics.RegisterBlue(blueTeam[i].statistics);
     }
 
     private void TickTeam(List<BattleCharacter> team)
     {
-        foreach (BattleCharacter character in team)
+        for (int i = 0; i < team.Count; i++)
         {
+            BattleCharacter character = team[i];
+
             if (character.IsDead)
                 continue;
 
+            character.statistics.survivalTime += TICK;
             TickCharacter(character);
         }
     }
@@ -233,10 +243,12 @@ public class BattleSimulator : MonoBehaviour
         character.currentMana = Math.Min(character.currentMana + amount, maxMana);
     }
 
-    private void CollectTeamActions(List<BattleCharacter> team, List<BattleCharacter> enemyTeam, List<BattleActionCommand> commands)
+    private void CollectTeamActions(List<BattleCharacter> team, List<BattleCharacter> enemyTeam)
     {
-        foreach (BattleCharacter character in team)
+        for (int i = 0; i < team.Count; i++)
         {
+            BattleCharacter character = team[i];
+
             if (character.IsDead || !character.CanAct || !character.CanThink)
                 continue;
 
@@ -252,8 +264,30 @@ public class BattleSimulator : MonoBehaviour
             if (action == BattleAction.None)
                 continue;
 
-            commands.Add(new BattleActionCommand(character, target, action));
+            BattleActionCommand command = GetCommand();
+            command.Set(character, target, action);
+            commands.Add(command);
         }
+    }
+
+    private BattleActionCommand GetCommand()
+    {
+        if (commandPool.Count > 0)
+            return commandPool.Pop();
+
+        return new BattleActionCommand();
+    }
+
+    private void ReleaseCommands()
+    {
+        for (int i = 0; i < commands.Count; i++)
+        {
+            BattleActionCommand command = commands[i];
+            command.Clear();
+            commandPool.Push(command);
+        }
+
+        commands.Clear();
     }
 
     private BattleCharacter SelectTarget(BattleCharacter attacker, List<BattleCharacter> enemyTeam)
@@ -261,8 +295,10 @@ public class BattleSimulator : MonoBehaviour
         BattleCharacter target = null;
         float closestDistance = float.MaxValue;
 
-        foreach (BattleCharacter enemy in enemyTeam)
+        for (int i = 0; i < enemyTeam.Count; i++)
         {
+            BattleCharacter enemy = enemyTeam[i];
+
             if (enemy.IsDead)
                 continue;
 
@@ -283,10 +319,12 @@ public class BattleSimulator : MonoBehaviour
         return Mathf.Abs(attacker.position - target.position);
     }
 
-    private void ExecuteActions(List<BattleActionCommand> commands, System.Random random)
+    private void ExecuteActions(System.Random random)
     {
-        foreach (BattleActionCommand command in commands)
+        for (int i = 0; i < commands.Count; i++)
         {
+            BattleActionCommand command = commands[i];
+
             if (command.attacker == null || command.attacker.IsDead)
                 continue;
 
@@ -299,19 +337,13 @@ public class BattleSimulator : MonoBehaviour
 
     private bool IsTeamAlive(List<BattleCharacter> team)
     {
-        foreach (BattleCharacter character in team)
+        for (int i = 0; i < team.Count; i++)
         {
-            if (!character.IsDead)
+            if (!team[i].IsDead)
                 return true;
         }
 
         return false;
-    }
-
-    private void UpdateSurvivalTime(List<BattleCharacter> team, float battleTime)
-    {
-        foreach (BattleCharacter character in team)
-            character.statistics.survivalTime = battleTime;
     }
 
     private float GetReactionTime(BattleCharacter character)
@@ -327,10 +359,21 @@ public class BattleActionCommand
     public BattleCharacter target;
     public BattleAction action;
 
-    public BattleActionCommand(BattleCharacter attacker, BattleCharacter target, BattleAction action)
+    public BattleActionCommand()
+    {
+    }
+
+    public void Set(BattleCharacter attacker, BattleCharacter target, BattleAction action)
     {
         this.attacker = attacker;
         this.target = target;
         this.action = action;
+    }
+
+    public void Clear()
+    {
+        attacker = null;
+        target = null;
+        action = BattleAction.None;
     }
 }

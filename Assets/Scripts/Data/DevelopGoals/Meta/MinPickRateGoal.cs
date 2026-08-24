@@ -13,6 +13,11 @@ public class MinPickRateGoal : DeveloperGoal
         this.minPickRate = min;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         foreach(RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters().ToList())

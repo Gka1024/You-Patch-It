@@ -11,6 +11,11 @@ public class MaxPickRateGoal : DeveloperGoal
         this.maxPickRate = maxPickRate;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         return AnalysisManager.Instance.GetMaxValue(AnalysisItem.Pickrate, false) < maxPickRate;

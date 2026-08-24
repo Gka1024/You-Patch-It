@@ -10,6 +10,11 @@ public class NoAttackPatchGoal : DeveloperGoal
     
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         return PatchManager.Instance.IsStatUntouched(CharacterStatType.Attack);

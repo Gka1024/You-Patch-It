@@ -17,17 +17,17 @@ MonoBehaviour:
   role: 1
   stats:
   - statType: 0
-    value: 25
+    value: 19
   - statType: 1
     value: 280
   - statType: 2
     value: 14
   - statType: 3
-    value: 3.8
+    value: 3.6
   - statType: 4
     value: 1.4
   - statType: 5
-    value: 7.3
+    value: 6.5
   - statType: 6
     value: 4
   - statType: 7

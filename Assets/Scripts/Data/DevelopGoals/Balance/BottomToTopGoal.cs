@@ -17,9 +17,14 @@ public class BottomToTopGoal : DeveloperGoal
         this.rank = rank;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
-        return AnalysisManager.Instance.GetRank(    
+        return AnalysisManager.Instance.GetRank(
             targetCharacter,
             AnalysisItem.Winrate,
             false) <= 4;

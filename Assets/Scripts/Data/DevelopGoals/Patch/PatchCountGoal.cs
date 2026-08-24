@@ -13,6 +13,11 @@ public class PatchCountGoal : DeveloperGoal
         this.maxPatchCount = maxPatchCount;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         return PatchManager.Instance.AppliedPatches.Count <= maxPatchCount;

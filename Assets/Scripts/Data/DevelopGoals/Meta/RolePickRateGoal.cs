@@ -14,6 +14,11 @@ public class RolePickrateGoal : DeveloperGoal
         this.minPickrate = minPickrate;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         foreach (CharacterRole role in Enum.GetValues(typeof(CharacterRole)))

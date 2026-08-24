@@ -17,7 +17,7 @@ MonoBehaviour:
   description: "\uAC1C\uBC1C \uBAA9\uD45C\uC758 \uC2AC\uB86F\uC774 \uD558\uB098 \uB354
     \uCD94\uAC00\uB429\uB2C8\uB2E4."
   category: 1
-  costResource: 300
+  costResource: 150
   icon: {fileID: 0}
   prerequisites:
   - {fileID: 11400000, guid: 3e66dd613ca51ec49ab12c32a2cad95a, type: 2}

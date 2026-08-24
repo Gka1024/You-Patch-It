@@ -18,6 +18,8 @@ public class SeasonReportUI : MonoBehaviour
     [SerializeField] private TMP_Text ResourcePoint;
     [SerializeField] private TMP_Text ResourcePointText;
     [SerializeField] private Button ProceedButton;
+
+    public event System.Action OnProceed;
     public bool IsSeasonFinished;
 
     void Awake()
@@ -60,5 +62,6 @@ public class SeasonReportUI : MonoBehaviour
             IsSeasonFinished = false;
             SeasonManager.Instance.NextSeason();
         }
+        OnProceed?.Invoke();
     }
 }

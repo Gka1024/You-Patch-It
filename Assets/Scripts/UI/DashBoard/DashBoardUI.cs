@@ -23,6 +23,7 @@ public class DashBoardUI : MonoBehaviour
 
     [Header("Unlock System")]
     [SerializeField] private GameObject UnlockUI;
+    public event System.Action OnUnlockUIOpen;
 
     [Header("Developer Goals")]
     [SerializeField] private GameObject DeveloperGoal;
@@ -70,6 +71,7 @@ public class DashBoardUI : MonoBehaviour
     {
         RemoveAll();
         UnlockUI.SetActive(true);
+        OnUnlockUIOpen?.Invoke();
     }
 
     public void ShowGoals()

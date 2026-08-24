@@ -7,7 +7,7 @@ public class AnalysisManager : MonoBehaviour
 {
     public static AnalysisManager Instance { get; private set; }
 
-    private const int TEAM_SIZE = 3;
+    private int currentTeamSize = 1;
 
     private readonly Dictionary<bool, Dictionary<AnalysisItem, Dictionary<int, int>>> rankCache = new();
     private readonly Dictionary<(bool past, int characterid, AnalysisItem item), float> valueCache = new();
@@ -27,6 +27,11 @@ public class AnalysisManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+    }
+
+    public void SetCurrentTeamSize(int size)
+    {
+        currentTeamSize = size;
     }
 
     //=========================================================
@@ -351,7 +356,7 @@ public class AnalysisManager : MonoBehaviour
         if (battleCount <= 0)
             return 0f;
 
-        int totalCharacterSlots = battleCount * TEAM_SIZE * 2;
+        int totalCharacterSlots = battleCount * currentTeamSize * 2;
 
         return (float)stat.MatchCount / totalCharacterSlots * 100f;
     }

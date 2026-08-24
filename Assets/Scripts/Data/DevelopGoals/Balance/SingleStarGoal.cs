@@ -14,6 +14,11 @@ public class SingleStarGoal : DeveloperGoal
         this.winrate = winrate;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         int count = 0;

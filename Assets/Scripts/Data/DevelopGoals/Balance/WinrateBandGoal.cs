@@ -18,6 +18,11 @@ public class WinrateBandGoal : DeveloperGoal
         requiredCount = count;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         return CountQualifiedCharacters() >= requiredCount;

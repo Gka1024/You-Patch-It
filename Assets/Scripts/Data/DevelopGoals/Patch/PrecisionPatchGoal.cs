@@ -11,6 +11,11 @@ public class PrecisionPatchGoal : DeveloperGoal
     {
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         return PatchManager.Instance.MaxModifiedStatCount(2);

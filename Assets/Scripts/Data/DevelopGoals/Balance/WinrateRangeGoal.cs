@@ -13,6 +13,11 @@ public class WinrateRangeGoal : DeveloperGoal
         this.maxWinrate = maxWinrate;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())

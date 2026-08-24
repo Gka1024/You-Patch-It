@@ -12,6 +12,11 @@ public class ReverseMetaGoal : DeveloperGoal
     {
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         return GetCurrentProgress() >= 1f;

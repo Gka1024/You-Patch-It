@@ -13,6 +13,11 @@ public class PredictCharacterWinrateRank : DeveloperGoal
         this.rank = rank;
     }
 
+    public override void Initialize()
+    {
+
+    }
+
     protected override bool CheckCompleted()
     {
         return AnalysisManager.Instance.GetRank(RuntimeCharacterManager.Instance.GetRuntimeCharacter(character.id), AnalysisItem.Winrate, false) == rank;

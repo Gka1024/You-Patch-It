@@ -7,16 +7,34 @@ public class PickManager : MonoBehaviour
 {
     public static PickManager Instance;
 
-    private const int TEAM_SIZE = 3;
+    private int TeamSize = 1;
+
+    private const int TEAM_SIZE_3 = 3051;
 
     private void Awake()
     {
+        TeamSize = 1;
         Instance = this;
+    }
+
+    void Start()
+    {
+        UnlockManager.Instance.OnUnlockChanged += CheckTeamSize;
     }
 
     //=========================================================
     // Match Making
     //=========================================================
+
+    private void CheckTeamSize()
+    {
+        if (UnlockManager.Instance.IsUnlocked(TEAM_SIZE_3))
+        {
+            UnlockManager.Instance.OnUnlockChanged -= CheckTeamSize;
+            TeamSize = 3;
+            AnalysisManager.Instance.SetCurrentTeamSize(TeamSize);
+        }
+    }
 
     public List<MatchData> StartPick(IReadOnlyList<RuntimePlayer> players, System.Random random)
     {
@@ -87,12 +105,12 @@ public class PickManager : MonoBehaviour
     {
         foreach (Queue<RuntimePlayer> queue in queues.Values)
         {
-            if (queue.Count < TEAM_SIZE)
+            if (queue.Count < TeamSize)
                 continue;
 
             List<RuntimePlayer> team = new();
 
-            for (int i = 0; i < TEAM_SIZE; i++)
+            for (int i = 0; i < TeamSize; i++)
                 team.Add(queue.Dequeue());
 
             return team;
@@ -115,12 +133,12 @@ public class PickManager : MonoBehaviour
 
         foreach (PlayerTier searchTier in searchTiers)
         {
-            if (queues[searchTier].Count < TEAM_SIZE)
+            if (queues[searchTier].Count < TeamSize)
                 continue;
 
             List<RuntimePlayer> team = new();
 
-            for (int i = 0; i < TEAM_SIZE; i++)
+            for (int i = 0; i < TeamSize; i++)
                 team.Add(queues[searchTier].Dequeue());
 
             return team;
@@ -197,7 +215,7 @@ public class PickManager : MonoBehaviour
     }
 
     //---------------------------------------------------------
-    
+
     private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
     {
         float winRate = StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;

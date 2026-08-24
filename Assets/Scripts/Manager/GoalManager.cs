@@ -5,181 +5,255 @@ using UnityEngine;
 public class GoalManager : MonoBehaviour
 {
     public static GoalManager Instance;
-    public CharacterDatabase characterDatabase;
 
+    public CharacterDatabase characterDatabase;
     public DeveloperGoalUI GoalUI;
+    public BottomGoalPreviewUI BottomGoalUI;
 
     private List<DeveloperGoal> GoalList = new();
     private List<DeveloperGoal> shuffledGoals = new();
     private Dictionary<GoalDifficulty, GoalReward> RewardTable = new();
 
+    public bool IsGoalAvailable;
+    private int currentGoalCount;
     private int rerollCount;
+
     private const int REROLL_REQUIRE_RESOURCE = 10;
 
     private bool isRerollAvailable;
     private bool isGoalConfirmed;
+
     public bool IsGoalSet => isGoalConfirmed;
 
+    public event System.Action OnGoalChanged;
+    public event System.Action OnGoalConfirmed;
+
     private const int GOAL_REWARD = 2011;
-    private const int ADDITIONAL_SLOT = 2021;
+    private const int ADDITIONAL_SLOT_1 = 2021;
+    private const int ADDITIONAL_SLOT_2 = 2022;
     private const int FREE_REROLL = 2031;
 
     private const int ADDITIONAL_GOAL_I = 2041;
     private const int ADDITIONAL_GOAL_II = 2042;
     private const int ADDITIONAL_GOAL_III = 2043;
 
-    void Awake()
+    private void Awake()
     {
         Instance = this;
+
+        IsGoalAvailable = false;
+        currentGoalCount = 1;
+
         GenerateRewards();
         ResetRerollCount();
     }
 
-    void Start()
+    private void Start()
     {
         GenerateGoals();
         SetGoals();
+
         GoalUI.Initialize(shuffledGoals, this);
+        BottomGoalUI.Initialize(this);
         GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * rerollCount);
+
+        UnlockManager.Instance.OnUnlockChanged += CheckSecondGoal;
         UnlockManager.Instance.OnUnlockChanged += CheckThirdGoal;
+
         UnlockManager.Instance.OnUnlockChanged += AddGoalsTier1;
         UnlockManager.Instance.OnUnlockChanged += AddGoalsTier2;
         UnlockManager.Instance.OnUnlockChanged += AddGoalsTier3;
     }
 
+    //=========================================================
+    // Goal
+    //=========================================================
+
     public void GenerateGoals()
     {
         GoalList.Clear();
 
-        GoalList.Add(new SingleStarGoal(57f, GoalDifficulty.Normal, GoalType.Balance));
-        GoalList.Add(new SpecificCharacterWinrateGoal(40, 60, RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, GoalDifficulty.Normal, GoalType.Challenge));
+        GoalList.Add(new NerfTopGoal(GoalDifficulty.Easy, GoalType.Challenge));
 
-
+        GoalList.Add(new SpecificCharacterWinrateGoal(40, 60, GoalDifficulty.Easy, GoalType.Challenge));
     }
 
     private void AddGoalsTier1()
     {
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_I))
-        {
-            UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier1;
-            GoalList.Add(new WinrateBandGoal(49f, 54f, 3, GoalDifficulty.Hard, GoalType.Balance));
+        if (!UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_I))
+            return;
 
-            GoalList.Add(new MobilityPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
-            GoalList.Add(new NoAttackPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
-            GoalList.Add(new MinPickRateGoal((100f / RuntimeCharacterManager.Instance.CharacterCount) * 0.65f, GoalDifficulty.Hard, GoalType.Meta));
+        UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier1;
 
-        }
+        GoalList.Add(new WinrateBandGoal(49f, 54f, 3, GoalDifficulty.Hard, GoalType.Balance));
+        GoalList.Add(new SingleStarGoal(55f, GoalDifficulty.Normal, GoalType.Balance));
+        GoalList.Add(new MobilityPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
+        GoalList.Add(new NoAttackPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
+        GoalList.Add(new MinPickRateGoal((100f / RuntimeCharacterManager.Instance.CharacterCount) * 0.65f, GoalDifficulty.Hard, GoalType.Meta));
     }
 
     private void AddGoalsTier2()
     {
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_II))
-        {
-            UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier2;
+        if (!UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_II))
+            return;
 
-            GoalList.Add(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
-
-            GoalList.Add(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
-            GoalList.Add(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
-            GoalList.Add(new MaxPickRateGoal((100f / RuntimeCharacterManager.Instance.CharacterCount) * 1.15f, GoalDifficulty.Hard, GoalType.Meta));
-
-        }
+        UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier2;
+        GoalList.Add(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
+        GoalList.Add(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
+        GoalList.Add(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
+        GoalList.Add(new MaxPickRateGoal((100f / RuntimeCharacterManager.Instance.CharacterCount) * 1.15f, GoalDifficulty.Hard, GoalType.Meta));
     }
 
     private void AddGoalsTier3()
     {
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_III))
-        {
-            UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier3;
+        if (!UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_III))
+            return;
 
-            GoalList.Add(new PredictCharacterWinrateRank(RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter,
-            Random.Range(2, RuntimeCharacterManager.Instance.CharacterCount - 1), GoalDifficulty.Impossible, GoalType.Challenge));
-
-            GoalList.Add(new ReverseMetaGoal(GoalDifficulty.Hard, GoalType.Meta));
-            GoalList.Add(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
-        }
+        UnlockManager.Instance.OnUnlockChanged -= AddGoalsTier3;
+        GoalList.Add(new PredictCharacterWinrateRank(RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, Random.Range(2, RuntimeCharacterManager.Instance.CharacterCount - 1), GoalDifficulty.Impossible, GoalType.Challenge));
+        GoalList.Add(new ReverseMetaGoal(GoalDifficulty.Hard, GoalType.Meta));
+        GoalList.Add(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
     }
 
     public void SetGoals()
     {
-        shuffledGoals.Clear();
+        shuffledGoals = GetRandomGoals(currentGoalCount);
 
-        int goalCount = 2;
-        if (UnlockManager.Instance != null)
+        foreach (DeveloperGoal goal in shuffledGoals)
         {
-            goalCount = UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT) ? 3 : 2;
+            goal.Initialize();
         }
 
-        ShuffleGoals();
-
-        shuffledGoals = GetGoals(goalCount);
-
-        GoalUI.SetGoals(shuffledGoals);
-    }
-
-    private void ShuffleGoals()
-    {
-        shuffledGoals.Clear();
-        List<DeveloperGoal> shuffled = new(GoalList);
-
-        for (int i = shuffled.Count - 1; i > 0; i--)
+        if (IsGoalAvailable)
         {
-            int j = Random.Range(0, i + 1);
-
-            (shuffled[i], shuffled[j]) = (shuffled[j], shuffled[i]);
-        }
-
-        for (int i = 0; i < shuffled.Count; i++)
-        {
-            shuffledGoals.Add(shuffled[i]);
+            GoalUI.SetGoals(shuffledGoals);
+            BottomGoalUI.SetText(shuffledGoals);
         }
     }
 
-    private List<DeveloperGoal> GetGoals(int count)
+    private List<DeveloperGoal> GetRandomGoals(int count)
     {
-        List<DeveloperGoal> result = new();
+        List<DeveloperGoal> result;
 
-        for (int i = 0; i < count; i++)
+        do
         {
-            result.Add(shuffledGoals[i]);
-        }
+            result = new List<DeveloperGoal>(GoalList);
+
+            for (int i = result.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (result[i], result[j]) = (result[j], result[i]);
+            }
+
+            if (count < result.Count)
+                result.RemoveRange(count, result.Count - count);
+
+        } while (IsSameGoals(result, shuffledGoals) && GoalList.Count > count);
 
         return result;
     }
 
+    private bool IsSameGoals(List<DeveloperGoal> a, List<DeveloperGoal> b)
+    {
+        if (a == null || b == null)
+            return false;
+
+        if (a.Count != b.Count)
+            return false;
+
+        return a.All(b.Contains);
+    }
+
+    //=========================================================
+    // Reroll
+    //=========================================================
+
     public void ChangeGoals()
     {
-        if (!isRerollAvailable) return;
-        if (!ResourceManager.Instance.SpendDevelopResource(REROLL_REQUIRE_RESOURCE * rerollCount)) return;
+        if (!IsGoalAvailable)
+        {
+            IsGoalAvailable = true;
+            rerollCount = 0;
+        }
 
-        GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * ++rerollCount);
+        if (!isRerollAvailable)
+            return;
+
+        int cost = REROLL_REQUIRE_RESOURCE * rerollCount;
+
+        if (!ResourceManager.Instance.SpendDevelopResource(cost))
+            return;
+
+        rerollCount++;
+
+        GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * rerollCount);
+
         SetGoals();
+
+        OnGoalChanged?.Invoke();
+    }
+
+    //=========================================================
+    // Additional Goal
+    //=========================================================
+
+    private void CheckSecondGoal()
+    {
+        currentGoalCount = 2;
+
+        if (!UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT_1))
+            return;
+
+        UnlockManager.Instance.OnUnlockChanged -= CheckSecondGoal;
+
+        if (shuffledGoals.Count < 2)
+            shuffledGoals = GetRandomGoals(currentGoalCount);
+
+        GoalUI.SetGoals(shuffledGoals[1], 1);
     }
 
     private void CheckThirdGoal()
     {
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT))
-        {
-            UnlockManager.Instance.OnUnlockChanged -= CheckThirdGoal;
+        currentGoalCount = 3;
 
-            if (shuffledGoals.Count < 3) ShuffleGoals();
-            GoalUI.SetGoals(shuffledGoals[2], 2);
-        }
+        if (!UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT_2))
+            return;
+
+        UnlockManager.Instance.OnUnlockChanged -= CheckThirdGoal;
+
+        if (shuffledGoals.Count < 3)
+            shuffledGoals = GetRandomGoals(currentGoalCount);
+
+        GoalUI.SetGoals(shuffledGoals[2], 2);
     }
+
+    //=========================================================
+    // Confirm
+    //=========================================================
 
     public void ConfirmGoals()
     {
         GoalUI.ShowAlert(false);
+
         BottomDisplayUI.Instance.GoalPreview.SetText(shuffledGoals);
         BottomDisplayUI.Instance.ShowPreview();
+
         isGoalConfirmed = true;
         isRerollAvailable = false;
+
+        OnGoalConfirmed?.Invoke();
+
         SeasonManager.Instance.FinishStart();
     }
+
+    //=========================================================
+    // Season
+    //=========================================================
 
     public void SeasonReset()
     {
         GoalUI.ShowAlert(true);
+
         ResetRerollCount();
         GenerateGoals();
         SetGoals();
@@ -202,6 +276,10 @@ public class GoalManager : MonoBehaviour
         GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * rerollCount);
     }
 
+    //=========================================================
+    // Reward
+    //=========================================================
+
     private void GenerateRewards()
     {
         RewardTable.Add(GoalDifficulty.Easy, new GoalReward(100, 25));
@@ -214,34 +292,37 @@ public class GoalManager : MonoBehaviour
     {
         RewardTable.TryGetValue(difficulty, out GoalReward reward);
 
-        reward.DevelopResource *= (int)(UnlockManager.Instance.IsUnlocked(GOAL_REWARD) ? 1.2f : 1f);
-        reward.TrustPoint *= (int)(UnlockManager.Instance.IsUnlocked(GOAL_REWARD) ? 1.2f : 1f);
+        float multiplier = UnlockManager.Instance.IsUnlocked(GOAL_REWARD) ? 1.2f : 1f;
+
+        reward.DevelopResource *= (int)multiplier;
+        reward.TrustPoint *= (int)multiplier;
 
         return reward;
     }
 
+    //=========================================================
+    // Evaluate
+    //=========================================================
+
     public void EvaluateAllGoals()
     {
         foreach (DeveloperGoal goal in shuffledGoals)
-        {
             goal.Evaluate();
-        }
 
         RefreshUI();
-        //todo ui에 진행상황 연결하기
+
+        // TODO: UI에 진행상황 연결하기
     }
 
     public void CalculateGoals()
     {
         Debug.Log("CalculateGoals");
+
         EvaluateAllGoals();
 
         foreach (DeveloperGoal goal in shuffledGoals)
         {
-            if (goal.IsComplete)
-            {
-                ResourceManager.Instance.AddReward(goal.Reward);
-            }
+            if (goal.IsComplete) ResourceManager.Instance.AddReward(goal.Reward);
         }
     }
 
@@ -249,7 +330,6 @@ public class GoalManager : MonoBehaviour
     {
         GoalUI.RefreshUI();
     }
-
 }
 
 public enum GoalDifficulty

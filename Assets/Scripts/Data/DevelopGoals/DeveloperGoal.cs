@@ -20,6 +20,8 @@ public abstract class DeveloperGoal
         IsComplete = CheckCompleted();
     }
 
+    public abstract void Initialize();
+
     protected abstract bool CheckCompleted();
     public abstract float GetCurrentProgress();
 }

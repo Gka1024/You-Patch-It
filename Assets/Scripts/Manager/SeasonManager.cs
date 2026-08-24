@@ -33,6 +33,8 @@ public class SeasonManager : MonoBehaviour
     private bool isSeasonFinished = false;
     public bool IsSeasonFinished => isSeasonFinished;
 
+    public event System.Action OnSeasonEnd;
+
     List<RuntimePlayer> players;
     List<MatchData> matches;
     List<BattleResult> results;
@@ -211,6 +213,7 @@ public class SeasonManager : MonoBehaviour
 
             case SeasonState.End:
                 isSeasonFinished = true;
+                OnSeasonEnd?.Invoke();
                 PlayerManager.Instance.UpdatePlayerCount(SeasonRandom);
                 UIManager.Instance.dashBoardUI.ShowSeasonReports();
                 UIManager.Instance.seasonReportUI.Initialize(CurrentSeason);

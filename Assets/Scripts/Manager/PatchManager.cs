@@ -10,6 +10,7 @@ public class PatchManager : MonoBehaviour
 
     public event Action<PatchRecord> OnPatchApplied;
     public event Action<PatchRecord> OnPatchUndone;
+    public event Action OnPatchConfirmed;
 
     [SerializeField] private int patchRequireResource;
 
@@ -57,13 +58,14 @@ public class PatchManager : MonoBehaviour
             return;
         }
 
-        if (!GoalManager.Instance.IsGoalSet)
+        if (!GoalManager.Instance.IsGoalSet && GoalManager.Instance.IsGoalAvailable)
         {
             UIManager.Instance.GoalUnsetAlert.GetComponent<TextMeshProUGUI>().color = Color.red;
         }
         else
         {
             UIManager.Instance.GoalUnsetAlert.GetComponent<TextMeshProUGUI>().color = Color.white;
+            OnPatchConfirmed?.Invoke();
             SeasonManager.Instance.FinishPatch();
         }
     }

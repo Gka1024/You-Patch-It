@@ -12,7 +12,7 @@ public class ReverseMetaGoal : DeveloperGoal
     {
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

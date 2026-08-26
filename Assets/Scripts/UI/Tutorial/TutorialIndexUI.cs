@@ -8,6 +8,8 @@ public class TutorialIndexUI : MonoBehaviour, IPointerClickHandler
     public GameObject[] contents;
     public GameObject nextUI;
 
+    [SerializeField] private GameObject RootObject;
+
     protected virtual void Awake()
     {
         index = 0;
@@ -39,6 +41,11 @@ public class TutorialIndexUI : MonoBehaviour, IPointerClickHandler
 
     private void ShowNextTutorial()
     {
+        if(nextUI == null)
+        {
+            RootObject.SetActive(false);
+        }
+
         nextUI.SetActive(true);
     }
 }

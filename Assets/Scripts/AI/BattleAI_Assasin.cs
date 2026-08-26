@@ -1,4 +1,4 @@
-using Unity.VisualScripting.FullSerializer;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObject/Character/AI/AssasinAI")]

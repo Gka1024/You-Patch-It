@@ -13,7 +13,7 @@ public class MinPickRateGoal : DeveloperGoal
         this.minPickRate = min;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

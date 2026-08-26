@@ -12,6 +12,6 @@ public class TutorialUI : MonoBehaviour
 
     private void SkipTutorial()
     {
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
     }
 }

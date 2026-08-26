@@ -33,6 +33,9 @@ public class BattleCharacter
 
     public bool isSkillReady;
 
+    public BattleCharacter currentTarget;
+    public float targetUpdateTimer;
+
     public bool CanAttack => attackCooldown <= 0f;
     public bool CanThink => reactionTimer <= 0f;
     public bool CanAct => actionLockTime <= 0f;
@@ -62,7 +65,7 @@ public class BattleCharacter
         reactionTimer = 0f;
         skillDelayTimer = 0f;
 
-        isSkillReady = true;
+        isSkillReady = false;
     }
 
     // ============================================================
@@ -90,7 +93,7 @@ public class BattleCharacter
         reactionTimer = 0f;
         skillDelayTimer = 0f;
 
-        isSkillReady = true;
+        isSkillReady = false;
     }
 
     private void InitializeStats()
@@ -115,7 +118,10 @@ public class BattleCharacter
         reactionTimer = 0f;
         skillDelayTimer = 0f;
 
-        isSkillReady = true;
+        isSkillReady = false;
+
+        currentTarget = null;
+        targetUpdateTimer = 0f;
     }
 
     // ============================================================

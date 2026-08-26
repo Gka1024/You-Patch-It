@@ -54,6 +54,7 @@ public class InspectorUI : MonoBehaviour
     public void Show(RuntimeCharacter character)
     {
         currentCharacter = character;
+        patchReason.Show(false);
         InitializeStats();
         InitializeAnalysis();
         InitializeWinrate();
@@ -102,9 +103,20 @@ public class InspectorUI : MonoBehaviour
     private void ShowPatchReason()
     {
         if (currentCharacter == null) return;
+        if (!CheckDelta()) return;
+
         patchReason.Show(true);
         patchConfirmButton.interactable = false;
         patchReason.ResourceLackAlert.SetActive(false);
+    }
+
+    private bool CheckDelta()
+    {
+        foreach (GameObject row in StatRows)
+        {
+            if (row.GetComponent<InspectorRowUI>().HasChange()) return true;
+        }
+        return false;
     }
 
     private void ApplyPatch()
@@ -114,10 +126,21 @@ public class InspectorUI : MonoBehaviour
 
         List<CharacterPatch> patches = new();
 
+        bool HasChange = false;
+
         foreach (GameObject row in StatRows)
         {
             InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
+
+            if (!HasChange) HasChange = rowUI.HasChange();
+
             patches.Add(rowUI.GetPatch());
+        }
+
+        if (!HasChange)
+        {
+            patchReason.Show(false);
+            return;
         }
 
         List<PatchReason> reasons = patchReason.GetComponent<PatchReasonPopupUI>().GetPatchReasons();

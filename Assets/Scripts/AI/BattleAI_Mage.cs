@@ -1,4 +1,4 @@
-using Unity.VisualScripting.FullSerializer;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObject/Character/AI/MageAI")]
@@ -30,4 +30,6 @@ public class BattleAI_Mage : BattleAI
         return BattleAction.None;
 
     }
+
+
 }

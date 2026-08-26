@@ -121,7 +121,7 @@ public class GoalManager : MonoBehaviour
 
         foreach (DeveloperGoal goal in shuffledGoals)
         {
-            goal.Initialize();
+            goal.Refresh();
         }
 
         if (IsGoalAvailable)
@@ -199,10 +199,10 @@ public class GoalManager : MonoBehaviour
 
     private void CheckSecondGoal()
     {
-        currentGoalCount = 2;
-
         if (!UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT_1))
             return;
+
+        currentGoalCount = 2;
 
         UnlockManager.Instance.OnUnlockChanged -= CheckSecondGoal;
 
@@ -214,10 +214,10 @@ public class GoalManager : MonoBehaviour
 
     private void CheckThirdGoal()
     {
-        currentGoalCount = 3;
-
         if (!UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT_2))
             return;
+
+        currentGoalCount = 3;
 
         UnlockManager.Instance.OnUnlockChanged -= CheckThirdGoal;
 

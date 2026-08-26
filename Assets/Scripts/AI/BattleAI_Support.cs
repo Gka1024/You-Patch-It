@@ -1,4 +1,4 @@
-using Unity.VisualScripting.FullSerializer;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObject/Character/AI/SupportAI")]
@@ -30,4 +30,6 @@ public class BattleAI_Support : BattleAI
         return BattleAction.None;
 
     }
+
+    
 }

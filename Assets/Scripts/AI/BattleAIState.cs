@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class BattleAIState
 {
@@ -24,6 +25,11 @@ public class BattleAIState
     public BattleAction DecideAction(BattleCharacter self, BattleCharacter enemy)
     {
         return originAI.DecideAction(self, enemy, this);
+    }
+
+    public BattleCharacter GetTarget(BattleCharacter self, List<BattleCharacter> enemys)
+    {
+        return originAI.GetTarget(self, enemys, this);
     }
 
     private float GetRandomValue(float baseValue, float consistency, Random random)

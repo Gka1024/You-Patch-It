@@ -5,7 +5,7 @@ public class IntroduceTutorialUI : TutorialIndexUI
         PatchManager.Instance.OnPatchConfirmed += OnSeasonProceeded;
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         PatchManager.Instance.OnPatchConfirmed -= OnSeasonProceeded;
 

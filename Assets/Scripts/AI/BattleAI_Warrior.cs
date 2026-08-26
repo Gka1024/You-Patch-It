@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObject/Character/AI/WarriorAI")]
@@ -29,4 +30,5 @@ public class BattleAI_Warrior : BattleAI
 
         return BattleAction.None;
     }
+
 }

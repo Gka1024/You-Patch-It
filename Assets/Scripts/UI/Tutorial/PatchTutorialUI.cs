@@ -11,7 +11,7 @@ public class PatchTutorialUI : TutorialIndexUI
         report.OnProceed += OnProceed;
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         PatchManager.Instance.OnPatchApplied -= OnCharacterPatched;
         PatchManager.Instance.OnPatchConfirmed -= OnPatchConfirmed;

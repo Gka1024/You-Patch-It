@@ -55,6 +55,7 @@ public class UnlockManager : MonoBehaviour
     public bool CanUnlock(UnlockData data)
     {
         if (IsUnlocked(data)) return false;
+        if (SeasonManager.Instance.CurrentSeason == 1) return false;
 
         foreach (UnlockData pre in data.prerequisites)
         {
@@ -69,7 +70,7 @@ public class UnlockManager : MonoBehaviour
 
     public bool Unlock(UnlockData data)
     {
-        //Debug.Log($"Unlocked : {data.unlockName}");
+        Debug.Log($"Unlock : {data.unlockName}");
 
         if (!CanUnlock(data)) return false;
 

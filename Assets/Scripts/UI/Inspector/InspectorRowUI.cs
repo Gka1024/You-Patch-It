@@ -63,6 +63,11 @@ public class InspectorRowUI : MonoBehaviour
         RefreshUI();
     }
 
+    public bool HasChange()
+    {
+        return changeValueFloat != 0;
+    }
+
     public CharacterPatch GetPatch()
     {
         return new CharacterPatch(statType, currentValueFloat, currentValueFloat + changeValueFloat);

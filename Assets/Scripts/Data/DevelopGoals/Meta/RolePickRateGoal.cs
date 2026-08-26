@@ -14,7 +14,7 @@ public class RolePickrateGoal : DeveloperGoal
         this.minPickrate = minPickrate;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

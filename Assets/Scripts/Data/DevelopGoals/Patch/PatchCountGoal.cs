@@ -13,7 +13,7 @@ public class PatchCountGoal : DeveloperGoal
         this.maxPatchCount = maxPatchCount;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

@@ -40,4 +40,4 @@ MonoBehaviour:
     value: 1.7
   skill: {fileID: 11400000, guid: c2852eec8e4028b40b9baf1a61f1e751, type: 2}
   defaultEditableStats: 00000000010000000200000004000000
-  battleAI: {fileID: 11400000, guid: e6b4f5c38a12d2344b191767cd4daf5a, type: 2}
+  battleAI: {fileID: 11400000, guid: a1cacc51a563e224391a9c0839abffdf, type: 2}

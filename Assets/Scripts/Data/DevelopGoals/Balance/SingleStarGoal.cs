@@ -14,7 +14,7 @@ public class SingleStarGoal : DeveloperGoal
         this.winrate = winrate;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

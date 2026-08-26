@@ -10,7 +10,7 @@ public class NoAttackPatchGoal : DeveloperGoal
     
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

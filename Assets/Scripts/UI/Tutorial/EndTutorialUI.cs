@@ -6,12 +6,14 @@ public class EndTutorialUI : TutorialIndexUI
     {
         SeasonManager.Instance.OnSeasonEnd += OnSeasonEnd;
         UnlockManager.Instance.OnUnlockChanged += OnTutorialEnd;
+        UnityEngine.Debug.Log("start");
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         SeasonManager.Instance.OnSeasonEnd -= OnSeasonEnd;
         UnlockManager.Instance.OnUnlockChanged -= OnTutorialEnd;
+        UnityEngine.Debug.Log("disable");
     }
 
     private void OnSeasonEnd()
@@ -25,18 +27,15 @@ public class EndTutorialUI : TutorialIndexUI
 
     private void OnTutorialEnd()
     {
-        if (index != 4) return;
+        if (index != 3) return;
 
         if (UnlockManager.Instance.IsUnlocked(ADD_GAME_3VS3))
         {
             UnlockManager.Instance.OnUnlockChanged -= OnTutorialEnd;
-
-        }
-        else
-        {
             EnterNextPage();
-        }
 
+        }
+        
     }
 
 }

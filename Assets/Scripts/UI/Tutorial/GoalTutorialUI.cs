@@ -6,7 +6,7 @@ public class GoalTutorialUI : TutorialIndexUI
         GoalManager.Instance.OnGoalConfirmed += OnGoalConfirmed;
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         GoalManager.Instance.OnGoalChanged -= OnGoalChanged;
         GoalManager.Instance.OnGoalConfirmed -= OnGoalConfirmed;

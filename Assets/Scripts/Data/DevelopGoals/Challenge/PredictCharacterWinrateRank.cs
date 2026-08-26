@@ -13,7 +13,7 @@ public class PredictCharacterWinrateRank : DeveloperGoal
         this.rank = rank;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

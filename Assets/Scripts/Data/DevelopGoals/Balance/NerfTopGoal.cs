@@ -13,10 +13,10 @@ public class NerfTopGoal : DeveloperGoal
 
     public NerfTopGoal(GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
     {
-        Initialize();
+        Refresh();
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
         targetCharacter = GetTarget();
     }

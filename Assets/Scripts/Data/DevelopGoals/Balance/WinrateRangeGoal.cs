@@ -13,7 +13,7 @@ public class WinrateRangeGoal : DeveloperGoal
         this.maxWinrate = maxWinrate;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

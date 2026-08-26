@@ -55,6 +55,7 @@ public class DashBoardUI : MonoBehaviour
     public void ShowCharacter()
     {
         RemoveAll();
+        SeasonManager.Instance.CheckSeasonFinished();
 
         CharacterTable.SetActive(true);
         Inspector.SetActive(true);
@@ -64,12 +65,16 @@ public class DashBoardUI : MonoBehaviour
     public void ShowPatchNote()
     {
         RemoveAll();
+        SeasonManager.Instance.CheckSeasonFinished();
+
         PatchNotes.SetActive(true);
     }
 
     public void ShowUnlock()
     {
         RemoveAll();
+        SeasonManager.Instance.CheckSeasonFinished();
+
         UnlockUI.SetActive(true);
         OnUnlockUIOpen?.Invoke();
     }
@@ -77,6 +82,8 @@ public class DashBoardUI : MonoBehaviour
     public void ShowGoals()
     {
         RemoveAll();
+        SeasonManager.Instance.CheckSeasonFinished();
+        
         DeveloperGoal.GetComponent<DeveloperGoalUI>().RefreshUI();
         DeveloperGoal.SetActive(true);
     }

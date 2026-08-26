@@ -10,7 +10,7 @@ public class MobilityPatchGoal : DeveloperGoal
         
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

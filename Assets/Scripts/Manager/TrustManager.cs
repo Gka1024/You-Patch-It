@@ -7,6 +7,8 @@ public class TrustManager : MonoBehaviour
 {
     public static TrustManager Instance;
 
+    private bool Is3vs3Unlocked = false;
+
     [SerializeField] private List<TierWeight> tierWeights = new();
 
     private void Awake()
@@ -25,7 +27,6 @@ public class TrustManager : MonoBehaviour
         ResourceManager.Instance.GiveSeasonReward(developResource, trust);
 
         Debug.Log($"Reward : +{developResource} Develop / {trust:+0;-0;0} Trust");
-
     }
 
     //====================================================
@@ -34,9 +35,12 @@ public class TrustManager : MonoBehaviour
 
     private int CalculateSeasonDevelopResource()
     {
-        return Mathf.RoundToInt(
-            20 +
-            ResourceManager.Instance.TrustPoint * 0.5f);
+        if (!Is3vs3Unlocked)
+        {
+            return Mathf.RoundToInt(10 + ResourceManager.Instance.TrustPoint * 0.3f);
+        }
+
+        return Mathf.RoundToInt(40 + ResourceManager.Instance.TrustPoint * 0.5f);
     }
 
     private int CalculateSeasonTrust()

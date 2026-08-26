@@ -210,6 +210,7 @@ public class BattleSimulator : MonoBehaviour
         character.attackCooldown = Mathf.Max(0f, character.attackCooldown - TICK);
         character.actionLockTime = Mathf.Max(0f, character.actionLockTime - TICK);
         character.reactionTimer = Mathf.Max(0f, character.reactionTimer - TICK);
+        character.targetUpdateTimer = Mathf.Max(0f, character.targetUpdateTimer - TICK);
 
         HealCharacter(character, character.runtimeCharacter.GetStat(CharacterStatType.HealthRegen) / 100f);
         RegenManaOnTick(character, character.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 100f);
@@ -252,22 +253,44 @@ public class BattleSimulator : MonoBehaviour
             if (character.IsDead || !character.CanAct || !character.CanThink)
                 continue;
 
-            BattleCharacter target = SelectTarget(character, enemyTeam);
+            UpdateTarget(character, enemyTeam);
 
-            if (target == null)
+            if (character.currentTarget == null)
                 continue;
 
             character.reactionTimer = GetReactionTime(character);
 
-            BattleAction action = character.aiState.DecideAction(character, target);
+            BattleAction action = character.aiState.DecideAction(character, character.currentTarget);
 
             if (action == BattleAction.None)
                 continue;
 
             BattleActionCommand command = GetCommand();
-            command.Set(character, target, action);
+            command.Set(character, character.currentTarget, action);
             commands.Add(command);
         }
+    }
+
+    private void UpdateTarget(BattleCharacter character, List<BattleCharacter> enemyTeam)
+    {
+        if (character.currentTarget == null || character.currentTarget.IsDead)
+        {
+            character.currentTarget = SelectTarget(character, enemyTeam);
+            character.targetUpdateTimer = GetTargetUpdateInterval(character);
+            return;
+        }
+
+        if (character.targetUpdateTimer > 0f)
+            return;
+
+        character.currentTarget = SelectTarget(character, enemyTeam);
+        character.targetUpdateTimer = GetTargetUpdateInterval(character);
+    }
+
+    private float GetTargetUpdateInterval(BattleCharacter character)
+    {
+        float reaction = character.player.ReactionTime / 100f;
+        return Mathf.Lerp(1f, 0.5f, reaction);
     }
 
     private BattleActionCommand GetCommand()
@@ -292,31 +315,7 @@ public class BattleSimulator : MonoBehaviour
 
     private BattleCharacter SelectTarget(BattleCharacter attacker, List<BattleCharacter> enemyTeam)
     {
-        BattleCharacter target = null;
-        float closestDistance = float.MaxValue;
-
-        for (int i = 0; i < enemyTeam.Count; i++)
-        {
-            BattleCharacter enemy = enemyTeam[i];
-
-            if (enemy.IsDead)
-                continue;
-
-            float distance = GetDistance(attacker, enemy);
-
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                target = enemy;
-            }
-        }
-
-        return target;
-    }
-
-    private float GetDistance(BattleCharacter attacker, BattleCharacter target)
-    {
-        return Mathf.Abs(attacker.position - target.position);
+        return attacker.aiState.GetTarget(attacker, enemyTeam);
     }
 
     private void ExecuteActions(System.Random random)

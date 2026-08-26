@@ -39,7 +39,7 @@ public class ResourceManager : MonoBehaviour
     // Reward
     //====================================================
 
-    public void CheckReward()
+    public void CheckGameOver()
     {
         if (trust <= 0)
         {

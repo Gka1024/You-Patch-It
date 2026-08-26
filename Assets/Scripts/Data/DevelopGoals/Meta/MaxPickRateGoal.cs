@@ -11,7 +11,7 @@ public class MaxPickRateGoal : DeveloperGoal
         this.maxPickRate = maxPickRate;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

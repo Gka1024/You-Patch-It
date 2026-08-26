@@ -10,6 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cc082c3bd711991408b3f839f639db1c, type: 3}
-  m_Name: Melee AI
+  m_Name: 100_Melee_AI
   m_EditorClassIdentifier: 
   prefferedDistance: 0
+  roleScoresList:
+  - role: 0
+    score: 5
+  - role: 1
+    score: 7
+  - role: 2
+    score: 6
+  - role: 3
+    score: 2
+  - role: 4
+    score: 4
+  - role: 5
+    score: 6

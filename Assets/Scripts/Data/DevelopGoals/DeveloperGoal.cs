@@ -20,7 +20,7 @@ public abstract class DeveloperGoal
         IsComplete = CheckCompleted();
     }
 
-    public abstract void Initialize();
+    public abstract void Refresh();
 
     protected abstract bool CheckCompleted();
     public abstract float GetCurrentProgress();

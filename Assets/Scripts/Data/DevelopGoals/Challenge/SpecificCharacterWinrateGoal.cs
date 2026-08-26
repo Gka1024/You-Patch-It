@@ -14,7 +14,7 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
         this.maxWinrate = maxWinrate;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
         character = RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter;
     }

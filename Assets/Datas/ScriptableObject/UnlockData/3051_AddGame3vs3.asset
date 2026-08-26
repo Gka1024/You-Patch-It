@@ -15,10 +15,9 @@ MonoBehaviour:
   id: 3051
   unlockName: "3 vs 3 \uCD94\uAC00\uD558\uAE30"
   description: "\uAC8C\uC784\uC5D0 3:3 \uBAA8\uB4DC\uB97C \uCD94\uAC00\uD569\uB2C8\uB2E4.
-    \uD29C\uD1A0\uB9AC\uC5BC\uC774 \uC885\uB8CC\uB429\uB2C8\uB2E4."
+    \uCD94\uAC00\uC801\uC73C\uB85C \uC5BB\uB294 \uB9AC\uC18C\uC2A4\uAC00 \uC99D\uAC00\uD569\uB2C8\uB2E4."
   category: 2
   costResource: 100
   icon: {fileID: 0}
-  prerequisites:
-  - {fileID: 11400000, guid: 3e66dd613ca51ec49ab12c32a2cad95a, type: 2}
+  prerequisites: []
   NextData: {fileID: 0}

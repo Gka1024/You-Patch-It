@@ -11,7 +11,7 @@ public class SingleStatPatchGoal : DeveloperGoal
     {
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

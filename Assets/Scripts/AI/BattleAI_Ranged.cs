@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
@@ -30,4 +31,6 @@ public class BattleAI_Ranged : BattleAI
         return BattleAction.None;
 
     }
+
+  
 }

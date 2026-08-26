@@ -18,7 +18,7 @@ public class WinrateBandGoal : DeveloperGoal
         requiredCount = count;
     }
 
-    public override void Initialize()
+    public override void Refresh()
     {
 
     }

@@ -102,6 +102,11 @@ public class SeasonManager : MonoBehaviour
         StartSeason();
     }
 
+    public void CheckSeasonFinished()
+    {
+        if(isSeasonFinished) NextSeason();
+    }
+
     public void FinishStart()
     {
         ChangeState(SeasonState.Patch);
@@ -200,7 +205,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Reward:
-                ResourceManager.Instance.CheckReward();
+                ResourceManager.Instance.CheckGameOver();
                 if (RuntimeCharacterManager.Instance.HasLockedCharacter())
                 {
                     RuntimeCharacterManager.Instance.AddRandomCharacter(SeasonRandom);
@@ -215,6 +220,7 @@ public class SeasonManager : MonoBehaviour
                 isSeasonFinished = true;
                 OnSeasonEnd?.Invoke();
                 PlayerManager.Instance.UpdatePlayerCount(SeasonRandom);
+                GoalManager.Instance.ChangeGoals();
                 UIManager.Instance.dashBoardUI.ShowSeasonReports();
                 UIManager.Instance.seasonReportUI.Initialize(CurrentSeason);
                 UIManager.Instance.bottomDisplayUI.GoalPreview.Reset();

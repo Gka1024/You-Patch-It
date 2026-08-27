@@ -11,6 +11,15 @@ public class TrustManager : MonoBehaviour
 
     [SerializeField] private List<TierWeight> tierWeights = new();
 
+    private readonly List<TrustReportData> seasonTrustReports = new();
+    public IReadOnlyList<TrustReportData> SeasonTrustReports => seasonTrustReports;
+
+    private readonly List<CharacterTrustReport> characterTrustReports = new();
+    public IReadOnlyList<CharacterTrustReport> CharacterTrustReports => characterTrustReports;
+
+    private readonly List<TrustReportData> seasonResourceReports = new();
+    public IReadOnlyList<TrustReportData> SeasonResourceReports => seasonResourceReports;
+
     private void Awake()
     {
         Instance = this;
@@ -35,36 +44,110 @@ public class TrustManager : MonoBehaviour
 
     private int CalculateSeasonDevelopResource()
     {
+        seasonResourceReports.Clear();
+
+        int baseResource;
+        float trustMultiplier;
+
         if (!Is3vs3Unlocked)
         {
-            return Mathf.RoundToInt(10 + ResourceManager.Instance.TrustPoint * 0.3f);
+            baseResource = 30;
+            trustMultiplier = 0.9f;
+        }
+        else
+        {
+            baseResource = 50;
+            trustMultiplier = 1.2f;
         }
 
-        return Mathf.RoundToInt(40 + ResourceManager.Instance.TrustPoint * 0.5f);
-    }
+        float trustPoint = ResourceManager.Instance.TrustPoint;
+        int trustResource = Mathf.RoundToInt(trustPoint * trustMultiplier);
 
+        seasonResourceReports.Add(
+            new TrustReportData(
+                "기본 지급",
+                baseResource,
+                "시즌 종료에 따른 기본 개발 리소스"
+            )
+        );
+
+        seasonResourceReports.Add(
+            new TrustReportData(
+                "신뢰도 보너스",
+                trustResource,
+                $"현재 신뢰도 {trustPoint:0} x {trustMultiplier:0.0}"
+            )
+        );
+
+        return baseResource + trustResource;
+    }
+    
     private int CalculateSeasonTrust()
     {
+        seasonTrustReports.Clear();
+
         int trust = 0;
-        int temp;
 
-        temp = EvaluateWinRate();
-        Debug.Log($"Winrate : {temp}");
-        trust += temp;
+        // 승률
 
-        temp = EvaluateCharacterIdentity();
-        Debug.Log($"Identity : {temp}");
-        trust += temp;
+        int winrateScore = EvaluateWinRate();
 
-        temp = EvaluateMetaDiversity();
-        Debug.Log($"Meta : {temp}");
-        trust += temp;
+        seasonTrustReports.Add(
+            new TrustReportData("캐릭터 밸런스", winrateScore, GetTrustDescription("캐릭터들의 승률이 50%에 가까울수록 높은 평가를 받습니다.",
+                    winrateScore)
+            )
+        );
 
-        temp = EvaluateRoleBalance();
-        Debug.Log($"Balance : {temp}");
-        trust += temp;
+        trust += winrateScore;
+
+        // 캐릭터 아이덴티티
+
+        int identityScore = EvaluateCharacterIdentity();
+
+        seasonTrustReports.Add(
+                        new TrustReportData("캐릭터 개성", identityScore, GetTrustDescription("캐릭터마다 서로 다른 능력치를 가지고 있을수록 높은 평가를 받습니다.",
+                    identityScore)
+            )
+        );
+
+        trust += identityScore;
+
+        // 메타 다양성
+
+        int metaScore = EvaluateMetaDiversity();
+
+        seasonTrustReports.Add(
+            new TrustReportData("메타 다양성", metaScore, GetTrustDescription("특정 캐릭터에 픽률이 집중되지 않을수록 높은 평가를 받습니다.",
+               metaScore)
+            )
+        );
+
+        trust += metaScore;
+
+        // 직업군 밸런스
+
+        int roleScore = EvaluateRoleBalance();
+
+        seasonTrustReports.Add(
+            new TrustReportData("직업군 밸런스", roleScore, GetTrustDescription("각 직업군의 평균 승률이 균형을 이룰수록 높은 평가를 받습니다.",
+                    roleScore)
+            )
+        );
+
+        trust += roleScore;
 
         return trust;
+    }
+
+    private string GetTrustDescription(string baseDescription, float score)
+    {
+        if (score > 3)
+            return $"{baseDescription}\n : 긍정적";
+
+        if (score < -3)
+            return $"{baseDescription}\n : 개선 필요";
+
+        return $"{baseDescription}\n : 보통";
     }
 
     //====================================================
@@ -72,8 +155,10 @@ public class TrustManager : MonoBehaviour
     //====================================================
 
     private int EvaluateWinRate()
-    { // 각 캐릭터의 티어별 승률을 기준으로 신뢰도 평가
+    {
         List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+
+        characterTrustReports.Clear();
 
         if (characters.Count == 0)
             return 0;
@@ -85,57 +170,35 @@ public class TrustManager : MonoBehaviour
         {
             CharacterStatistics stat = StatisticsManager.Instance.GetCurrentStatistics(character);
 
+            float characterScore = 0f;
+            float characterWeight = 0f;
+
             foreach (PlayerTier tier in Enum.GetValues(typeof(PlayerTier)))
             {
                 TierStatistics tierStat = stat.TierStatistics[tier];
 
-                // 해당 티어에서 전투가 없으면 평가하지 않음
                 if (tierStat.MatchCount <= 0)
                     continue;
 
-                // ----------------------------------------
-                // 승률 -> 0 ~ 10점
-                // ----------------------------------------
-
                 float score = CalculateWinRateScore(tierStat.WinRate);
-
                 score = Mathf.Clamp(score, -20f, 10f);
 
-                // ----------------------------------------
-                // 티어 가중치
-                // ----------------------------------------
-
                 float tierWeight = GetTierWeight(tier);
-
-                // ----------------------------------------
-                // 표본 수 보정
-                //
-                // 경기 수가 많을수록 신뢰도 증가
-                // 단, sqrt를 사용해서 완만하게 증가
-                // ----------------------------------------
-
                 float sampleWeight = Mathf.Sqrt(tierStat.WinCount + tierStat.LoseCount);
 
                 float weight = tierWeight * sampleWeight;
 
-                // ----------------------------------------
-                // 가중 평균
-                // ----------------------------------------
-
                 totalScore += score * weight;
                 totalWeight += weight;
 
-                Debug.Log(
-    $"Character : {character.OriginCharacter.characterName} | " +
-    $"Tier : {tier} | " +
-    $"WinRate : {tierStat.WinRate:F1}% | " +
-    $"Score : {score:F2} | " +
-    $"TierWeight : {tierWeight:F2} | " +
-    $"SampleWeight : {sampleWeight:F2} | " +
-    $"Weight : {weight:F2} | " +
-    $"CumulativeScore : {(totalScore / totalWeight):F2}"
-);
+                characterScore += score * weight;
+                characterWeight += weight;
             }
+
+            // 해당 캐릭터의 최종 기여도
+            float finalCharacterScore = characterWeight <= 0f ? 0f : characterScore / characterWeight;
+
+            characterTrustReports.Add(new CharacterTrustReport(character, finalCharacterScore));
         }
 
         if (totalWeight <= 0f)
@@ -305,30 +368,36 @@ public class TrustManager : MonoBehaviour
     // ----------------------------------------
 
     private int EvaluateRoleBalance()
-    { // 특정 직업군 편향에 따른 신뢰도 평가
+    {
         int score = 0;
 
         foreach (CharacterRole role in Enum.GetValues(typeof(CharacterRole)))
         {
-            List<RuntimeCharacter> characters =
-                RuntimeCharacterManager.Instance
-                .GetCharactersInRole(role)
-                .ToList();
+            List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetCharactersInRole(role).ToList();
 
             if (characters.Count == 0)
                 continue;
 
-            float averageWinrate = 0;
+            float totalWinrate = 0f;
+            int evaluatedCount = 0;
 
             foreach (RuntimeCharacter character in characters)
             {
-                CharacterStatistics stat =
-                    StatisticsManager.Instance.GetCurrentStatistics(character);
+                CharacterStatistics stat = StatisticsManager.Instance.GetCurrentStatistics(character);
 
-                averageWinrate += stat.Winrate;
+                // 전투 기록이 없으면 평가에서 제외
+                if (stat.MatchCount <= 0) continue;
+
+                totalWinrate += stat.Winrate;
+                evaluatedCount++;
             }
 
-            averageWinrate /= characters.Count;
+            // 해당 직업군에 실제 전투 기록이 없으면 평가하지 않음
+            if (evaluatedCount == 0)
+                continue;
+
+            float averageWinrate =
+                totalWinrate / evaluatedCount;
 
             // 45~55는 정상
             if (averageWinrate >= 45f &&
@@ -340,14 +409,13 @@ public class TrustManager : MonoBehaviour
                 ? averageWinrate - 55f
                 : 45f - averageWinrate;
 
-            // 기하급수적으로 증가
             float penalty =
                 Mathf.Pow(delta / 5f, 2f);
 
             score -= Mathf.RoundToInt(penalty);
         }
 
-        return score;
+        return Mathf.Clamp(score, -20, 10);
     }
 }
 
@@ -356,4 +424,36 @@ public class TierWeight
 {
     public PlayerTier tier;
     public float weight = 1f;
+}
+
+[Serializable]
+public class TrustReportData
+{
+    public string title;
+    public float trust;
+    public string description;
+
+    public TrustReportData(string title, float trust, string description)
+    {
+        this.title = title;
+        this.trust = trust;
+        this.description = description;
+    }
+}
+
+[Serializable]
+public class CharacterTrustReport
+{
+    public int characterId;
+    public string characterName;
+    public float trust;
+
+    public CharacterTrustReport(
+        RuntimeCharacter character,
+        float trust)
+    {
+        characterId = character.OriginCharacter.id;
+        characterName = character.OriginCharacter.characterName;
+        this.trust = trust;
+    }
 }

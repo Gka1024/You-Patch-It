@@ -2,13 +2,13 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
 {
     private readonly float minWinrate;
     private readonly float maxWinrate;
-    private Character character;
+    private RuntimeCharacter character;
 
-    public override string Title => $"{character.characterName}가 좋아요";
+    public override string Title => $"{character.OriginCharacter.characterName}가 좋아요";
     public override string Description =>
-    $"{character.characterName}의 승률을 {minWinrate}% ~ {maxWinrate}%로 맞추세요.";
+    $"{character.OriginCharacter.characterName}의 승률을 {minWinrate}% ~ {maxWinrate}%로 맞추세요.";
 
-    public SpecificCharacterWinrateGoal(float minWinrate, float maxWinrate,  GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
+    public SpecificCharacterWinrateGoal(float minWinrate, float maxWinrate, GoalDifficulty difficulty, GoalType type) : base(difficulty, type)
     {
         this.minWinrate = minWinrate;
         this.maxWinrate = maxWinrate;
@@ -16,12 +16,13 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
 
     public override void Refresh()
     {
-        character = RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter;
+        character = RuntimeCharacterManager.Instance.GetRandomCharacter();
     }
 
     protected override bool CheckCompleted()
     {
-        return AnalysisManager.Instance.GetMaxValue(AnalysisItem.Pickrate, false) < 20f;
+        float winrate = AnalysisManager.Instance.GetAnalysis(character, AnalysisItem.Winrate).CurrentValue;
+        return 60 >= winrate && winrate >= 40;
     }
 
     public override float GetCurrentProgress()

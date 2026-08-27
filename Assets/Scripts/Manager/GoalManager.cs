@@ -12,6 +12,7 @@ public class GoalManager : MonoBehaviour
 
     private List<DeveloperGoal> GoalList = new();
     private List<DeveloperGoal> shuffledGoals = new();
+    public IReadOnlyList<DeveloperGoal> GetGoals => shuffledGoals;
     private Dictionary<GoalDifficulty, GoalReward> RewardTable = new();
 
     public bool IsGoalAvailable;
@@ -318,11 +319,17 @@ public class GoalManager : MonoBehaviour
     {
         Debug.Log("CalculateGoals");
 
+        if(!isGoalConfirmed) return;
+
         EvaluateAllGoals();
 
         foreach (DeveloperGoal goal in shuffledGoals)
         {
-            if (goal.IsComplete) ResourceManager.Instance.AddReward(goal.Reward);
+            if (goal.IsComplete)
+            {
+                ResourceManager.Instance.AddReward(goal.Reward);
+                Debug.Log(goal.Title);
+            }
         }
     }
 

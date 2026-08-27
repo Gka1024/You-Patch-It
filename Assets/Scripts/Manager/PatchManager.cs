@@ -53,7 +53,7 @@ public class PatchManager : MonoBehaviour
 
     public void ConfirmPatch()
     {
-        if(SeasonManager.Instance.IsSeasonFinished)
+        if (SeasonManager.Instance.IsSeasonFinished)
         {
             return;
         }
@@ -72,7 +72,7 @@ public class PatchManager : MonoBehaviour
 
     public bool ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
     {
-        if (!ResourceManager.Instance.SpendDevelopResource(GetRequieredResource()))
+        if (!ResourceManager.Instance.SpendDevelopResource(GetRequiredResource()))
         {
             UIManager.Instance.patchReasonPopupUI.ResourceLackAlert.SetActive(true);
             return false;
@@ -98,22 +98,22 @@ public class PatchManager : MonoBehaviour
         return true;
     }
 
-    private int GetRequieredResource()
+    public int GetRequiredResource()
     {
-        float multiflier = 1f;
+        float multiplier = 1f;
 
         if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_III))
-            multiflier = PATCH_REQUIRE_RESOURCE_III;
+            multiplier = PATCH_REQUIRE_RESOURCE_III;
+        else if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_II))
+            multiplier = PATCH_REQUIRE_RESOURCE_II;
+        else if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_I))
+            multiplier = PATCH_REQUIRE_RESOURCE_I;
 
-        if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_II))
-            multiflier = PATCH_REQUIRE_RESOURCE_II;
+        int result = Mathf.RoundToInt(multiplier * patchRequireResource);
 
-        if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_I))
-            multiflier = PATCH_REQUIRE_RESOURCE_I;
+        Debug.Log($"Multiplier : {multiplier}, Required Resource : {result}");
 
-        Debug.Log((int)multiflier * patchRequireResource);
-
-        return (int)multiflier * patchRequireResource;
+        return result;
     }
 
     public void Undo()

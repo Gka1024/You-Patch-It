@@ -13,11 +13,18 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private Button applyPatchButton;
     [SerializeField] private Button undoButton;
+    private readonly Dictionary<Transform, int> originalSiblingIndexes = new();
 
     [Header("Stats")]
     [SerializeField] private Button StatsButton;
     [SerializeField] private GameObject Stats;
     [SerializeField] private GameObject[] StatRows;
+    [SerializeField] private Transform NormalStatRows;
+    [SerializeField] private Transform SpecialStatRows;
+
+    [SerializeField] private TMP_Dropdown StatDropDown;
+    private readonly List<CharacterStatType> dropdownStatTypes = new();
+
 
     [Header("Analyses")]
     [SerializeField] private Button AnalysisButton;
@@ -42,6 +49,7 @@ public class InspectorUI : MonoBehaviour
         AnalysisButton.onClick.AddListener(ShowAnalysis);
         patchConfirmButton.onClick.AddListener(ApplyPatch);
         simulateButton.onClick.AddListener(Refresh);
+        CacheOriginalSiblingIndexes();
     }
 
     private void Start()
@@ -50,14 +58,16 @@ public class InspectorUI : MonoBehaviour
         PatchManager.Instance.OnPatchUndone += Refresh;
     }
 
+    // ==============================
+    // Initialize
+    // ==============================
+
 
     public void Show(RuntimeCharacter character)
     {
         currentCharacter = character;
         patchReason.Show(false);
-        InitializeStats();
-        InitializeAnalysis();
-        InitializeWinrate();
+        InitializeStatDropDown();
         Refresh();
     }
 
@@ -78,14 +88,57 @@ public class InspectorUI : MonoBehaviour
         InitializeStats();
     }
 
-    public void InitializeStats()
+    private void CacheOriginalSiblingIndexes()
     {
-        foreach (var row in StatRows)
+        originalSiblingIndexes.Clear();
+
+        foreach (GameObject row in StatRows)
         {
-            row.SetActive(true);
-            row.GetComponent<InspectorRowUI>().Initialize(currentCharacter);
+            originalSiblingIndexes[row.transform] = row.transform.GetSiblingIndex();
         }
     }
+
+    public void InitializeStats()
+    {
+        ShowAllStatRows(false);
+        ClearSpecialStatRows();
+
+        foreach (var row in StatRows)
+        {
+            if (currentCharacter.OriginCharacter.defaultEditableStats.Contains(row.GetComponent<InspectorRowUI>().StatType))
+            {
+                row.SetActive(true);
+                row.GetComponent<InspectorRowUI>().Initialize(currentCharacter);
+            }
+        }
+    }
+
+    private void InitializeStatDropDown()
+    {
+        StatDropDown.onValueChanged.RemoveAllListeners();
+
+        List<string> options = new() { "스탯 선택" };
+        dropdownStatTypes.Clear();
+
+        foreach (CharacterStatType type in System.Enum.GetValues(typeof(CharacterStatType)))
+        {
+            if (currentCharacter.OriginCharacter.defaultEditableStats.Contains(type))
+                continue;
+
+            options.Add(DisplayNameHelper.GetStatName(type));
+            dropdownStatTypes.Add(type);
+        }
+
+        StatDropDown.ClearOptions();
+        StatDropDown.AddOptions(options);
+
+        // 처음에는 "스탯 선택"
+        StatDropDown.value = 0;
+        StatDropDown.RefreshShownValue();
+
+        StatDropDown.onValueChanged.AddListener(OnStatChanged);
+    }
+
 
     private void InitializeAnalysis()
     {
@@ -99,6 +152,11 @@ public class InspectorUI : MonoBehaviour
     {
         Winrate.GetComponent<InspectorCombatAnalysisUI>().Initialize(currentCharacter);
     }
+
+
+    // ==============================
+    // Patch
+    // ==============================
 
     private void ShowPatchReason()
     {
@@ -152,6 +210,64 @@ public class InspectorUI : MonoBehaviour
         }
 
         Refresh();
+    }
+
+    // ==============================
+    // Show / Hide
+    // ==============================
+
+    private void ShowAllStatRows(bool show)
+    {
+        foreach (var row in StatRows)
+        {
+            row.SetActive(show);
+        }
+    }
+
+    private void ShowSpecificStats(CharacterStatType stat)
+    {
+        ClearSpecialStatRows();
+
+        foreach (GameObject row in StatRows)
+        {
+            InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
+
+            if (rowUI.StatType != stat)
+                continue;
+
+            row.transform.SetParent(SpecialStatRows, false);
+            row.transform.localPosition = Vector3.zero;
+            row.SetActive(true);
+            rowUI.Initialize(currentCharacter);
+            break;
+        }
+    }
+
+    private void ClearSpecialStatRows()
+    {
+        foreach (Transform child in SpecialStatRows)
+        {
+            child.SetParent(NormalStatRows, false);
+            child.gameObject.SetActive(false);
+        }
+
+        for (int i = 0; i < StatRows.Length; i++)
+        {
+            StatRows[i].transform.SetSiblingIndex(i);
+        }
+    }
+
+    private void OnStatChanged(int index)
+    {
+        if (index == 0)
+            return;
+
+        int statIndex = index - 1;
+
+        if (statIndex < 0 || statIndex >= dropdownStatTypes.Count)
+            return;
+
+        ShowSpecificStats(dropdownStatTypes[statIndex]);
     }
 
     public void ShowStats()

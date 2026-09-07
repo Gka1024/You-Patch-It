@@ -44,7 +44,7 @@ public class RuntimeCharacterManager : MonoBehaviour
             {
                 AddRuntimeCharacter(character.id);
             }
-            else if(primalAdditionalCharacterIds.Contains(character.id))
+            else if (primalAdditionalCharacterIds.Contains(character.id))
             {
                 continue;
             }
@@ -57,6 +57,11 @@ public class RuntimeCharacterManager : MonoBehaviour
 
     public RuntimeCharacter AddRandomCharacter(System.Random random)
     {
+        if(!HasLockedCharacter())
+        {
+            AddedRuntimeCharacter = null;
+        }
+
         if (primalAdditionalCharacterIds.Count > 0)
         {
             RuntimeCharacter character = AddRuntimeCharacter(primalAdditionalCharacterIds[0]);

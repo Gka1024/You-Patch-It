@@ -6,6 +6,7 @@ public class InspectorRowUI : MonoBehaviour
 {
     [Header("Stat")]
     [SerializeField] private CharacterStatType statType;
+    public CharacterStatType StatType => statType;
     [SerializeField] private float changeUnit; // 증감 단위
 
     [Header("UI")]

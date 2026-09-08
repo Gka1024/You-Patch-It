@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d69d0ebeac54ac4e8e0a4e1f0c627bb, type: 3}
   m_Name: 601_Bard
   m_EditorClassIdentifier: 
-  id: 602
-  characterName: "\uBB34\uB140"
+  id: 601
+  characterName: "\uC74C\uC720\uC2DC\uC778"
   role: 5
   stats:
   - statType: 0
@@ -38,6 +38,6 @@ MonoBehaviour:
     value: 100
   - statType: 10
     value: 1.7
-  skill: {fileID: 0}
-  defaultEditableStats: 00000000010000000200000004000000
+  skill: {fileID: 11400000, guid: 8eb6ed5f390b76549aa76f7e859c4e41, type: 2}
+  defaultEditableStats: 010000000300000004000000070000000a000000
   battleAI: {fileID: 11400000, guid: f1f675742f9ce4142924efb568c95706, type: 2}

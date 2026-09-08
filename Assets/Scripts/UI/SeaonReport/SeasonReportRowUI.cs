@@ -22,24 +22,23 @@ public class SeasonReportRowUI : MonoBehaviour
 
     private void SetText(RuntimeCharacter character, List<CharacterStatistics> stats)
     {
-        string textToWrite = "";
-        textToWrite += $"{character.OriginCharacter.characterName} : ";
+        string textToWrite = $"{character.OriginCharacter.characterName} : ";
 
-        if (RuntimeCharacterManager.Instance.AddedRuntimeCharacter.OriginCharacter.id == character.OriginCharacter.id)
+        bool isNewCharacter =
+            RuntimeCharacterManager.Instance.AddedRuntimeCharacter != null &&
+            RuntimeCharacterManager.Instance.AddedRuntimeCharacter.OriginCharacter.id ==
+            character.OriginCharacter.id;
+
+        if (isNewCharacter)
         {
             textToWrite += "신규 추가됨";
         }
         else
         {
-            for (int i = 0; i < stats.Count; i++)
-            {
-                textToWrite += $" {stats[i].Winrate:F1}";
-
-                if (i != stats.Count - 1)
-                {
-                    textToWrite += " - ";
-                }
-            }
+            textToWrite += string.Join(
+                " - ",
+                stats.ConvertAll(stat => $"{stat.Winrate:F1}")
+            );
         }
 
         RowText.text = textToWrite;

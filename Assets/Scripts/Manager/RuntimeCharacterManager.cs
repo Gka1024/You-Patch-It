@@ -60,19 +60,14 @@ public class RuntimeCharacterManager : MonoBehaviour
         if(!HasLockedCharacter())
         {
             AddedRuntimeCharacter = null;
-        }
+            return null;
+        } 
 
         if (primalAdditionalCharacterIds.Count > 0)
         {
             RuntimeCharacter character = AddRuntimeCharacter(primalAdditionalCharacterIds[0]);
             primalAdditionalCharacterIds.RemoveAt(0);
             return character;
-        }
-
-        if (lockedCharacters.Count == 0)
-        {
-            AddedRuntimeCharacter = null;
-            return null;
         }
 
         int index = random.Next(lockedCharacters.Count);
@@ -131,6 +126,14 @@ public class RuntimeCharacterManager : MonoBehaviour
     public IEnumerable<RuntimeCharacter> GetAllCharacters()
     {
         return runtimeCharacters.Values;
+    }
+
+    public void ResetAllCharacter()
+    {
+        foreach(RuntimeCharacter character in GetAllCharacters())
+        {
+            character.ResetSpecialStat();
+        }
     }
 
     public RuntimeCharacter GetRandomCharacter()

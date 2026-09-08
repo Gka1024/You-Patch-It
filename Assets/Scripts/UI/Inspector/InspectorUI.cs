@@ -110,6 +110,11 @@ public class InspectorUI : MonoBehaviour
                 row.SetActive(true);
                 row.GetComponent<InspectorRowUI>().Initialize(currentCharacter);
             }
+
+            if(currentCharacter.HasPatchedSpecialStat() == row.GetComponent<InspectorRowUI>().StatType)
+            {
+                ShowSpecificStats(row.GetComponent<InspectorRowUI>().StatType);
+            }
         }
     }
 
@@ -120,8 +125,11 @@ public class InspectorUI : MonoBehaviour
         List<string> options = new() { "스탯 선택" };
         dropdownStatTypes.Clear();
 
+        CharacterStatType? patchedStat = currentCharacter.HasPatchedSpecialStat();
+
         foreach (CharacterStatType type in System.Enum.GetValues(typeof(CharacterStatType)))
         {
+            // 기본 수정 가능 스탯은 드롭다운에서 제외
             if (currentCharacter.OriginCharacter.defaultEditableStats.Contains(type))
                 continue;
 
@@ -132,13 +140,28 @@ public class InspectorUI : MonoBehaviour
         StatDropDown.ClearOptions();
         StatDropDown.AddOptions(options);
 
-        // 처음에는 "스탯 선택"
-        StatDropDown.value = 0;
-        StatDropDown.RefreshShownValue();
+        // 이미 특수 스탯을 패치했다면 해당 스탯으로 고정
+        if (patchedStat.HasValue)
+        {
+            int index = dropdownStatTypes.IndexOf(patchedStat.Value);
 
+            if (index >= 0)
+            {
+                StatDropDown.value = index + 1;
+                StatDropDown.interactable = false;
+                ShowSpecificStats(patchedStat.Value);
+            }
+        }
+        else
+        {
+            // 아직 특수 스탯을 패치하지 않았다면 선택 가능
+            StatDropDown.value = 0;
+            StatDropDown.interactable = true;
+        }
+
+        StatDropDown.RefreshShownValue();
         StatDropDown.onValueChanged.AddListener(OnStatChanged);
     }
-
 
     private void InitializeAnalysis()
     {
@@ -207,6 +230,16 @@ public class InspectorUI : MonoBehaviour
         {
             InitializeStats();
             patchReason.Show(false);
+
+            foreach (GameObject row in StatRows)
+            {
+                InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
+
+                if (rowUI.HasChange() && !currentCharacter.OriginCharacter.defaultEditableStats.Contains(rowUI.StatType))
+                {
+                    currentCharacter.SetPatchedSpecialStat(rowUI.StatType);
+                }
+            }
         }
 
         Refresh();
@@ -234,6 +267,8 @@ public class InspectorUI : MonoBehaviour
 
             if (rowUI.StatType != stat)
                 continue;
+
+            Debug.Log(DisplayNameHelper.GetStatName(rowUI.StatType));
 
             row.transform.SetParent(SpecialStatRows, false);
             row.transform.localPosition = Vector3.zero;

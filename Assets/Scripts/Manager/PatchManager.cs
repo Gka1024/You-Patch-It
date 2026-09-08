@@ -61,6 +61,7 @@ public class PatchManager : MonoBehaviour
         if (!GoalManager.Instance.IsGoalSet && GoalManager.Instance.IsGoalAvailable)
         {
             UIManager.Instance.GoalUnsetAlert.GetComponent<TextMeshProUGUI>().color = Color.red;
+            UIManager.Instance.dashBoardUI.ShowGoals();
         }
         else
         {
@@ -72,15 +73,16 @@ public class PatchManager : MonoBehaviour
 
     public bool ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
     {
+        if (character == null) return false;
+
+        if (patches == null || patches.Count == 0) return false;
+
         if (!ResourceManager.Instance.SpendDevelopResource(GetRequiredResource()))
         {
             UIManager.Instance.patchReasonPopupUI.ResourceLackAlert.SetActive(true);
             return false;
         }
 
-        if (character == null) return false;
-
-        if (patches == null || patches.Count == 0) return false;
 
         RuntimeCharacterSnapshot before = new RuntimeCharacterSnapshot(character);
 

@@ -161,6 +161,7 @@ public class SeasonManager : MonoBehaviour
         {
             case SeasonState.Start: // 신규 캐릭터 추가, 리롤 횟수 초기화
                 GoalManager.Instance.SeasonReset();
+                RuntimeCharacterManager.Instance.ResetAllCharacter();
                 break;
 
             case SeasonState.Patch:

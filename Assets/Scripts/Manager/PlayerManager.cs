@@ -8,6 +8,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private int currentPlayerCount;
     public int GetCurrentPlayer => currentPlayerCount;
 
+    [SerializeField] private int currentPlayer;
+
     [Header("Player Profiles")]
     [SerializeField] private List<PlayerProfile> playerProfiles = new();
 
@@ -23,7 +25,14 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        currentPlayerCount = 10000;
+        if (currentPlayer != 0)
+        {
+            currentPlayerCount = currentPlayer;
+        }
+        else
+        {
+            currentPlayerCount = 10000;
+        }
         Initialize();
     }
 

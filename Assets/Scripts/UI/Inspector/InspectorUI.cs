@@ -15,6 +15,16 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private Button undoButton;
     private readonly Dictionary<Transform, int> originalSiblingIndexes = new();
 
+    [Header("Image")]
+    [SerializeField] private Image roleImage;
+
+    [SerializeField] private Sprite warriorSprite;
+    [SerializeField] private Sprite rangedSprite;
+    [SerializeField] private Sprite mageSprite;
+    [SerializeField] private Sprite assassinSprite;
+    [SerializeField] private Sprite tankSprite;
+    [SerializeField] private Sprite supportSprite;
+
     [Header("Stats")]
     [SerializeField] private Button StatsButton;
     [SerializeField] private GameObject Stats;
@@ -54,19 +64,20 @@ public class InspectorUI : MonoBehaviour
 
     private void Start()
     {
-        PatchManager.Instance.OnPatchApplied += Refresh;
-        PatchManager.Instance.OnPatchUndone += Refresh;
+        PatchManager.Instance.OnPatchApplied += RefreshOnPatched;
+        PatchManager.Instance.OnPatchUndone += RefreshOnPatched;
     }
 
     // ==============================
-    // Initialize
+    // Set Character
     // ==============================
 
-
-    public void Show(RuntimeCharacter character)
+    public void Showcharacter(RuntimeCharacter character)
     {
         currentCharacter = character;
         patchReason.Show(false);
+        SetRoleImage(character.OriginCharacter.role);
+        SetCharacterSkillDescription();
         InitializeStatDropDown();
         Refresh();
     }
@@ -81,12 +92,36 @@ public class InspectorUI : MonoBehaviour
         InitializeWinrate();
     }
 
-    public void Refresh(PatchRecord record)
+    public void RefreshOnPatched(PatchRecord record)
     {
         if (!ReferenceEquals(currentCharacter, record.Character)) return;
 
         InitializeStats();
     }
+
+    private void SetRoleImage(CharacterRole role)
+    {
+        roleImage.sprite = role switch
+        {
+            CharacterRole.Warrior => warriorSprite,
+            CharacterRole.Ranged => rangedSprite,
+            CharacterRole.Mage => mageSprite,
+            CharacterRole.Assassin => assassinSprite,
+            CharacterRole.Tank => tankSprite,
+            CharacterRole.Support => supportSprite,
+            _ => null
+        };
+    }
+
+    private void SetCharacterSkillDescription()
+    {
+        UIManager.Instance.bottomDisplayUI.ShowDescription();
+    }
+
+    // ==============================
+    // Initialize
+    // ==============================
+
 
     private void CacheOriginalSiblingIndexes()
     {
@@ -111,7 +146,7 @@ public class InspectorUI : MonoBehaviour
                 row.GetComponent<InspectorRowUI>().Initialize(currentCharacter);
             }
 
-            if(currentCharacter.HasPatchedSpecialStat() == row.GetComponent<InspectorRowUI>().StatType)
+            if (currentCharacter.HasPatchedSpecialStat() == row.GetComponent<InspectorRowUI>().StatType)
             {
                 ShowSpecificStats(row.GetComponent<InspectorRowUI>().StatType);
             }
@@ -201,24 +236,25 @@ public class InspectorUI : MonoBehaviour
     }
 
     private void ApplyPatch()
-    { // 실제로 패치를 하는 부분
+    {
         if (currentCharacter == null)
             return;
 
         List<CharacterPatch> patches = new();
-
-        bool HasChange = false;
+        bool hasChange = false;
 
         foreach (GameObject row in StatRows)
         {
             InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
 
-            if (!HasChange) HasChange = rowUI.HasChange();
+            if (!rowUI.HasChange())
+                continue;
 
+            hasChange = true;
             patches.Add(rowUI.GetPatch());
         }
 
-        if (!HasChange)
+        if (!hasChange)
         {
             patchReason.Show(false);
             return;

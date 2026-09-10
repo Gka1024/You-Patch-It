@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: 401_Skill_Clown
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: 
-  skillDescription: 
+  skillName: "\uAD11\uB300\uD589\uC9C4"
+  skillDescription: "\uB300\uC0C1\uC5D0\uAC8C \uB3CC\uC9C4\uD558\uC5EC \uD53C\uD574\uB97C
+    \uC785\uD788\uACE0 \uAE30\uC808\uC2DC\uD0B5\uB2C8\uB2E4."
   ignoreDistance: 0
+  targetType: 1
+  targetSelection: 2
+  damageMultiplier: 1
+  stunDuration: 1

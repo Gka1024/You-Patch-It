@@ -73,7 +73,7 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private void OnClick()
     {
         Debug.Log(runtimeCharacter.OriginCharacter.name);
-        InspectorUI.Instance.Show(runtimeCharacter);
+        InspectorUI.Instance.Showcharacter(runtimeCharacter);
         BottomDisplayUI.Instance.SkillDescription.SetText(runtimeCharacter.OriginCharacter);
     }
 

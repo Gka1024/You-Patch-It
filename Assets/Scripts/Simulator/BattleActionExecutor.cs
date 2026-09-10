@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class BattleActionExecutor
 {
     private const float TICK = 0.05f;
 
-    public static void ExecuteAction(BattleCharacter self, BattleCharacter enemy, BattleAction action, float tick, System.Random random)
+    public static void ExecuteAction(BattleCharacter self, BattleCharacter enemy, List<BattleCharacter> allies, List<BattleCharacter> enemies, BattleAction action, float tick, System.Random random)
     {
         action = ApplyDecisionAccuracy(self, action, random);
 
@@ -24,15 +25,16 @@ public static class BattleActionExecutor
                 break;
 
             case BattleAction.UseSkill:
-                UseSkill(self, enemy);
+                UseSkill(self, allies, enemies, random);
                 break;
         }
     }
 
-    private static void MoveTowards(BattleCharacter self, BattleCharacter enemy, float tick)
+    public static void MoveTowards(BattleCharacter self, BattleCharacter enemy, float tick)
     {
         float direction = Mathf.Sign(enemy.position - self.position);
         Move(self, direction, tick);
+
         float directionAfter = Mathf.Sign(enemy.position - self.position);
 
         if (directionAfter != direction)
@@ -41,13 +43,27 @@ public static class BattleActionExecutor
         }
     }
 
-    private static void MoveAway(BattleCharacter self, BattleCharacter enemy, float tick)
+    public static void MoveToTarget(BattleCharacter self, BattleCharacter target, float distance)
+    {
+        float direction = Mathf.Sign(target.position - self.position);
+
+        self.position += direction * distance;
+
+        self.statistics.moveDistance += distance;
+
+        if (Mathf.Sign(target.position - self.position) != direction)
+        {
+            self.position = target.position - direction * 0.01f;
+        }
+    }
+
+    public static void MoveAway(BattleCharacter self, BattleCharacter enemy, float tick)
     {
         float direction = -Mathf.Sign(enemy.position - self.position);
         Move(self, direction, tick);
     }
 
-    private static void Move(BattleCharacter self, float direction, float tick)
+    public static void Move(BattleCharacter self, float direction, float tick)
     {
         float moveDistance = self.GetStat(CharacterStatType.MoveSpeed) * tick;
 
@@ -56,37 +72,65 @@ public static class BattleActionExecutor
         self.statistics.moveDistance += moveDistance;
     }
 
-    private static void Attack(BattleCharacter self, BattleCharacter enemy)
+    public static void Attack(BattleCharacter self, BattleCharacter enemy)
     {
         float damage = self.GetStat(CharacterStatType.Attack) * GetDamageMultiplier(self);
-        damage *= 100f / (100f + enemy.GetStat(CharacterStatType.Defence));
 
         self.currentMana += self.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 20f;
 
-        enemy.currentHealth -= damage;
+        DealDamage(self, enemy, damage);
 
         self.attackCooldown = 1f / self.GetStat(CharacterStatType.AttackSpeed);
-
         self.actionLockTime = 0.4f / self.GetStat(CharacterStatType.AttackSpeed);
 
-        self.statistics.damageDealt += damage;
         self.statistics.attackCount++;
-        enemy.statistics.damageTaken += damage;
     }
 
-    private static void UseSkill(BattleCharacter self, BattleCharacter enemy)
+    public static void UseSkill(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, System.Random random)
     {
-        self.currentMana = 0;
+        self.currentMana = 0f;
 
-        if (self.skill != null)
-        {
-            self.skill.Execute(self, enemy, self.runtimeCharacter.GetStat(CharacterStatType.SkillCoefficient));
-        }
-        else
+        if (self.skill == null)
         {
             Debug.Log($"{self.runtimeCharacter.OriginCharacter.characterName} 가 스킬이 없습니다!");
+            return;
         }
 
+        self.skill.Execute(self, allies, enemies, self.runtimeCharacter.GetStat(CharacterStatType.SkillCoefficient), random);
+        self.statistics.skillCount++;
+    }
+
+    public static void DealDamage(BattleCharacter attacker, BattleCharacter target, float damage)
+    {
+        damage *= 100f / (100f + target.GetStat(CharacterStatType.Defence));
+
+        float remainingDamage = damage;
+
+        if (target.currentShield > 0f)
+        {
+            float absorbedDamage = Mathf.Min(target.currentShield, remainingDamage);
+
+            target.currentShield -= absorbedDamage;
+            remainingDamage -= absorbedDamage;
+        }
+
+        if (remainingDamage > 0f)
+        {
+            target.currentHealth -= remainingDamage;
+        }
+
+        attacker.statistics.damageDealt += damage;
+        target.statistics.damageTaken += damage;
+    }
+
+    public static void AddShield(BattleCharacter target, float amount)
+    {
+        target.currentShield += amount;
+    }
+
+    public static void AddStun(BattleCharacter target, float duration)
+    {
+        target.actionLockTime = Mathf.Max(target.actionLockTime, duration);
     }
 
     private static float GetDamageMultiplier(BattleCharacter self)
@@ -107,7 +151,6 @@ public static class BattleActionExecutor
 
         return actions[random.Next(actions.Length)];
     }
-
 }
 
 public enum BattleAction

@@ -82,7 +82,7 @@ public class BattleSimulator : MonoBehaviour
 
             if (battleTime > BATTLE_TIME_LIMIT)
             {
-                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed})");
+                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) ||  {redCharacters[0].OriginCharacter.characterName} vs {blueCharacters[0].OriginCharacter.characterName}");
                 break;
             }
         }
@@ -266,7 +266,7 @@ public class BattleSimulator : MonoBehaviour
                 continue;
 
             BattleActionCommand command = GetCommand();
-            command.Set(character, character.currentTarget, action);
+            command.Set(character, character.currentTarget, team, enemyTeam, action);
             commands.Add(command);
         }
     }
@@ -330,7 +330,7 @@ public class BattleSimulator : MonoBehaviour
             if (command.target == null || command.target.IsDead)
                 continue;
 
-            BattleActionExecutor.ExecuteAction(command.attacker, command.target, command.action, TICK, random);
+            BattleActionExecutor.ExecuteAction(command.attacker, command.target, command.allies, command.enemies, command.action, TICK, random);
         }
     }
 
@@ -356,16 +356,20 @@ public class BattleActionCommand
 {
     public BattleCharacter attacker;
     public BattleCharacter target;
+
+    public List<BattleCharacter> allies;
+    public List<BattleCharacter> enemies;
+
     public BattleAction action;
 
-    public BattleActionCommand()
-    {
-    }
+    public BattleActionCommand() { }
 
-    public void Set(BattleCharacter attacker, BattleCharacter target, BattleAction action)
+    public void Set(BattleCharacter attacker, BattleCharacter target, List<BattleCharacter> allies, List<BattleCharacter> enemies, BattleAction action)
     {
         this.attacker = attacker;
         this.target = target;
+        this.allies = allies;
+        this.enemies = enemies;
         this.action = action;
     }
 
@@ -373,6 +377,8 @@ public class BattleActionCommand
     {
         attacker = null;
         target = null;
+        allies = null;
+        enemies = null;
         action = BattleAction.None;
     }
 }

@@ -74,7 +74,7 @@ public class BottomUserReactionUI : MonoBehaviour
         while (LoopOn)
         {
             Refresh();
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(5f);
         }
     }
 

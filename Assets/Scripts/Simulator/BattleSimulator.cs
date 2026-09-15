@@ -212,6 +212,9 @@ public class BattleSimulator : MonoBehaviour
         character.reactionTimer = Mathf.Max(0f, character.reactionTimer - TICK);
         character.targetUpdateTimer = Mathf.Max(0f, character.targetUpdateTimer - TICK);
 
+        character.TickModifiers();
+        character.TickDamageOverTimes(TICK);
+
         HealCharacter(character, character.runtimeCharacter.GetStat(CharacterStatType.HealthRegen) / 100f);
         RegenManaOnTick(character, character.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 100f);
 

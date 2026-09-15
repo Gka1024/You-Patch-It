@@ -133,6 +133,17 @@ public static class BattleActionExecutor
         target.actionLockTime = Mathf.Max(target.actionLockTime, duration);
     }
 
+    public static void AddTaunt(BattleCharacter target, BattleCharacter taunter, float duration)
+    {
+        target.currentTarget = taunter;
+        target.targetUpdateTimer = Mathf.Max(target.targetUpdateTimer, duration);
+    }
+
+    public static void AddDamageOverTime(BattleCharacter source, BattleCharacter target, float damage, float duration, float tickInterval)
+    {
+        target.AddDamageOverTime(new BattleDamageOverTime(source, target, damage, duration, tickInterval, DealDamage));
+    }
+
     private static float GetDamageMultiplier(BattleCharacter self)
     {
         return Mathf.Lerp(0.8f, 1.2f, self.player.ExecutionSkill / 100f);

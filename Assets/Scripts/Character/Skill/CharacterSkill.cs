@@ -14,10 +14,11 @@ public abstract class CharacterSkill : ScriptableObject
     public SkillTargetSelection targetSelection;
 
     public abstract void Execute(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random);
+    protected virtual float GetAreaRange(BattleCharacter self, float coefficient) { return 1f; }
 
-    protected List<BattleCharacter> GetTargets(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, System.Random random)
+    protected List<BattleCharacter> GetTargets(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, System.Random random, float coefficient = 1f)
     {
-        List<BattleCharacter> candidates = GetCandidates(allies, enemies);
+        List<BattleCharacter> candidates = GetCandidates(self, allies, enemies);
 
         if (candidates.Count == 0)
             return candidates;
@@ -41,14 +42,14 @@ public abstract class CharacterSkill : ScriptableObject
 
             case SkillTargetType.AreaEnemy:
             case SkillTargetType.AreaAlly:
-                return candidates;
+                return GetAreaTargets(self, candidates, GetAreaRange(self, coefficient));
 
             default:
                 return new List<BattleCharacter>();
         }
     }
 
-    private List<BattleCharacter> GetCandidates(List<BattleCharacter> allies, List<BattleCharacter> enemies)
+    private List<BattleCharacter> GetCandidates(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies)
     {
         switch (targetType)
         {
@@ -84,6 +85,25 @@ public abstract class CharacterSkill : ScriptableObject
 
         return aliveTargets;
     }
+
+    private List<BattleCharacter> GetAreaTargets(BattleCharacter self, List<BattleCharacter> candidates, float areaRange)
+    {
+        List<BattleCharacter> areaTargets = new();
+
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            BattleCharacter target = candidates[i];
+
+            float distance = Mathf.Abs(self.position - target.position);
+
+            if (distance <= areaRange)
+                areaTargets.Add(target);
+        }
+
+        return areaTargets;
+    }
+
+    // ===== Getter Functions
 
     private BattleCharacter SelectTarget(BattleCharacter self, List<BattleCharacter> candidates, System.Random random)
     {

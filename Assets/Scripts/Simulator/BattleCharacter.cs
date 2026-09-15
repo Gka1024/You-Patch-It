@@ -19,6 +19,9 @@ public class BattleCharacter
     // 모디파이어가 적용된 현재 스탯
     private readonly Dictionary<CharacterStatType, float> stats = new();
 
+    // 도트데미지
+    private readonly List<BattleDamageOverTime> damageOverTimes = new();
+
     public float currentHealth;
     public float currentMana;
     public float currentShield;
@@ -177,6 +180,24 @@ public class BattleCharacter
             {
                 CalculateStat(statType);
             }
+        }
+    }
+
+    // ============================================================
+    // DoT Tick
+    // ============================================================
+
+    public void AddDamageOverTime(BattleDamageOverTime damageOverTime)
+    {
+        damageOverTimes.Add(damageOverTime);
+    }
+
+    public void TickDamageOverTimes(float tick)
+    {
+        for (int i = damageOverTimes.Count - 1; i >= 0; i--)
+        {
+            if (damageOverTimes[i].Tick(tick))
+                damageOverTimes.RemoveAt(i);
         }
     }
 

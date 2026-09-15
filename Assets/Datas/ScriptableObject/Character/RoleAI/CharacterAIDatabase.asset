@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db298e41eddbc724f858a43f9ec59d1b, type: 3}
+  m_Name: CharacterAIDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAIDatabase
+  roleAIs:
+  - role: 0
+    battleAI: {fileID: 11400000, guid: 93fae18e31d78e848998b4d770c11ca3, type: 2}
+  - role: 1
+    battleAI: {fileID: 11400000, guid: e6b4f5c38a12d2344b191767cd4daf5a, type: 2}
+  - role: 2
+    battleAI: {fileID: 11400000, guid: a1cacc51a563e224391a9c0839abffdf, type: 2}
+  - role: 3
+    battleAI: {fileID: 11400000, guid: fc75c955ca2252548bb85522572f79f7, type: 2}
+  - role: 4
+    battleAI: {fileID: 11400000, guid: 9f3a04bb3dfad2e44a29c892fe7a247c, type: 2}
+  - role: 5
+    battleAI: {fileID: 11400000, guid: f1f675742f9ce4142924efb568c95706, type: 2}

@@ -51,4 +51,25 @@ public class CharacterDatabase : ScriptableObject
     }
 
     public int Count => InGameCharacters.Count;
+
+#if UNITY_EDITOR
+    public bool EditorAddCharacter(Character character)
+    {
+        if (character == null)
+            return false;
+
+        if (InGameCharacters.Exists(existing => existing != null && existing.id == character.id))
+        {
+            Debug.LogError($"Character ID 중복 : {character.id}");
+            return false;
+        }
+
+        if (InGameCharacters.Contains(character))
+            return false;
+
+        InGameCharacters.Add(character);
+        UnityEditor.EditorUtility.SetDirty(this);
+        return true;
+    }
+#endif
 }

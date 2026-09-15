@@ -14,10 +14,10 @@ public class RuntimeCharacterManager : MonoBehaviour
     private readonly HashSet<Character> lockedCharacters = new();
     public int LockedCharacterCount => lockedCharacters.Count;
 
-    [SerializeField] private Dictionary<int, RuntimeCharacter> runtimeCharacters = new();
+    private Dictionary<int, RuntimeCharacter> runtimeCharacters = new();
     public int CharacterCount => runtimeCharacters.Count;
 
-    public RuntimeCharacter AddedRuntimeCharacter;
+    public RuntimeCharacter AddedRuntimeCharacter { get; private set; }
 
     private void Awake()
     {
@@ -57,11 +57,11 @@ public class RuntimeCharacterManager : MonoBehaviour
 
     public RuntimeCharacter AddRandomCharacter(System.Random random)
     {
-        if(!HasLockedCharacter())
+        if (!HasLockedCharacter())
         {
             AddedRuntimeCharacter = null;
             return null;
-        } 
+        }
 
         if (primalAdditionalCharacterIds.Count > 0)
         {
@@ -130,7 +130,7 @@ public class RuntimeCharacterManager : MonoBehaviour
 
     public void ResetAllCharacter()
     {
-        foreach(RuntimeCharacter character in GetAllCharacters())
+        foreach (RuntimeCharacter character in GetAllCharacters())
         {
             character.ResetSpecialStat();
         }

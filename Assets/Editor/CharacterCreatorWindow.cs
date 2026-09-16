@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CharacterCreatorWindow : EditorWindow
 {
-    private const string CharacterRootFolder = "Assets/Data/Characters";
+    private const string CharacterRootFolder = "Assets/Datas/ScriptableObject/Character/Characters";
+    public const string SkillScriptFolder = "Assets/Scripts/Character/Skill";
 
     private int characterId;
     private string characterName = "NewCharacter";

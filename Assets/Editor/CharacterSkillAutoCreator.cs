@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
@@ -8,12 +8,13 @@ using UnityEngine;
 [InitializeOnLoad]
 public static class CharacterSkillAutoCreator
 {
-    private const string PendingCharacterPathKey = "PendingCharacterPath";
-    private const string PendingSkillClassNameKey = "PendingSkillClassName";
-    private const string PendingSkillAssetPathKey = "PendingSkillAssetPath";
+    private const string PendingCharacterPathKey = "CharacterSkillAutoCreator.PendingCharacterPath";
+    private const string PendingSkillClassNameKey = "CharacterSkillAutoCreator.PendingSkillClassName";
+    private const string PendingSkillAssetPathKey = "CharacterSkillAutoCreator.PendingSkillAssetPath";
 
     static CharacterSkillAutoCreator()
     {
+        CompilationPipeline.compilationFinished -= OnCompilationFinished;
         CompilationPipeline.compilationFinished += OnCompilationFinished;
     }
 
@@ -34,14 +35,22 @@ public static class CharacterSkillAutoCreator
         }
 
         string className = $"CharacterSkill_{safeName}";
-        string scriptPath = $"{skillFolderPath}/{className}.cs";
+        string scriptPath = $"{CharacterCreatorWindow.SkillScriptFolder}/{className}.cs";
         string skillAssetPath = $"{skillFolderPath}/{className}.asset";
 
-        if (File.Exists(scriptPath) || AssetDatabase.LoadAssetAtPath<CharacterSkill>(skillAssetPath) != null)
+        if (File.Exists(scriptPath))
         {
-            Debug.LogError($"스킬 파일 또는 에셋이 이미 존재합니다: {className}");
+            Debug.LogError($"이미 스킬 클래스 파일이 존재합니다: {scriptPath}");
             return;
         }
+
+        if (AssetDatabase.LoadAssetAtPath<CharacterSkill>(skillAssetPath) != null)
+        {
+            Debug.LogError($"스킬 에셋이 이미 존재합니다: {skillAssetPath}");
+            return;
+        }
+
+        Directory.CreateDirectory(CharacterCreatorWindow.SkillScriptFolder);
 
         string scriptContent = $@"using System.Collections.Generic;
 using UnityEngine;
@@ -92,17 +101,17 @@ public class {className} : CharacterSkill
                 return;
             }
 
-            Type skillType = AppDomain.CurrentDomain
-         .GetAssemblies()
-         .SelectMany(GetLoadableTypes)
-         .FirstOrDefault(type =>
-             type.Name == className &&
-             !type.IsAbstract &&
-             typeof(CharacterSkill).IsAssignableFrom(type));
+            Type skillType = TypeCache.GetTypesDerivedFrom<CharacterSkill>().FirstOrDefault(type => type.Name == className && !type.IsAbstract);
 
             if (skillType == null)
             {
-                Debug.LogError($"스킬 클래스를 찾을 수 없습니다: {className}");
+                Debug.LogError($"스킬 클래스를 찾을 수 없습니다: {className}. 스크립트 컴파일 오류를 확인해줘.");
+                return;
+            }
+
+            if (AssetDatabase.LoadAssetAtPath<CharacterSkill>(skillAssetPath) != null)
+            {
+                Debug.LogError($"스킬 에셋이 이미 존재합니다: {skillAssetPath}");
                 return;
             }
 
@@ -133,11 +142,11 @@ public class {className} : CharacterSkill
 
     private static string SanitizeName(string value)
     {
-        string result = new string(value.Where(char.IsLetterOrDigit).ToArray());
+        string result = new string(value.Where(character => char.IsLetterOrDigit(character) || character == '_').ToArray());
 
         if (string.IsNullOrEmpty(result))
         {
-            return "NewSkill";
+            return "";
         }
 
         if (char.IsDigit(result[0]))
@@ -146,17 +155,5 @@ public class {className} : CharacterSkill
         }
 
         return result;
-    }
-
-    private static Type[] GetLoadableTypes(System.Reflection.Assembly assembly)
-    {
-        try
-        {
-            return assembly.GetTypes();
-        }
-        catch (System.Reflection.ReflectionTypeLoadException exception)
-        {
-            return exception.Types.Where(type => type != null).ToArray();
-        }
     }
 }

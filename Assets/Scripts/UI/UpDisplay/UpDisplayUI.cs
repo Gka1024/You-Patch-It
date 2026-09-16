@@ -33,7 +33,7 @@ public class UpDisplayUI : MonoBehaviour
         SeasonText.text = $"시즌 데이터 : {SeasonManager.Instance.DisplaySeason} - {SeasonManager.Instance.DisplaySubSeason}";
         TrustPointText.text = $"{ResourceManager.Instance.TrustPoint}%";
         DevelopResourceText.text = $"{ResourceManager.Instance.DevelopResource}";
-        PlayersCountText.text = $"{PlayerManager.Instance.GetCurrentPlayer}";
+        PlayersCountText.text = $"{PlayerManager.Instance.CurrentPlayerCount}";
 
         ResetResourceTextDescription();
     }

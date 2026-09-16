@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CharacterCreatorWindow : EditorWindow
 {
-    private const string CharacterRootFolder = "Assets/Datas/ScriptableObject/Character/Characters";
+    public const string CharacterRootFolder = "Assets/Datas/ScriptableObject/Character/Characters";
     public const string SkillScriptFolder = "Assets/Scripts/Character/Skill";
 
     private int characterId;
@@ -118,7 +118,7 @@ public class CharacterCreatorWindow : EditorWindow
             AssetDatabase.Refresh();
         }
 
-        string characterFolderName = $"{characterId:D4}_{safeName}";
+        string characterFolderName = $"{characterId:D3}_{safeName}";
         string characterFolderPath = $"{CharacterRootFolder}/{characterFolderName}";
 
         if (AssetDatabase.IsValidFolder(characterFolderPath))
@@ -146,16 +146,18 @@ public class CharacterCreatorWindow : EditorWindow
             return;
         }
 
-        CharacterSkillAutoCreator.CreateSkillClassAndConnect(character, characterAssetPath, character.characterName, characterFolderPath);
-
         EditorUtility.SetDirty(characterDatabase);
+        EditorUtility.SetDirty(character);
+
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+
+        CharacterSkillAutoCreator.CreateSkillClassAndConnect(character, characterAssetPath, character.characterName, characterFolderPath);
 
         Selection.activeObject = character;
         EditorGUIUtility.PingObject(character);
 
-        Debug.Log($"캐릭터 에셋과 스킬 클래스 생성 요청 완료: {character.characterName}");
+        Debug.Log($"캐릭터 생성 완료. 스킬 클래스 컴파일 후 SO 생성 예정: {character.characterName}");
     }
 
     private static string SanitizeName(string value)

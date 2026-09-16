@@ -12,17 +12,25 @@ public static class CharacterSkillAutoCreator
     private const string PendingSkillClassNameKey = "CharacterSkillAutoCreator.PendingSkillClassName";
     private const string PendingSkillAssetPathKey = "CharacterSkillAutoCreator.PendingSkillAssetPath";
 
+    private static bool isProcessing;
+
     static CharacterSkillAutoCreator()
     {
-        CompilationPipeline.compilationFinished -= OnCompilationFinished;
-        CompilationPipeline.compilationFinished += OnCompilationFinished;
+        EditorApplication.update -= ProcessPendingSkillAsset;
+        EditorApplication.update += ProcessPendingSkillAsset;
     }
 
     public static void CreateSkillClassAndConnect(Character character, string characterAssetPath, string skillName, string skillFolderPath)
     {
         if (character == null)
         {
-            Debug.LogError("캐릭터가 지정되지 않았습니다.");
+            Debug.LogError("[SkillAutoCreator] 캐릭터가 지정되지 않았습니다.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(characterAssetPath) || string.IsNullOrWhiteSpace(skillFolderPath))
+        {
+            Debug.LogError("[SkillAutoCreator] 캐릭터 에셋 경로 또는 스킬 폴더 경로가 비어 있습니다.");
             return;
         }
 
@@ -30,23 +38,29 @@ public static class CharacterSkillAutoCreator
 
         if (string.IsNullOrEmpty(safeName))
         {
-            Debug.LogError("유효한 스킬 이름을 만들 수 없습니다.");
+            Debug.LogError("[SkillAutoCreator] 유효한 스킬 이름을 만들 수 없습니다.");
             return;
         }
 
-        string className = $"CharacterSkill_{safeName}";
+        string className = $"CharacterSkill_{character.id:D3}_{safeName}";
         string scriptPath = $"{CharacterCreatorWindow.SkillScriptFolder}/{className}.cs";
         string skillAssetPath = $"{skillFolderPath}/{className}.asset";
 
         if (File.Exists(scriptPath))
         {
-            Debug.LogError($"이미 스킬 클래스 파일이 존재합니다: {scriptPath}");
+            Debug.LogError($"[SkillAutoCreator] 스킬 클래스 파일이 이미 존재합니다: {scriptPath}");
             return;
         }
 
         if (AssetDatabase.LoadAssetAtPath<CharacterSkill>(skillAssetPath) != null)
         {
-            Debug.LogError($"스킬 에셋이 이미 존재합니다: {skillAssetPath}");
+            Debug.LogError($"[SkillAutoCreator] 스킬 SO가 이미 존재합니다: {skillAssetPath}");
+            return;
+        }
+
+        if (!AssetDatabase.IsValidFolder(skillFolderPath))
+        {
+            Debug.LogError($"[SkillAutoCreator] 스킬 SO 폴더가 없습니다: {skillFolderPath}");
             return;
         }
 
@@ -65,17 +79,32 @@ public class {className} : CharacterSkill
 }}
 ";
 
-        File.WriteAllText(scriptPath, scriptContent);
+        try
+        {
+            File.WriteAllText(scriptPath, scriptContent);
 
-        SessionState.SetString(PendingCharacterPathKey, characterAssetPath);
-        SessionState.SetString(PendingSkillClassNameKey, className);
-        SessionState.SetString(PendingSkillAssetPathKey, skillAssetPath);
+            SessionState.SetString(PendingCharacterPathKey, characterAssetPath);
+            SessionState.SetString(PendingSkillClassNameKey, className);
+            SessionState.SetString(PendingSkillAssetPathKey, skillAssetPath);
 
-        AssetDatabase.Refresh();
+            Debug.Log($"[SkillAutoCreator] 스킬 스크립트 생성: {scriptPath}");
+            Debug.Log($"[SkillAutoCreator] 생성 예정 SO 경로: {skillAssetPath}");
+
+            AssetDatabase.Refresh();
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError($"[SkillAutoCreator] 스킬 스크립트 생성 중 오류가 발생했습니다.\n{exception}");
+        }
     }
 
-    private static void OnCompilationFinished(object context)
+    private static void ProcessPendingSkillAsset()
     {
+        if (isProcessing || EditorApplication.isCompiling || EditorApplication.isUpdating)
+        {
+            return;
+        }
+
         string characterPath = SessionState.GetString(PendingCharacterPathKey, "");
         string className = SessionState.GetString(PendingSkillClassNameKey, "");
         string skillAssetPath = SessionState.GetString(PendingSkillAssetPathKey, "");
@@ -87,31 +116,41 @@ public class {className} : CharacterSkill
             return;
         }
 
-        SessionState.EraseString(PendingCharacterPathKey);
-        SessionState.EraseString(PendingSkillClassNameKey);
-        SessionState.EraseString(PendingSkillAssetPathKey);
+        isProcessing = true;
 
-        EditorApplication.delayCall += () =>
+        try
         {
+            Type skillType = TypeCache.GetTypesDerivedFrom<CharacterSkill>()
+                .FirstOrDefault(type => type.Name == className && !type.IsAbstract);
+
+            if (skillType == null)
+            {
+                // 새 스크립트의 타입이 아직 등록되지 않았다면 다음 update에서 다시 확인한다.
+                return;
+            }
+
             Character character = AssetDatabase.LoadAssetAtPath<Character>(characterPath);
 
             if (character == null)
             {
-                Debug.LogError($"캐릭터 에셋을 찾을 수 없습니다: {characterPath}");
+                Debug.LogError($"[SkillAutoCreator] 캐릭터 에셋을 찾을 수 없습니다: {characterPath}");
+                ClearPendingData();
                 return;
             }
 
-            Type skillType = TypeCache.GetTypesDerivedFrom<CharacterSkill>().FirstOrDefault(type => type.Name == className && !type.IsAbstract);
+            string skillAssetDirectory = Path.GetDirectoryName(skillAssetPath);
 
-            if (skillType == null)
+            if (string.IsNullOrEmpty(skillAssetDirectory) || !AssetDatabase.IsValidFolder(skillAssetDirectory))
             {
-                Debug.LogError($"스킬 클래스를 찾을 수 없습니다: {className}. 스크립트 컴파일 오류를 확인해줘.");
+                Debug.LogError($"[SkillAutoCreator] SO 저장 폴더가 없습니다: {skillAssetDirectory}");
+                ClearPendingData();
                 return;
             }
 
             if (AssetDatabase.LoadAssetAtPath<CharacterSkill>(skillAssetPath) != null)
             {
-                Debug.LogError($"스킬 에셋이 이미 존재합니다: {skillAssetPath}");
+                Debug.LogError($"[SkillAutoCreator] 스킬 SO가 이미 존재합니다: {skillAssetPath}");
+                ClearPendingData();
                 return;
             }
 
@@ -119,7 +158,8 @@ public class {className} : CharacterSkill
 
             if (skill == null)
             {
-                Debug.LogError($"CharacterSkill 생성에 실패했습니다: {className}");
+                Debug.LogError($"[SkillAutoCreator] 스킬 인스턴스 생성 실패: {className}");
+                ClearPendingData();
                 return;
             }
 
@@ -128,21 +168,53 @@ public class {className} : CharacterSkill
 
             AssetDatabase.CreateAsset(skill, skillAssetPath);
 
-            character.skill = skill;
+            CharacterSkill createdSkill = AssetDatabase.LoadAssetAtPath<CharacterSkill>(skillAssetPath);
+
+            if (createdSkill == null)
+            {
+                Debug.LogError($"[SkillAutoCreator] SO 에셋 저장에 실패했습니다: {skillAssetPath}");
+                UnityEngine.Object.DestroyImmediate(skill);
+                ClearPendingData();
+                return;
+            }
+
+            character.skill = createdSkill;
 
             EditorUtility.SetDirty(character);
-            EditorUtility.SetDirty(skill);
+            EditorUtility.SetDirty(createdSkill);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"스킬 생성 및 캐릭터 연결 완료: {className}");
-        };
+            Debug.Log($"[SkillAutoCreator] 스킬 SO 생성 및 캐릭터 연결 완료: {skillAssetPath}");
+
+            ClearPendingData();
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError($"[SkillAutoCreator] 스킬 SO 생성 중 예외가 발생했습니다.\n{exception}");
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private static void ClearPendingData()
+    {
+        SessionState.EraseString(PendingCharacterPathKey);
+        SessionState.EraseString(PendingSkillClassNameKey);
+        SessionState.EraseString(PendingSkillAssetPathKey);
     }
 
     private static string SanitizeName(string value)
     {
-        string result = new string(value.Where(character => char.IsLetterOrDigit(character) || character == '_').ToArray());
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "";
+        }
+
+        string result = new string(value.Trim().Where(character => char.IsLetterOrDigit(character) || character == '_').ToArray());
 
         if (string.IsNullOrEmpty(result))
         {

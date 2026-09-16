@@ -546,7 +546,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterDatabase: {fileID: 11400000, guid: 614e2339c1b6451449e0799da850a2e7, type: 2}
-  startingCharacterIds: 65000000c9000000910100002e010000i
+  startingCharacterIds: 65000000c900000091010000i
   primalAdditionalCharacterIds: f50100002d010000i
 --- !u!1 &15425858
 GameObject:
@@ -51323,7 +51323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentPlayerCount: 0
-  currentPlayer: 0
+  initialPlayerCount: 0
   playerProfiles:
   - {fileID: 11400000, guid: 8042422ae3e1596459e4496404b56fdc, type: 2}
   - {fileID: 11400000, guid: 55c0592cc0622ca4c919d0eda6fc5afc, type: 2}

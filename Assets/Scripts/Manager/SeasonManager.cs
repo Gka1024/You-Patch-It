@@ -18,7 +18,9 @@ public enum SeasonState
 
 public class SeasonManager : MonoBehaviour
 {
-    public static SeasonManager Instance;
+    public static SeasonManager Instance { get; private set; }
+
+    private const int SubSeasonCount = 3;
 
     public int CurrentSeason { get; private set; } = 1;
     public int CurrentSubSeason { get; private set; } = 1;
@@ -28,27 +30,26 @@ public class SeasonManager : MonoBehaviour
     public int DisplaySubSeason { get; private set; } = 1;
 
     public int SeasonSeed { get; private set; }
-    private System.Random SeasonRandom;
+    private System.Random seasonRandom;
 
-    private bool isSeasonFinished = false;
+    private bool isSeasonFinished;
     public bool IsSeasonFinished => isSeasonFinished;
 
     public event System.Action OnSeasonEnd;
 
-    List<RuntimePlayer> players;
-    List<MatchData> matches;
-    List<BattleResult> results;
+    private List<RuntimePlayer> players = new();
+    private List<MatchData> matches = new();
+    private List<BattleResult> results = new();
 
     private void Awake()
     {
-        if (Instance != null)
+        if (Instance != null && Instance != this)
         {
+            Destroy(gameObject);
             return;
         }
-        else
-        {
-            Instance = this;
-        }
+
+        Instance = this;
     }
 
     private void Start()
@@ -56,24 +57,33 @@ public class SeasonManager : MonoBehaviour
         StartSeason();
     }
 
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     public int NextSeed()
     {
-        return SeasonRandom.Next();
+        return seasonRandom.Next();
     }
+
+    //====================================================
+    // Season Flow
+    //====================================================
 
     public void StartSeason()
     {
         CurrentSubSeason = 1;
-        StartSubSeason();
         ChangeState(SeasonState.Start);
     }
 
     private void StartSubSeason()
     {
         SeasonSeed = UnityEngine.Random.Range(0, int.MaxValue);
-        SeasonRandom = new System.Random(SeasonSeed);
+        seasonRandom = new System.Random(SeasonSeed);
 
-        Debug.Log($"Season : {DisplaySeason}-{DisplaySubSeason} || Seed : {SeasonSeed}");
+        Debug.Log($"Season : {CurrentSeason}-{CurrentSubSeason} || Seed : {SeasonSeed}");
 
         ChangeState(SeasonState.Patch);
     }
@@ -82,20 +92,21 @@ public class SeasonManager : MonoBehaviour
     {
         CurrentSubSeason++;
 
-        if (CurrentSubSeason > 3)
+        if (CurrentSubSeason > SubSeasonCount)
         {
             ChangeState(SeasonState.Trust);
+            return;
         }
-        else
-        {
-            StartSubSeason();
-        }
+
+        StartSubSeason();
     }
 
     public void NextSeason()
     {
-        isSeasonFinished = false;
+        if (!isSeasonFinished)
+            return;
 
+        isSeasonFinished = false;
         CurrentSeason++;
         CurrentSubSeason = 1;
 
@@ -104,12 +115,17 @@ public class SeasonManager : MonoBehaviour
 
     public void CheckSeasonFinished()
     {
-        if (isSeasonFinished) NextSeason();
+        if (isSeasonFinished)
+            NextSeason();
     }
+
+    //====================================================
+    // State Finish
+    //====================================================
 
     public void FinishStart()
     {
-        ChangeState(SeasonState.Patch);
+        StartSubSeason();
     }
 
     public void FinishPatch()
@@ -121,6 +137,7 @@ public class SeasonManager : MonoBehaviour
 
         ChangeState(SeasonState.GeneratePlayer);
     }
+
     public void FinishGeneratePlayer()
     {
         ChangeState(SeasonState.Pick);
@@ -151,6 +168,10 @@ public class SeasonManager : MonoBehaviour
         ChangeState(SeasonState.End);
     }
 
+    //====================================================
+    // State Machine
+    //====================================================
+
     private void ChangeState(SeasonState state)
     {
         CurrentState = state;
@@ -159,8 +180,9 @@ public class SeasonManager : MonoBehaviour
 
         switch (state)
         {
-            case SeasonState.Start: // 신규 캐릭터 추가, 리롤 횟수 초기화
+            case SeasonState.Start:
                 GoalManager.Instance.SeasonReset();
+                FinishStart();
                 break;
 
             case SeasonState.Patch:
@@ -170,18 +192,18 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.GeneratePlayer:
-                players = PlayerManager.Instance.GeneratePlayers(SeasonRandom).ToList();
+                GeneratePlayersForCurrentSubSeason();
                 FinishGeneratePlayer();
                 break;
 
             case SeasonState.Pick:
-                matches = PickManager.Instance.StartPick(players, SeasonRandom);
+                matches = PickManager.Instance.StartPick(players, seasonRandom);
                 FinishPick();
                 break;
 
             case SeasonState.Simulation:
                 StatisticsManager.Instance.ResetSeason();
-                results = BattleSimulator.Instance.StartSimulation(matches, SeasonRandom);
+                results = BattleSimulator.Instance.StartSimulation(matches, seasonRandom);
                 FinishSimulation();
                 break;
 
@@ -195,7 +217,10 @@ public class SeasonManager : MonoBehaviour
                 UIManager.Instance.patchNoteUI.Refresh();
                 UIManager.Instance.characterTableUI.ReArrangetable();
                 RuntimeCharacterManager.Instance.ResetAllCharacter();
-                if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn) UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();
+
+                if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn)
+                    UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();
+
                 UIManager.Instance.bottomDisplayUI.ShowReaction();
                 break;
 
@@ -208,17 +233,19 @@ public class SeasonManager : MonoBehaviour
 
             case SeasonState.Reward:
                 ResourceManager.Instance.CheckGameOver();
-                RuntimeCharacterManager.Instance.AddRandomCharacter(SeasonRandom);
+                RuntimeCharacterManager.Instance.AddRandomCharacter(seasonRandom);
                 UIManager.Instance.patchNoteUI.InitializeDropdown();
                 UIManager.Instance.characterTableUI.GenerateTable();
-
                 FinishReward();
                 break;
 
             case SeasonState.End:
                 isSeasonFinished = true;
+
+                PlayerManager.Instance.UpdatePlayerCount(seasonRandom);
+
                 OnSeasonEnd?.Invoke();
-                PlayerManager.Instance.UpdatePlayerCount(SeasonRandom);
+
                 GoalManager.Instance.ChangeGoals();
                 UIManager.Instance.dashBoardUI.ShowSeasonReports();
                 UIManager.Instance.seasonReportUI.Initialize(CurrentSeason);
@@ -227,4 +254,24 @@ public class SeasonManager : MonoBehaviour
         }
     }
 
+    private void GeneratePlayersForCurrentSubSeason()
+    {
+        PlayerManager playerManager = PlayerManager.Instance;
+
+        if (CurrentSeason == 1 && CurrentSubSeason == 1)
+        {
+            // 게임 최초 시작: 전체 플레이어 생성
+            players = playerManager.GeneratePlayers(seasonRandom).ToList();
+        }
+        else if (CurrentSubSeason == 1)
+        {
+            // 새 시즌 첫 서브시즌: 잔존 플레이어 + 신규 유입
+            players = playerManager.UpdatePlayers(seasonRandom).ToList();
+        }
+        else
+        {
+            // 같은 시즌의 다음 서브시즌: 기존 플레이어 유지
+            players = playerManager.GetPlayers().ToList();
+        }
+    }
 }

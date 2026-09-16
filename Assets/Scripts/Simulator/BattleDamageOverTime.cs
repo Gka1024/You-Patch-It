@@ -35,7 +35,6 @@ public class BattleDamageOverTime
 
         if (tickTimer <= 0f)
         {
-            UnityEngine.Debug.Log("Tick");
             effect(source, target, value);
             tickTimer += tickInterval;
         }

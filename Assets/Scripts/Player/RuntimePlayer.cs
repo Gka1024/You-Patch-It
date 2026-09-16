@@ -33,6 +33,7 @@ public class RuntimePlayer
     public PreferenceShape PreferenceShape { get; private set; }
 
     public Dictionary<CharacterRole, float> ClassPreferences { get; } = new();
+    public Dictionary<RuntimeCharacter, float> KnownPickRates { get; } = new();
 
     public RuntimePlayer(PlayerProfile profile, TierSetting tier, System.Random random)
     {

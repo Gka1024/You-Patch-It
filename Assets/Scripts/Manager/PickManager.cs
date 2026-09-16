@@ -11,15 +11,28 @@ public class PickManager : MonoBehaviour
 
     private const int TEAM_SIZE_3 = 3051;
 
+    private const float MIN_META_LEARNING_RATE = 0.03f;
+    private const float MAX_META_LEARNING_RATE = 0.25f;
+
     private void Awake()
     {
         TeamSize = 1;
         Instance = this;
     }
 
-    void Start()
+    private void Start()
     {
         UnlockManager.Instance.OnUnlockChanged += CheckTeamSize;
+        CheckTeamSize();
+    }
+
+    private void OnDestroy()
+    {
+        if (UnlockManager.Instance != null)
+            UnlockManager.Instance.OnUnlockChanged -= CheckTeamSize;
+
+        if (Instance == this)
+            Instance = null;
     }
 
     //=========================================================
@@ -51,7 +64,13 @@ public class PickManager : MonoBehaviour
             List<RuntimePlayer> bluePlayers = FindOpponentTeam(redPlayers[0], queues);
 
             if (bluePlayers == null)
-                continue;
+            {
+                // 상대를 찾지 못한 플레이어를 다시 큐에 넣어 유실을 방지한다.
+                foreach (RuntimePlayer player in redPlayers)
+                    queues[player.Tier].Enqueue(player);
+
+                break;
+            }
 
             List<RuntimeCharacter> redCharacters = PickTeamCharacters(redPlayers, random);
             List<RuntimeCharacter> blueCharacters = PickTeamCharacters(bluePlayers, random);
@@ -77,7 +96,12 @@ public class PickManager : MonoBehaviour
             List<RuntimePlayer> bluePlayers = FindOpponentTeam(redPlayers[0], queues);
 
             if (bluePlayers == null)
-                continue;
+            {
+                foreach (RuntimePlayer player in redPlayers)
+                    queues[player.Tier].Enqueue(player);
+
+                break;
+            }
 
             List<RuntimeCharacter> redCharacters = new(baseCharacters);
             List<RuntimeCharacter> blueCharacters = new(opponentCharacters);
@@ -122,13 +146,14 @@ public class PickManager : MonoBehaviour
     private List<RuntimePlayer> FindOpponentTeam(RuntimePlayer player, Dictionary<PlayerTier, Queue<RuntimePlayer>> queues)
     {
         int tier = (int)player.Tier;
+        int tierCount = Enum.GetValues(typeof(PlayerTier)).Length;
 
         List<PlayerTier> searchTiers = new() { player.Tier };
 
         if (tier > 0)
             searchTiers.Add((PlayerTier)(tier - 1));
 
-        if (tier < Enum.GetValues(typeof(PlayerTier)).Length - 1)
+        if (tier < tierCount - 1)
             searchTiers.Add((PlayerTier)(tier + 1));
 
         foreach (PlayerTier searchTier in searchTiers)
@@ -173,7 +198,9 @@ public class PickManager : MonoBehaviour
 
     private RuntimeCharacter PickCharacter(RuntimePlayer player, System.Random random, List<RuntimeCharacter> pickedCharacters)
     {
-        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().Where(character => !pickedCharacters.Contains(character)).ToList();
+        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters()
+            .Where(character => !pickedCharacters.Contains(character))
+            .ToList();
 
         if (characters.Count == 0)
             return null;
@@ -208,12 +235,47 @@ public class PickManager : MonoBehaviour
         float score = 50f;
 
         score += WinrateScore(character, player);
-        score += PickRateScore(character);
+        score += PickRateScore(character, player);
         score += PreferenceScore(character, player);
 
         return Mathf.Max(1f, score);
     }
 
+    //---------------------------------------------------------
+    // Meta Knowledge
+    //---------------------------------------------------------
+
+    public void UpdatePlayerMetaKnowledge(IReadOnlyList<RuntimePlayer> players)
+    {
+        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+
+        foreach (RuntimePlayer player in players)
+        {
+            float learningRate = Mathf.Lerp(
+                MIN_META_LEARNING_RATE,
+                MAX_META_LEARNING_RATE,
+                Mathf.Clamp01(player.MetaKnowledge / 100f));
+
+            foreach (RuntimeCharacter character in characters)
+            {
+                float observedPickRate = AnalysisManager.Instance.GetPickRate(character);
+
+                if (!player.KnownPickRates.TryGetValue(character, out float knownPickRate))
+                {
+                    player.KnownPickRates[character] = observedPickRate;
+                    continue;
+                }
+
+                player.KnownPickRates[character] = Mathf.Lerp(
+                    knownPickRate,
+                    observedPickRate,
+                    learningRate);
+            }
+        }
+    }
+
+    //---------------------------------------------------------
+    // Pick Score
     //---------------------------------------------------------
 
     private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
@@ -226,11 +288,12 @@ public class PickManager : MonoBehaviour
         return delta * 2f * (player.MetaKnowledge / 100f) * experimentWeight;
     }
 
-    private float PickRateScore(RuntimeCharacter character)
+    private float PickRateScore(RuntimeCharacter character, RuntimePlayer player)
     {
-        float pickRate = AnalysisManager.Instance.GetPickRate(character);
+        if (!player.KnownPickRates.TryGetValue(character, out float knownPickRate))
+            knownPickRate = AnalysisManager.Instance.GetPickRate(character);
 
-        return pickRate * 0.3f;
+        return knownPickRate * 0.3f;
     }
 
     private float PreferenceScore(RuntimeCharacter character, RuntimePlayer player)

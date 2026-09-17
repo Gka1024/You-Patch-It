@@ -17,7 +17,7 @@ public class CharacterSkill_Warrior : CharacterSkill
         BattleActionExecutor.DealDamage(self, target, damage);
 
         float shield = self.GetStat(CharacterStatType.Health) * (coefficient - 1) * 0.1f;
-        BattleActionExecutor.AddShield(self, shield);
+        BattleActionExecutor.AddShield(self, shield, 5);
 
     }
 }

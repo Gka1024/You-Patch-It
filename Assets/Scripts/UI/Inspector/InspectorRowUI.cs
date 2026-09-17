@@ -69,6 +69,12 @@ public class InspectorRowUI : MonoBehaviour
         return changeValueFloat != 0;
     }
 
+    public void ResetValue()
+    {
+        changeValueFloat = 0f;
+        RefreshUI();
+    }
+
     public CharacterPatch GetPatch()
     {
         return new CharacterPatch(statType, currentValueFloat, currentValueFloat + changeValueFloat);

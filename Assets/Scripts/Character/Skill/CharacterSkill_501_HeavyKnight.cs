@@ -21,6 +21,8 @@ public class CharacterSkill_HeavyKnight : CharacterSkill
             BattleActionExecutor.AddTaunt(targets[i], self, tauntDuration);
         }
 
-        BattleActionExecutor.AddShield(self, self.GetStat(CharacterStatType.Health) * (coefficient - 1));
+        float shieldAmount = self.GetStat(CharacterStatType.Health) * (coefficient - 1) * 0.3f;
+
+        BattleActionExecutor.AddShield(self, shieldAmount, tauntDuration);
     }
 }

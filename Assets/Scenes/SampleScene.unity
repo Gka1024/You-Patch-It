@@ -546,8 +546,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterDatabase: {fileID: 11400000, guid: 614e2339c1b6451449e0799da850a2e7, type: 2}
-  startingCharacterIds: 65000000c900000091010000i
-  primalAdditionalCharacterIds: f50100002d010000i
+  startingCharacterIds: 65000000c90000002d01000091010000f5010000i
+  primalAdditionalCharacterIds: 
 --- !u!1 &15425858
 GameObject:
   m_ObjectHideFlags: 0
@@ -595,7 +595,6 @@ MonoBehaviour:
   characterDatabase: {fileID: 11400000, guid: 614e2339c1b6451449e0799da850a2e7, type: 2}
   GoalUI: {fileID: 695578421}
   BottomGoalUI: {fileID: 950043359}
-  IsGoalAvailable: 0
 --- !u!1001 &30183815
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13335,12 +13334,12 @@ MonoBehaviour:
   applyPatchButton: {fileID: 1992747310}
   undoButton: {fileID: 652851812}
   roleImage: {fileID: 1497772186}
-  warriorSprite: {fileID: -1471981965771863757, guid: 7362324d4b65b9948b40ba0414e4bc4c, type: 3}
-  rangedSprite: {fileID: -1304915726, guid: 7362324d4b65b9948b40ba0414e4bc4c, type: 3}
-  mageSprite: {fileID: -1156609169, guid: 7362324d4b65b9948b40ba0414e4bc4c, type: 3}
-  assassinSprite: {fileID: -85060389, guid: 7362324d4b65b9948b40ba0414e4bc4c, type: 3}
-  tankSprite: {fileID: 1284488301, guid: 7362324d4b65b9948b40ba0414e4bc4c, type: 3}
-  supportSprite: {fileID: 1646969938, guid: 7362324d4b65b9948b40ba0414e4bc4c, type: 3}
+  warriorSprite: {fileID: -410985052009719666, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  rangedSprite: {fileID: 2002527262303815227, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  mageSprite: {fileID: 1214262895612555007, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  assassinSprite: {fileID: -1950056267831496790, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  tankSprite: {fileID: -2588839765438997867, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  supportSprite: {fileID: -8893909045972252029, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
   StatsButton: {fileID: 270293968}
   Stats: {fileID: 1037165686}
   StatRows:
@@ -33394,6 +33393,59 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -350}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1291183617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1291183618}
+  - component: {fileID: 1291183619}
+  m_Layer: 0
+  m_Name: Debugger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1291183618
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291183617}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -789.0011, y: -505.9652, z: 9.074913}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1469754313}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1291183619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291183617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88cec0036ef9e1044bfd444941016c51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleSimulationDebug
+  redCharacter: {fileID: 0}
+  blueCharacter: {fileID: 0}
+  redProfile: {fileID: 0}
+  redTier: {fileID: 0}
+  blueProfile: {fileID: 0}
+  blueTier: {fileID: 0}
+  redPlayerSeed: 100
+  bluePlayerSeed: 200
+  battleSeed: 300
 --- !u!1 &1297335682
 GameObject:
   m_ObjectHideFlags: 0
@@ -37385,6 +37437,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 242184915}
+  - {fileID: 1291183618}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1479937946
@@ -38374,19 +38427,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tierWeights:
   - tier: 0
-    weight: 1
+    weight: 1.2
   - tier: 1
-    weight: 1.7
+    weight: 2
   - tier: 2
-    weight: 2.5
+    weight: 3.3
   - tier: 3
-    weight: 3.1
-  - tier: 4
-    weight: 3.7
-  - tier: 5
     weight: 4.2
+  - tier: 4
+    weight: 6.5
+  - tier: 5
+    weight: 8
   - tier: 6
-    weight: 5
+    weight: 10
 --- !u!1 &1552684663
 GameObject:
   m_ObjectHideFlags: 0
@@ -51323,7 +51376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentPlayerCount: 0
-  initialPlayerCount: 0
+  initialPlayerCount: 10000
   playerProfiles:
   - {fileID: 11400000, guid: 8042422ae3e1596459e4496404b56fdc, type: 2}
   - {fileID: 11400000, guid: 55c0592cc0622ca4c919d0eda6fc5afc, type: 2}
@@ -52022,7 +52075,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4308094770271194935 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1300460721349860810, guid: 92ed09499b8f9584d9968e5fe6a3e7b0, type: 3}

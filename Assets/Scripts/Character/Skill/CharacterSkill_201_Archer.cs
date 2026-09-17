@@ -16,6 +16,9 @@ public class CharacterSkill_Archer : CharacterSkill
         float damage = self.GetStat(CharacterStatType.Attack) * coefficient;
         BattleActionExecutor.DealDamage(self, target, damage);
 
-        BattleActionExecutor.MoveAway(self, target, self.GetStat(CharacterStatType.MoveSpeed) * coefficient);
+        if (Mathf.Abs(target.position - self.position) > self.aiState.PreferredDistance)
+        {
+            BattleActionExecutor.MoveAway(self, target, self.GetStat(CharacterStatType.MoveSpeed) * coefficient);
+        }
     }
 }

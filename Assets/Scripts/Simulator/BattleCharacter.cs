@@ -26,6 +26,9 @@ public class BattleCharacter
     public float currentMana;
     public float currentShield;
 
+    // 실드 지속 시간
+    public float shieldRemainingTime;
+
     public float position;
 
     public bool IsDead => currentHealth <= 0f;
@@ -52,6 +55,7 @@ public class BattleCharacter
     {
         Initialize(runtimeCharacter, player, ai, startPosition);
     }
+
     // ============================================================
     // Initialization
     // ============================================================
@@ -70,6 +74,7 @@ public class BattleCharacter
         currentHealth = GetStat(CharacterStatType.Health);
         currentMana = 0f;
         currentShield = 0f;
+        shieldRemainingTime = 0f;
 
         position = startPosition;
 
@@ -79,6 +84,11 @@ public class BattleCharacter
         skillDelayTimer = 0f;
 
         isSkillReady = false;
+
+        currentTarget = null;
+        targetUpdateTimer = 0f;
+
+        damageOverTimes.Clear();
     }
 
     private void InitializeStats()
@@ -98,6 +108,7 @@ public class BattleCharacter
     {
         currentMana = 0f;
         currentShield = 0f;
+        shieldRemainingTime = 0f;
 
         attackCooldown = 0f;
         actionLockTime = 0f;
@@ -108,6 +119,8 @@ public class BattleCharacter
 
         currentTarget = null;
         targetUpdateTimer = 0f;
+
+        damageOverTimes.Clear();
     }
 
     // ============================================================
@@ -180,6 +193,37 @@ public class BattleCharacter
             {
                 CalculateStat(statType);
             }
+        }
+    }
+
+    // ============================================================
+    // Shield
+    // ============================================================
+
+    public void AddShield(float amount, float duration)
+    {
+        if (amount <= 0f || duration <= 0f)
+            return;
+
+        currentShield += amount;
+        shieldRemainingTime = duration;
+    }
+
+    public void TickShield(float tick)
+    {
+        if (currentShield <= 0f)
+        {
+            currentShield = 0f;
+            shieldRemainingTime = 0f;
+            return;
+        }
+
+        shieldRemainingTime -= tick;
+
+        if (shieldRemainingTime <= 0f)
+        {
+            currentShield = 0f;
+            shieldRemainingTime = 0f;
         }
     }
 

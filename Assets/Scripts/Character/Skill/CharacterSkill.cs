@@ -23,6 +23,9 @@ public abstract class CharacterSkill : ScriptableObject
         if (candidates.Count == 0)
             return candidates;
 
+        if (candidates.Count == 1)
+            return new List<BattleCharacter> { candidates[0] };
+
         switch (targetType)
         {
             case SkillTargetType.Self:

@@ -319,6 +319,7 @@ public class InspectorUI : MonoBehaviour
         foreach (Transform child in SpecialStatRows)
         {
             child.SetParent(NormalStatRows, false);
+            child.gameObject.GetComponent<InspectorRowUI>().ResetValue();
             child.gameObject.SetActive(false);
         }
 
@@ -340,6 +341,8 @@ public class InspectorUI : MonoBehaviour
 
         ShowSpecificStats(dropdownStatTypes[statIndex]);
     }
+
+
 
     public void ShowStats()
     {

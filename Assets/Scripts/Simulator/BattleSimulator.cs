@@ -9,7 +9,7 @@ public class BattleSimulator : MonoBehaviour
     public StatisticsManager statisticsManager;
 
     private const float TICK = 0.05f;
-    private const float BATTLE_TIME_LIMIT = 300f;
+    private const float BATTLE_TIME_LIMIT = 1000f;
 
     private readonly List<BattleCharacter> redTeam = new();
     private readonly List<BattleCharacter> blueTeam = new();
@@ -83,6 +83,7 @@ public class BattleSimulator : MonoBehaviour
             if (battleTime > BATTLE_TIME_LIMIT)
             {
                 Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) ||  {redCharacters[0].OriginCharacter.characterName} vs {blueCharacters[0].OriginCharacter.characterName}");
+                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) ||  {redPlayers[0].Tier} vs {bluePlayers[0].Tier}");
                 break;
             }
         }

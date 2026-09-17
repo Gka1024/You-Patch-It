@@ -16,3 +16,5 @@ MonoBehaviour:
   skillName: 
   skillDescription: 
   ignoreDistance: 0
+  targetType: 5
+  targetSelection: 1

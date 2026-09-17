@@ -76,7 +76,7 @@ public static class BattleActionExecutor
     {
         float damage = self.GetStat(CharacterStatType.Attack) * GetDamageMultiplier(self);
 
-        self.currentMana += self.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 20f;
+        self.currentMana += self.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 40f;
 
         DealDamage(self, enemy, damage);
 
@@ -123,9 +123,9 @@ public static class BattleActionExecutor
         target.statistics.damageTaken += damage;
     }
 
-    public static void AddShield(BattleCharacter target, float amount)
+    public static void AddShield(BattleCharacter target, float amount, float time)
     {
-        target.currentShield += amount;
+        target.AddShield(amount, time);
     }
 
     public static void AddStun(BattleCharacter target, float duration)

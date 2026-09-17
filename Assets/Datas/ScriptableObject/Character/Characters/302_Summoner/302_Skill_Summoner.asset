@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7591c5d62efbd714a8d1ebfd41e30769, type: 3}
   m_Name: 302_Skill_Summoner
   m_EditorClassIdentifier: 
-  skillOwner: 0
-  skillName: 
-  skillDescription: 
+  skillOwner: 302
+  skillName: "\uC815\uB839 \uC18C\uD658"
+  skillDescription: "\uC815\uB839\uC744 \uC18C\uD658\uD558\uC5EC \uC801\uC5D0\uAC8C \uC9C0\uC18D \uD53C\uD574\uB97C \uC900\uB2E4."
   ignoreDistance: 0
   targetType: 1
   targetSelection: 1

@@ -15,20 +15,23 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField] private TMP_Text damageText;
     [SerializeField] private TMP_Text livetimeText;
 
+    [SerializeField] private Image Symbols;
+
     [SerializeField] private GameObject backgroundImage;
 
     [SerializeField] private Button button;
 
-    [SerializeField] private RuntimeCharacter runtimeCharacter;
+    private RuntimeCharacter runtimeCharacter;
 
     private const int UnlockShowTier = 1021;
     private const int UnlockShowBan = 1022;
     private const int UnlockShowLivetime = 1023;
     private const int UnlockShowDPS = 1024;
 
-    public void Initialize(RuntimeCharacter character)
+    public void Initialize(RuntimeCharacter character, CharacterTableUI tableUI)
     {
         runtimeCharacter = character;
+        Symbols.sprite = tableUI.GetSymbolSprite(character);
 
         Refresh();
 

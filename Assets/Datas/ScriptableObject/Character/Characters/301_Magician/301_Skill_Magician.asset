@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 301_Skill_Magician
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: 
-  skillDescription: 
+  skillName: "\uC720\uC131\uC6B0"
+  skillDescription: "\uD558\uB298\uC5D0\uC11C \uC6B4\uC11D\uC744 \uB099\uD558\uD558\uC5EC \uC801\uC5D0\uAC8C \uAD11\uC5ED \uB370\uBBF8\uC9C0\uB97C \uC900\uB2E4."
   ignoreDistance: 0
   targetType: 5
   targetSelection: 1

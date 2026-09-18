@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: 102_Skill_Berserker
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: 
-  skillDescription: 
-  ignoreDistance: 0
+  skillName: "\uAD11\uD654"
+  skillDescription: "\uC790\uC2E0\uC758 \uACF5\uACA9\uB825, \uACF5\uACA9 \uC18D\uB3C4, \uC774\uB3D9 \uC18D\uB3C4\uB97C \uC62C\uB9B0\uB2E4."
+  ignoreDistance: 1
+  targetType: 0
+  targetSelection: 0

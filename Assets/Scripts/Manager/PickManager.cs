@@ -7,7 +7,7 @@ public class PickManager : MonoBehaviour
 {
     public static PickManager Instance;
 
-    private int TeamSize = 1;
+    private int TeamSize;
 
     private const int TEAM_SIZE_3 = 3051;
 

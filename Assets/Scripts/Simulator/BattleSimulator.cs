@@ -154,6 +154,8 @@ public class BattleSimulator : MonoBehaviour
             character.Initialize(runtimeCharacter, runtimePlayer, aiState, startingPosition);
             team.Add(character);
         }
+
+        Debug.Log($"[CreateTeam] 생성된 team: {team.Count}");
     }
 
     private BattleCharacter GetBattleCharacter()
@@ -213,7 +215,8 @@ public class BattleSimulator : MonoBehaviour
         character.reactionTimer = Mathf.Max(0f, character.reactionTimer - TICK);
         character.targetUpdateTimer = Mathf.Max(0f, character.targetUpdateTimer - TICK);
 
-        character.TickModifiers();
+        character.TickModifiers(TICK);
+        character.TickShield(TICK);
         character.TickDamageOverTimes(TICK);
 
         HealCharacter(character, character.runtimeCharacter.GetStat(CharacterStatType.HealthRegen) / 100f);

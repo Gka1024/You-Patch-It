@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 501_Skill_HeavyKnight
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: 
-  skillDescription: 
+  skillName: "\uAE30\uC0AC\uC758 \uBC29\uD328"
+  skillDescription: "\uADFC\uCC98\uC758 \uC801\uC744 \uB3C4\uBC1C\uD558\uC5EC \uACF5\uACA9\uB9CC \uD560 \uC218 \uC788\uAC8C \uB9CC\uB4E0\uB2E4. \uC790\uC2E0\uC740 \uBCF4\uD638\uB9C9\uB97C \uC5BB\uB294\uB2E4."
   ignoreDistance: 0
   targetType: 5
   targetSelection: 0

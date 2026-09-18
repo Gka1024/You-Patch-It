@@ -4,11 +4,11 @@ public class BattleStatModifier
     public BattleStatModifierType modifierType;
     public float value;
 
-    public int remainingTicks;
+    public float remainingTicks;
 
     public object Source;
 
-    public BattleStatModifier(CharacterStatType statType, BattleStatModifierType statModifier, float value, int durationTicks, object Source = null)
+    public BattleStatModifier(CharacterStatType statType, BattleStatModifierType statModifier, float value, float durationTicks, object Source = null)
     {
         this.statType = statType;
         this.modifierType = statModifier;

@@ -546,8 +546,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterDatabase: {fileID: 11400000, guid: 614e2339c1b6451449e0799da850a2e7, type: 2}
-  startingCharacterIds: 65000000c90000002d01000091010000f5010000i
-  primalAdditionalCharacterIds: 
+  startingCharacterIds: 65000000c900000091010000i
+  primalAdditionalCharacterIds: 2d010000f501000059020000i
 --- !u!1 &15425858
 GameObject:
   m_ObjectHideFlags: 0
@@ -9477,6 +9477,12 @@ MonoBehaviour:
   - {fileID: 2078101572}
   - {fileID: 1110991261}
   - {fileID: 601777456}
+  warriorSprite: {fileID: -410985052009719666, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  rangedSprite: {fileID: 2002527262303815227, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  mageSprite: {fileID: 1214262895612555007, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  assassinSprite: {fileID: -1950056267831496790, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  tankSprite: {fileID: -2588839765438997867, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
+  supportSprite: {fileID: -8893909045972252029, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
   rankNumList:
   - {fileID: 832716890}
   - {fileID: 1958746015}
@@ -13304,8 +13310,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 72835899}
-  - {fileID: 1836072064}
   - {fileID: 1497772185}
+  - {fileID: 1836072064}
   - {fileID: 79217898}
   - {fileID: 1037165687}
   - {fileID: 951804492}
@@ -37752,7 +37758,7 @@ GameObject:
   - component: {fileID: 1497772187}
   - component: {fileID: 1497772186}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Symbol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37797,7 +37803,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1471981965771863757, guid: 7362324d4b65b9948b40ba0414e4bc4c, type: 3}
+  m_Sprite: {fileID: -410985052009719666, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -52075,7 +52081,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4308094770271194935 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1300460721349860810, guid: 92ed09499b8f9584d9968e5fe6a3e7b0, type: 3}

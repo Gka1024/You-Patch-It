@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: 601_Skill_Bard
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: 
-  skillDescription: 
-  ignoreDistance: 0
+  skillName: "\uC624\uB77C\uD1A0\uB9AC\uC544"
+  skillDescription: "\uBAA8\uB4E0 \uC544\uAD70\uC5D0\uAC8C \uBCF4\uD638\uB9C9\uACFC \uBC29\uC5B4\uB825 \uC99D\uAC00 \uBC84\uD504\uB97C \uBD80\uC5EC\uD55C\uB2E4."
+  ignoreDistance: 1
+  targetType: 4
+  targetSelection: 0

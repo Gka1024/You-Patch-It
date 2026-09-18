@@ -11,6 +11,13 @@ public class CharacterTableUI : MonoBehaviour
 
     [SerializeField] private List<CharacterTableHeaderUI> headers = new();
 
+    [SerializeField] private Sprite warriorSprite;
+    [SerializeField] private Sprite rangedSprite;
+    [SerializeField] private Sprite mageSprite;
+    [SerializeField] private Sprite assassinSprite;
+    [SerializeField] private Sprite tankSprite;
+    [SerializeField] private Sprite supportSprite;
+
     private readonly List<CharacterRowUI> rowList = new();
     private Dictionary<RuntimeCharacter, CharacterRowUI> rowMap = new();
     [SerializeField] private List<GameObject> rankNumList;
@@ -29,7 +36,7 @@ public class CharacterTableUI : MonoBehaviour
         {
             CharacterRowUI row = Instantiate(rowPrefab, content);
 
-            row.Initialize(runtimeCharacter);
+            row.Initialize(runtimeCharacter, this);
 
             rowList.Add(row);
             rowMap.Add(runtimeCharacter, row);
@@ -77,7 +84,7 @@ public class CharacterTableUI : MonoBehaviour
     {
         CharacterRowUI row = Instantiate(rowPrefab, content);
 
-        row.Initialize(runtimeCharacter);
+        row.Initialize(runtimeCharacter, this);
 
         rowList.Add(row);
     }
@@ -102,6 +109,25 @@ public class CharacterTableUI : MonoBehaviour
         {
             rankNumList[i].SetActive(count - 1 >= i);
         }
+    }
+
+    public Sprite GetSymbolSprite(RuntimeCharacter character)
+    {
+        if (character == null)
+        {
+            return null;
+        }
+
+        return character.OriginCharacter.role switch
+        {
+            CharacterRole.Warrior => warriorSprite,
+            CharacterRole.Ranged => rangedSprite,
+            CharacterRole.Mage => mageSprite,
+            CharacterRole.Assassin => assassinSprite,
+            CharacterRole.Tank => tankSprite,
+            CharacterRole.Support => supportSprite,
+            _ => warriorSprite
+        };
     }
 
     public void OnClickHeader(AnalysisItem item)

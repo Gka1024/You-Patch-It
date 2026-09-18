@@ -167,7 +167,7 @@ public class BattleCharacter
     // Modifier Tick
     // ============================================================
 
-    public void TickModifiers()
+    public void TickModifiers(float tick)
     {
         foreach (var pair in modifiers)
         {
@@ -180,7 +180,7 @@ public class BattleCharacter
             {
                 BattleStatModifier modifier = list[i];
 
-                modifier.remainingTicks--;
+                modifier.remainingTicks -= tick;
 
                 if (modifier.remainingTicks <= 0)
                 {
@@ -209,7 +209,7 @@ public class BattleCharacter
         shieldRemainingTime = duration;
     }
 
-    public void TickShield(float tick)
+    public void TickShield(float tick) // 이거 적용시킬것
     {
         if (currentShield <= 0f)
         {

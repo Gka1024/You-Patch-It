@@ -98,7 +98,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.2d.tooling": {
-      "version": "4.0.1",
+      "version": "4.0.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -149,7 +149,7 @@
         "com.unity.2d.tilemap": "1.0.0",
         "com.unity.2d.tilemap.extras": "9.0.0",
         "com.unity.2d.aseprite": "6.0.0",
-        "com.unity.2d.tooling": "4.0.1"
+        "com.unity.2d.tooling": "4.0.0"
       }
     },
     "com.unity.graph-authoring": {

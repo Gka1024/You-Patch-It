@@ -7,7 +7,7 @@ public class AnalysisManager : MonoBehaviour
 {
     public static AnalysisManager Instance { get; private set; }
 
-    private int currentTeamSize = 1;
+    private int currentTeamSize = 3;
 
     private readonly Dictionary<bool, Dictionary<AnalysisItem, Dictionary<int, int>>> rankCache = new();
     private readonly Dictionary<(bool past, int characterid, AnalysisItem item), float> valueCache = new();

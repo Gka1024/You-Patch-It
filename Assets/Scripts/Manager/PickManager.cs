@@ -16,7 +16,7 @@ public class PickManager : MonoBehaviour
 
     private void Awake()
     {
-        TeamSize = 1;
+        TeamSize = 3;
         Instance = this;
     }
 

@@ -160,7 +160,7 @@ public class SeasonReportUI : MonoBehaviour
         float sumTrust = 0f;
         int characterCount = 0;
 
-        foreach (CharacterTrustReport report in TrustManager.Instance.CharacterTrustReports)
+        foreach (CharacterTrustReport report in ResourceCalculateManager.Instance.CharacterTrustReports)
         {
             string sign = report.trust >= 0 ? "+" : "";
 
@@ -202,7 +202,7 @@ public class SeasonReportUI : MonoBehaviour
         builder.AppendLine("<b><시즌 신뢰도></b>");
         builder.AppendLine();
 
-        foreach (TrustReportData report in TrustManager.Instance.SeasonTrustReports)
+        foreach (TrustReportData report in ResourceCalculateManager.Instance.SeasonTrustReports)
         {
             builder.AppendLine($"{report.title}  {report.trust:+0;-0;0}");
 
@@ -261,7 +261,7 @@ public class SeasonReportUI : MonoBehaviour
         builder.AppendLine("<b><개발 리소스></b>");
         builder.AppendLine();
 
-        foreach (TrustReportData report in TrustManager.Instance.SeasonResourceReports)
+        foreach (TrustReportData report in ResourceCalculateManager.Instance.SeasonResourceReports)
         {
             builder.AppendLine($"{report.title}  {report.trust:+0;-0;0}");
 

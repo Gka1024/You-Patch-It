@@ -8,6 +8,7 @@ public class UpDisplayUI : MonoBehaviour
     [SerializeField] private TMP_Text TrustPointText;
     [SerializeField] private TMP_Text DevelopResourceText;
     [SerializeField] private TMP_Text PlayersCountText;
+    [SerializeField] private TMP_Text MoneyText;
 
     [SerializeField] private GameObject TrustText;
     [SerializeField] private GameObject ResourceText;
@@ -31,9 +32,10 @@ public class UpDisplayUI : MonoBehaviour
     {
         Debug.Log("UpdisplayUI refresh");
         SeasonText.text = $"시즌 데이터 : {SeasonManager.Instance.DisplaySeason} - {SeasonManager.Instance.DisplaySubSeason}";
-        TrustPointText.text = $"{ResourceManager.Instance.TrustPoint}%";
-        DevelopResourceText.text = $"{ResourceManager.Instance.DevelopResource}";
+        TrustPointText.text = $"{ResourceManager.Instance.GetTrust}%";
+        DevelopResourceText.text = $"{ResourceManager.Instance.GetDevelop}";
         PlayersCountText.text = $"{PlayerManager.Instance.CurrentPlayerCount}";
+        MoneyText.text = $"{ResourceManager.Instance.GetMoney}";
 
         ResetResourceTextDescription();
     }

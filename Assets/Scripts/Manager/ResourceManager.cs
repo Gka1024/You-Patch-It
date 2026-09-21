@@ -12,8 +12,12 @@ public class ResourceManager : MonoBehaviour
     [Range(0, 100)]
     private float trust = 50f;
 
-    public int TrustPoint => Mathf.RoundToInt(trust);
-    public int DevelopResource => developResource;
+    [Header("Money")]
+    [SerializeField] private int money;
+
+    public int GetTrust => Mathf.RoundToInt(trust);
+    public int GetDevelop => developResource;
+    public int GetMoney => money;
 
     public float curSeasonTrust;
     public int curSeasonResource;
@@ -27,12 +31,33 @@ public class ResourceManager : MonoBehaviour
 
         trust = 50f;
         developResource = 300;
+        money = 1000;
     }
 
     public void ResetCurrentSeason()
     {
         curSeasonResource = 0;
         curSeasonTrust = 0;
+    }
+
+    public void CalculateSeasonReward()
+    {
+        int developResource = ResourceCalculateManager.Instance.CalculateSeasonDevelopResource();
+        float trust = ResourceCalculateManager.Instance.CalculateSeasonTrust();
+        int money = ResourceCalculateManager.Instance.CalculateMoney();
+        int operatingCost = ResourceCalculateManager.Instance.CalculateOperatingCost();
+
+        AddDevelopResource(developResource);
+        AddTrust(trust);
+        AddMoney(money);
+        SpendMoney(operatingCost);
+
+        curSeasonResource += developResource;
+        curSeasonTrust += trust;
+
+        UIManager.Instance.upDisplayUI.Refresh();
+
+        Debug.Log($"Reward : +{developResource} Develop / {trust:+0;-0;0} Trust / +{money} Money / -{operatingCost} Operating Cost");
     }
 
     //====================================================
@@ -47,10 +72,11 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    public void GiveSeasonReward(int develop, float trustPoint)
+    public void GiveSeasonReward(int develop, float trustPoint, int money)
     {
         curSeasonResource += AddDevelopResource(develop);
         curSeasonTrust += AddTrust(trustPoint);
+        AddMoney(money);
 
         UIManager.Instance.upDisplayUI.Refresh();
     }
@@ -112,6 +138,27 @@ public class ResourceManager : MonoBehaviour
         developResource -= amount;
 
         UIManager.Instance.upDisplayUI.Refresh();
+
+        return true;
+    }
+
+    //====================================================
+    // Money
+    //====================================================
+
+    public void AddMoney(int amount)
+    {
+        this.money += amount;
+    }
+
+    public bool SpendMoney(int amount)
+    {
+        if (money < amount)
+        {
+            return false;
+        }
+
+        money -= amount;
 
         return true;
     }

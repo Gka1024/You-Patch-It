@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class TrustManager : MonoBehaviour
+public class ResourceCalculateManager : MonoBehaviour
 {
-    public static TrustManager Instance;
-
-    private bool Is3vs3Unlocked = false;
+    public static ResourceCalculateManager Instance;
 
     [SerializeField] private List<TierWeight> tierWeights = new();
 
@@ -20,47 +18,31 @@ public class TrustManager : MonoBehaviour
     private readonly List<TrustReportData> seasonResourceReports = new();
     public IReadOnlyList<TrustReportData> SeasonResourceReports => seasonResourceReports;
 
+    private const int BASE_MONEY = 100;
+    private const float PLAYER_COUNT_MONEY_RATE = 0.0001f;
+    private const int OPERATE_COST = 200;
+
     private void Awake()
     {
         Instance = this;
         InitializeTierWeights();
     }
 
-    public void CalculateTrust()
-    {
-        Debug.Log("Calculate Trust Start");
-
-        int developResource = CalculateSeasonDevelopResource();
-        float trust = CalculateSeasonTrust();
-
-        ResourceManager.Instance.GiveSeasonReward(developResource, trust);
-
-        Debug.Log($"Reward : +{developResource} Develop / {trust:+0;-0;0} Trust");
-    }
-
     //====================================================
     // Calculation
     //====================================================
 
-    private int CalculateSeasonDevelopResource()
+    public int CalculateSeasonDevelopResource()
     {
         seasonResourceReports.Clear();
 
         int baseResource;
         float trustMultiplier;
 
-        if (!Is3vs3Unlocked)
-        {
-            baseResource = 30;
-            trustMultiplier = 0.9f;
-        }
-        else
-        {
-            baseResource = 50;
-            trustMultiplier = 1.2f;
-        }
+        baseResource = 30;
+        trustMultiplier = 0.9f;
 
-        float trustPoint = ResourceManager.Instance.TrustPoint;
+        float trustPoint = ResourceManager.Instance.GetTrust;
         int trustResource = Mathf.RoundToInt(trustPoint * trustMultiplier);
 
         seasonResourceReports.Add(
@@ -81,56 +63,76 @@ public class TrustManager : MonoBehaviour
 
         return baseResource + trustResource;
     }
-    
-    private int CalculateSeasonTrust()
+
+    public int CalculateSeasonTrust()
     {
         seasonTrustReports.Clear();
+        characterTrustReports.Clear();
+
+        List<RuntimeCharacter> characters =
+            RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
 
         int trust = 0;
 
         // 승률
-
-        int winrateScore = EvaluateWinRate();
+        int winrateScore = EvaluateWinRate(characters);
 
         seasonTrustReports.Add(
-            new TrustReportData("캐릭터 밸런스", winrateScore, GetTrustDescription("캐릭터들의 승률이 50%에 가까울수록 높은 평가를 받습니다.",
-                    winrateScore)
+            new TrustReportData(
+                "캐릭터 밸런스",
+                winrateScore,
+                GetScoreDescription(
+                    "캐릭터들의 승률이 50%에 가까울수록 높은 평가를 받습니다.",
+                    winrateScore
+                )
             )
         );
 
         trust += winrateScore;
 
         // 캐릭터 아이덴티티
-
-        int identityScore = EvaluateCharacterIdentity();
+        int identityScore = EvaluateCharacterIdentity(characters);
 
         seasonTrustReports.Add(
-                        new TrustReportData("캐릭터 개성", identityScore, GetTrustDescription("캐릭터마다 서로 다른 능력치를 가지고 있을수록 높은 평가를 받습니다.",
-                    identityScore)
+            new TrustReportData(
+                "캐릭터 개성",
+                identityScore,
+                GetScoreDescription(
+                    "캐릭터마다 서로 다른 능력치를 가지고 있을수록 높은 평가를 받습니다.",
+                    identityScore
+                )
             )
         );
 
         trust += identityScore;
 
         // 메타 다양성
-
-        int metaScore = EvaluateMetaDiversity();
+        int metaScore = EvaluateMetaDiversity(characters);
 
         seasonTrustReports.Add(
-            new TrustReportData("메타 다양성", metaScore, GetTrustDescription("특정 캐릭터에 픽률이 집중되지 않을수록 높은 평가를 받습니다.",
-               metaScore)
+            new TrustReportData(
+                "메타 다양성",
+                metaScore,
+                GetScoreDescription(
+                    "특정 캐릭터에 픽률이 집중되지 않을수록 높은 평가를 받습니다.",
+                    metaScore
+                )
             )
         );
 
         trust += metaScore;
 
         // 직업군 밸런스
-
-        int roleScore = EvaluateRoleBalance();
+        int roleScore = EvaluateRoleBalance(characters);
 
         seasonTrustReports.Add(
-            new TrustReportData("직업군 밸런스", roleScore, GetTrustDescription("각 직업군의 평균 승률이 균형을 이룰수록 높은 평가를 받습니다.",
-                    roleScore)
+            new TrustReportData(
+                "직업군 밸런스",
+                roleScore,
+                GetScoreDescription(
+                    "각 직업군의 평균 승률이 균형을 이룰수록 높은 평가를 받습니다.",
+                    roleScore
+                )
             )
         );
 
@@ -139,7 +141,18 @@ public class TrustManager : MonoBehaviour
         return trust;
     }
 
-    private string GetTrustDescription(string baseDescription, float score)
+    public int CalculateMoney()
+    {
+        float trustMultiplier = Mathf.Lerp(0.5f, 1f, ResourceManager.Instance.GetTrust * 0.01f);
+
+        float money = BASE_MONEY;
+        money *= PlayerManager.Instance.CurrentPlayerCount * PLAYER_COUNT_MONEY_RATE;
+        money *= trustMultiplier;
+
+        return (int)money;
+    }
+
+    private string GetScoreDescription(string baseDescription, float score)
     {
         if (score > 3)
             return $"{baseDescription}\n : 긍정적";
@@ -150,16 +163,17 @@ public class TrustManager : MonoBehaviour
         return $"{baseDescription}\n : 보통";
     }
 
+    public int CalculateOperatingCost()
+    {
+        return OPERATE_COST; // 차후에 해금에서 값을 줄이거나 늘릴 수 있도록
+    }
+
     //====================================================
     // Evaluation
     //====================================================
 
-    private int EvaluateWinRate()
+    private int EvaluateWinRate(IReadOnlyList<RuntimeCharacter> characters)
     {
-        List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
-
-        characterTrustReports.Clear();
-
         if (characters.Count == 0)
             return 0;
 
@@ -168,7 +182,8 @@ public class TrustManager : MonoBehaviour
 
         foreach (RuntimeCharacter character in characters)
         {
-            CharacterStatistics stat = StatisticsManager.Instance.GetCurrentStatistics(character);
+            CharacterStatistics stat =
+                StatisticsManager.Instance.GetCurrentStatistics(character);
 
             float characterScore = 0f;
             float characterWeight = 0f;
@@ -184,7 +199,8 @@ public class TrustManager : MonoBehaviour
                 score = Mathf.Clamp(score, -20f, 10f);
 
                 float tierWeight = GetTierWeight(tier);
-                float sampleWeight = Mathf.Sqrt(tierStat.WinCount + tierStat.LoseCount);
+                float sampleWeight =
+                    Mathf.Sqrt(tierStat.WinCount + tierStat.LoseCount);
 
                 float weight = tierWeight * sampleWeight;
 
@@ -195,10 +211,17 @@ public class TrustManager : MonoBehaviour
                 characterWeight += weight;
             }
 
-            // 해당 캐릭터의 최종 기여도
-            float finalCharacterScore = characterWeight <= 0f ? 0f : characterScore / characterWeight;
+            float finalCharacterScore =
+                characterWeight <= 0f
+                    ? 0f
+                    : characterScore / characterWeight;
 
-            characterTrustReports.Add(new CharacterTrustReport(character, finalCharacterScore));
+            characterTrustReports.Add(
+                new CharacterTrustReport(
+                    character,
+                    finalCharacterScore
+                )
+            );
         }
 
         if (totalWeight <= 0f)
@@ -211,9 +234,12 @@ public class TrustManager : MonoBehaviour
 
     private float GetTierWeight(PlayerTier tier)
     {
-        TierWeight tierWeight = tierWeights.FirstOrDefault(x => x.tier == tier);
+        TierWeight tierWeight =
+            tierWeights.FirstOrDefault(x => x.tier == tier);
 
-        return tierWeight != null ? Mathf.Max(0f, tierWeight.weight) : 1f;
+        return tierWeight != null
+            ? Mathf.Max(0f, tierWeight.weight)
+            : 1f;
     }
 
     private void InitializeTierWeights()
@@ -222,15 +248,15 @@ public class TrustManager : MonoBehaviour
             return;
 
         tierWeights = new List<TierWeight>
-    {
-        new TierWeight { tier = PlayerTier.Bronze, weight = 1.0f },
-        new TierWeight { tier = PlayerTier.Silver, weight = 1.1f },
-        new TierWeight { tier = PlayerTier.Gold, weight = 1.25f },
-        new TierWeight { tier = PlayerTier.Platinum, weight = 1.5f },
-        new TierWeight { tier = PlayerTier.Diamond, weight = 1.75f },
-        new TierWeight { tier = PlayerTier.Master, weight = 2.0f },
-        new TierWeight { tier = PlayerTier.Challenger, weight = 2.5f }
-    };
+        {
+            new TierWeight { tier = PlayerTier.Bronze, weight = 1.0f },
+            new TierWeight { tier = PlayerTier.Silver, weight = 1.1f },
+            new TierWeight { tier = PlayerTier.Gold, weight = 1.25f },
+            new TierWeight { tier = PlayerTier.Platinum, weight = 1.5f },
+            new TierWeight { tier = PlayerTier.Diamond, weight = 1.75f },
+            new TierWeight { tier = PlayerTier.Master, weight = 2.0f },
+            new TierWeight { tier = PlayerTier.Challenger, weight = 2.5f }
+        };
     }
 
     private float CalculateWinRateScore(float winRate)
@@ -252,13 +278,10 @@ public class TrustManager : MonoBehaviour
         return Mathf.Lerp(-13f, -20f, (delta - 40f) / 10f);
     }
 
-    // ----------------------------------------
+    // -- 아이덴티티 평가 : 캐릭터가 다르면 다를수록 고득점
 
-    private int EvaluateCharacterIdentity()
+    private int EvaluateCharacterIdentity(IReadOnlyList<RuntimeCharacter> characters)
     {
-        List<RuntimeCharacter> characters =
-            RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
-
         if (characters.Count < 2)
             return 10;
 
@@ -271,34 +294,58 @@ public class TrustManager : MonoBehaviour
             {
                 totalDistance += GetCharacterDistance(
                     characters[i],
-                    characters[j]);
+                    characters[j]
+                );
 
                 pairCount++;
             }
         }
 
         float averageDistance = totalDistance / pairCount;
-
         float score = CalculateIdentityScore(averageDistance);
 
         Debug.Log(
             $"Character Identity | " +
             $"Average Distance : {averageDistance:F2} | " +
-            $"Score : {score:F1}");
+            $"Score : {score:F1}"
+        );
 
         return Mathf.RoundToInt(score);
     }
 
     private float GetCharacterDistance(RuntimeCharacter a, RuntimeCharacter b)
     {
-        float distance = 0;
+        float distance = 0f;
 
-        distance += Mathf.Abs(a.GetStat(CharacterStatType.Attack) - b.GetStat(CharacterStatType.Attack)) / 100f;
-        distance += Mathf.Abs(a.GetStat(CharacterStatType.Health) - b.GetStat(CharacterStatType.Health)) / 500f;
-        distance += Mathf.Abs(a.GetStat(CharacterStatType.Defence) - b.GetStat(CharacterStatType.Defence)) / 50f;
-        distance += Mathf.Abs(a.GetStat(CharacterStatType.MoveSpeed) - b.GetStat(CharacterStatType.MoveSpeed)) / 3f;
-        distance += Mathf.Abs(a.GetStat(CharacterStatType.AttackSpeed) - b.GetStat(CharacterStatType.AttackSpeed)) / 2f;
-        distance += Mathf.Abs(a.GetStat(CharacterStatType.AttackRange) - b.GetStat(CharacterStatType.AttackRange)) / 5f;
+        distance += Mathf.Abs(
+            a.GetStat(CharacterStatType.Attack) -
+            b.GetStat(CharacterStatType.Attack)
+        ) / 100f;
+
+        distance += Mathf.Abs(
+            a.GetStat(CharacterStatType.Health) -
+            b.GetStat(CharacterStatType.Health)
+        ) / 500f;
+
+        distance += Mathf.Abs(
+            a.GetStat(CharacterStatType.Defence) -
+            b.GetStat(CharacterStatType.Defence)
+        ) / 50f;
+
+        distance += Mathf.Abs(
+            a.GetStat(CharacterStatType.MoveSpeed) -
+            b.GetStat(CharacterStatType.MoveSpeed)
+        ) / 3f;
+
+        distance += Mathf.Abs(
+            a.GetStat(CharacterStatType.AttackSpeed) -
+            b.GetStat(CharacterStatType.AttackSpeed)
+        ) / 2f;
+
+        distance += Mathf.Abs(
+            a.GetStat(CharacterStatType.AttackRange) -
+            b.GetStat(CharacterStatType.AttackRange)
+        ) / 5f;
 
         return distance;
     }
@@ -307,86 +354,81 @@ public class TrustManager : MonoBehaviour
     {
         // 캐릭터가 거의 동일하면 강한 페널티
         if (distance <= 1f)
-        {
             return Mathf.Lerp(-20f, -8f, distance / 1f);
-        }
 
         // 1 ~ 2
         if (distance <= 2f)
-        {
             return Mathf.Lerp(-8f, 2f, (distance - 1f) / 1f);
-        }
 
         // 2 ~ 3
         if (distance <= 3f)
-        {
             return Mathf.Lerp(2f, 7f, (distance - 2f) / 1f);
-        }
 
         // 3 ~ 4
         if (distance <= 4f)
-        {
             return Mathf.Lerp(7f, 9f, (distance - 3f) / 1f);
-        }
 
         // 4 이상이면 거의 만점
         return 10f;
     }
 
-    // ----------------------------------------
+    // -- 메타 평가 : 픽률이 넓게 분포하면 고득점
 
-    private int EvaluateMetaDiversity()
-    { // 모든 캐릭터의 픽률에 기반한 신뢰도 평가
-        List<RuntimeCharacter> characters =
-            RuntimeCharacterManager.Instance.GetAllCharacters().ToList();
+    private int EvaluateMetaDiversity(IReadOnlyList<RuntimeCharacter> characters)
+    {
+        // 모든 캐릭터의 픽률에 기반한 신뢰도 평가
+
+        if (characters.Count == 0)
+            return 0;
 
         float average = 100f / characters.Count;
-
-        float variance = 0;
+        float variance = 0f;
 
         foreach (RuntimeCharacter character in characters)
         {
             float pick =
                 AnalysisManager.Instance.GetPickRate(character);
 
-            variance += Mathf.Pow(pick - average, 2);
+            float difference = pick - average;
+            variance += difference * difference;
         }
 
         variance /= characters.Count;
 
         float std = Mathf.Sqrt(variance);
 
-        float score =
-            Mathf.InverseLerp(
-                15f,
-                0f,
-                std);
+        float score = Mathf.InverseLerp(
+            15f,
+            0f,
+            std
+        );
 
         return Mathf.RoundToInt(score * 10f);
     }
 
-    // ----------------------------------------
+    // -- 직업군 평가 : 직업군별로 승률이 분포하면 고득점
 
-    private int EvaluateRoleBalance()
+    private int EvaluateRoleBalance(IReadOnlyList<RuntimeCharacter> characters)
     {
-        int score = 0;
+        int score = 10;
 
         foreach (CharacterRole role in Enum.GetValues(typeof(CharacterRole)))
         {
-            List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetCharactersInRole(role).ToList();
+            List<RuntimeCharacter> roleCharacters = RuntimeCharacterManager.Instance.GetCharactersInRole(role).ToList();
 
-            if (characters.Count == 0)
+            if (roleCharacters.Count == 0)
                 continue;
 
             float totalWinrate = 0f;
             int evaluatedCount = 0;
 
-            foreach (RuntimeCharacter character in characters)
+            foreach (RuntimeCharacter character in roleCharacters)
             {
                 CharacterStatistics stat = StatisticsManager.Instance.GetCurrentStatistics(character);
 
                 // 전투 기록이 없으면 평가에서 제외
-                if (stat.MatchCount <= 0) continue;
+                if (stat.MatchCount <= 0)
+                    continue;
 
                 totalWinrate += stat.Winrate;
                 evaluatedCount++;
@@ -396,21 +438,18 @@ public class TrustManager : MonoBehaviour
             if (evaluatedCount == 0)
                 continue;
 
-            float averageWinrate =
-                totalWinrate / evaluatedCount;
+            float averageWinrate = totalWinrate / evaluatedCount;
 
             // 45~55는 정상
             if (averageWinrate >= 45f &&
                 averageWinrate <= 55f)
+            {
                 continue;
+            }
 
-            float delta =
-                averageWinrate > 55f
-                ? averageWinrate - 55f
-                : 45f - averageWinrate;
+            float delta = averageWinrate > 55f ? averageWinrate - 55f : 45f - averageWinrate;
 
-            float penalty =
-                Mathf.Pow(delta / 5f, 2f);
+            float penalty = Mathf.Pow(delta / 5f, 2f);
 
             score -= Mathf.RoundToInt(penalty);
         }
@@ -433,7 +472,10 @@ public class TrustReportData
     public float trust;
     public string description;
 
-    public TrustReportData(string title, float trust, string description)
+    public TrustReportData(
+        string title,
+        float trust,
+        string description)
     {
         this.title = title;
         this.trust = trust;

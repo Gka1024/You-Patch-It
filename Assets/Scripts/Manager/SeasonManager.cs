@@ -227,7 +227,7 @@ public class SeasonManager : MonoBehaviour
             case SeasonState.Trust:
                 ResourceManager.Instance.ResetCurrentSeason();
                 GoalManager.Instance.CalculateGoals();
-                TrustManager.Instance.CalculateTrust();
+                ResourceManager.Instance.CalculateSeasonReward();
                 FinishTrust();
                 break;
 

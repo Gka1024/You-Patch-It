@@ -154,8 +154,6 @@ public class BattleSimulator : MonoBehaviour
             character.Initialize(runtimeCharacter, runtimePlayer, aiState, startingPosition);
             team.Add(character);
         }
-
-        Debug.Log($"[CreateTeam] 생성된 team: {team.Count}");
     }
 
     private BattleCharacter GetBattleCharacter()

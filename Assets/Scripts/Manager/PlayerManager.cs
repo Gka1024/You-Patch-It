@@ -297,7 +297,7 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        float trust = ResourceManager.Instance.TrustPoint;
+        float trust = ResourceManager.Instance.GetTrust;
 
         // 신뢰도 30을 기준으로 기본 변동률 계산
         float normalized = Mathf.Clamp((trust - 30f) / 70f, -1f, 1f);

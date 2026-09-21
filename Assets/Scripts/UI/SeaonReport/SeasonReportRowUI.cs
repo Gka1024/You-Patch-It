@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 public class SeasonReportRowUI : MonoBehaviour
 {
-    [SerializeField] private RuntimeCharacter character;
-    [SerializeField] private TMP_Text RowText;
+    private RuntimeCharacter character;
+    [SerializeField] private TMP_Text CharacterName;
+    [SerializeField] private TMP_Text WinrateText;
+    [SerializeField] private TMP_Text PickrateText;
     [SerializeField] private Button GotoPatchNoteButton;
 
     void Awake()
@@ -41,7 +43,7 @@ public class SeasonReportRowUI : MonoBehaviour
             );
         }
 
-        RowText.text = textToWrite;
+        CharacterName.text = textToWrite;
     }
 
     private void MoveTo()

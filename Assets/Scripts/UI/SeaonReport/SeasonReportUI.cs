@@ -25,6 +25,9 @@ public class SeasonReportUI : MonoBehaviour
     [SerializeField] private TMP_Text ResourcePoint;
     [SerializeField] private TMP_Text ResourcePointText;
 
+    [SerializeField] private TMP_Text OperationCost;
+    [SerializeField] private TMP_Text OperationCostText;
+
     [Header("Page")]
     [SerializeField] private Button PreviousPageButton;
     [SerializeField] private Button NextPageButton;
@@ -63,6 +66,7 @@ public class SeasonReportUI : MonoBehaviour
 
         SetBalanceText();
         SetTrustText();
+        SetCostText();
         SetResourceText();
     }
 
@@ -186,7 +190,7 @@ public class SeasonReportUI : MonoBehaviour
 
     private void SetTrustText()
     {
-        float trust = ResourceManager.Instance.curSeasonTrust;
+        float trust = ResourceManager.Instance.CurSeasonTrust;
 
         TrustPointText.text = $"+ {trust:0}";
 
@@ -245,7 +249,7 @@ public class SeasonReportUI : MonoBehaviour
 
     private void SetResourceText()
     {
-        int resource = ResourceManager.Instance.curSeasonResource;
+        int resource = ResourceManager.Instance.CurSeasonResource;
 
         ResourcePointText.text = $"+ {resource:0}";
 
@@ -287,6 +291,39 @@ public class SeasonReportUI : MonoBehaviour
         }
 
         return totalResource;
+    }
+
+    // =========================================================
+    // Operation Cost
+    // =========================================================
+
+    private void SetCostText()
+    {
+        int cost = ResourceManager.Instance.CurSeasonIncome;
+
+        OperationCostText.text = $"+ {cost:0}";
+
+        DescriptionPopupUI popup = OperationCost.gameObject.GetComponent<DescriptionPopupUI>();
+
+        popup.SetText("운영 자금", GetCostReportDescription());
+    }
+
+    private string GetCostReportDescription()
+    {
+        StringBuilder builder = new();
+
+        builder.AppendLine("<b><운영 자금></b>");
+        builder.AppendLine();
+
+        builder.AppendLine($"신뢰도 : {ResourceManager.Instance.GetTrust} ( x {Mathf.Lerp(0.5f, 1f, ResourceManager.Instance.GetTrust * 0.01f)})");
+        builder.AppendLine($"플레이어 : {PlayerManager.Instance.GetCurrentPlayer}");
+        builder.AppendLine($"시즌 수익 : {ResourceManager.Instance.CurSeasonIncome}");
+        builder.AppendLine($"운영 비용 : {ResourceManager.Instance.CurSeasonOutcome}");
+        builder.AppendLine();
+
+        builder.AppendLine($"시즌 수익은 플레이어 수와 신뢰도에 비례해 증가합니다.");
+
+        return builder.ToString();
     }
 
     // =========================================================

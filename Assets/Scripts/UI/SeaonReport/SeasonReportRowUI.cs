@@ -24,7 +24,10 @@ public class SeasonReportRowUI : MonoBehaviour
 
     private void SetText(RuntimeCharacter character, List<CharacterStatistics> stats)
     {
-        string textToWrite = $"{character.OriginCharacter.characterName} : ";
+        CharacterName.text = character.OriginCharacter.characterName;
+
+        string WinrateTextToWrite = "";
+        string PickrateTextToWrite = "";
 
         bool isNewCharacter =
             RuntimeCharacterManager.Instance.AddedRuntimeCharacter != null &&
@@ -33,17 +36,17 @@ public class SeasonReportRowUI : MonoBehaviour
 
         if (isNewCharacter)
         {
-            textToWrite += "신규 추가됨";
+            WinrateTextToWrite += "신규 추가됨";
+            PickrateTextToWrite += " - ";
         }
         else
         {
-            textToWrite += string.Join(
-                " - ",
-                stats.ConvertAll(stat => $"{stat.Winrate:F1}")
-            );
+            WinrateTextToWrite += string.Join(" - ", stats.ConvertAll(stat => $"{stat.Winrate:F1}"));
+            PickrateTextToWrite += $"{AnalysisManager.Instance.GetPickRate(character):F1}%";
         }
 
-        CharacterName.text = textToWrite;
+        WinrateText.text = WinrateTextToWrite;
+        PickrateText.text = PickrateTextToWrite;
     }
 
     private void MoveTo()

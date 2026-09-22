@@ -96,11 +96,6 @@ public static class BattleActionExecutor
             return;
         }
 
-        if (self.runtimeCharacter.OriginCharacter.id == 601)
-        {
-            Debug.Log(allies.Count);
-        }
-
         self.skill.Execute(self, allies, enemies, self.runtimeCharacter.GetStat(CharacterStatType.SkillCoefficient), random);
         self.statistics.skillCount++;
     }

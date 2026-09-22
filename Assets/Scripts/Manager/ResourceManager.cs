@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ResourceManager : MonoBehaviour
+public class    ResourceManager : MonoBehaviour
 {
     public static ResourceManager Instance { get; private set; }
 
@@ -19,8 +19,10 @@ public class ResourceManager : MonoBehaviour
     public int GetDevelop => developResource;
     public int GetMoney => money;
 
-    public float curSeasonTrust;
-    public int curSeasonResource;
+    public float CurSeasonTrust { get; private set; }
+    public int CurSeasonResource { get; private set; }
+    public int CurSeasonIncome { get; private set; }
+    public int CurSeasonOutcome { get; private set; }
 
     private const int REDUCE_TRUST_DECREASE_I = 3011;
     private const int REDUCE_TRUST_DECREASE_II = 3012;
@@ -36,8 +38,10 @@ public class ResourceManager : MonoBehaviour
 
     public void ResetCurrentSeason()
     {
-        curSeasonResource = 0;
-        curSeasonTrust = 0;
+        CurSeasonResource = 0;
+        CurSeasonTrust = 0;
+        CurSeasonIncome = 0;
+        CurSeasonOutcome = 0;
     }
 
     public void CalculateSeasonReward()
@@ -52,8 +56,10 @@ public class ResourceManager : MonoBehaviour
         AddMoney(money);
         SpendMoney(operatingCost);
 
-        curSeasonResource += developResource;
-        curSeasonTrust += trust;
+        CurSeasonResource += developResource;
+        CurSeasonTrust += trust;
+        CurSeasonIncome += money;
+        CurSeasonOutcome += operatingCost;
 
         UIManager.Instance.upDisplayUI.Refresh();
 
@@ -74,8 +80,8 @@ public class ResourceManager : MonoBehaviour
 
     public void GiveSeasonReward(int develop, float trustPoint, int money)
     {
-        curSeasonResource += AddDevelopResource(develop);
-        curSeasonTrust += AddTrust(trustPoint);
+        CurSeasonResource += AddDevelopResource(develop);
+        CurSeasonTrust += AddTrust(trustPoint);
         AddMoney(money);
 
         UIManager.Instance.upDisplayUI.Refresh();
@@ -83,8 +89,8 @@ public class ResourceManager : MonoBehaviour
 
     public void AddReward(GoalReward reward)
     {
-        curSeasonResource += AddDevelopResource(reward.DevelopResource);
-        curSeasonTrust += AddTrust(reward.TrustPoint);
+        CurSeasonResource += AddDevelopResource(reward.DevelopResource);
+        CurSeasonTrust += AddTrust(reward.TrustPoint);
 
         UIManager.Instance.upDisplayUI.Refresh();
     }

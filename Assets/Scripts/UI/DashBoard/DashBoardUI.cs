@@ -5,6 +5,7 @@ public class DashBoardUI : MonoBehaviour
 {
     [SerializeField] private Button CharacterButton;
     [SerializeField] private Button PatchNoteButton;
+    [SerializeField] private Button EventButton;
     [SerializeField] private Button SeasonReportButton;
     [SerializeField] private Button UnlockButton;
     [SerializeField] private Button GoalButton;
@@ -35,6 +36,7 @@ public class DashBoardUI : MonoBehaviour
     {
         CharacterButton.onClick.AddListener(ShowCharacter);
         PatchNoteButton.onClick.AddListener(ShowPatchNote);
+        EventButton.onClick.AddListener(ShowEvent);
         UnlockButton.onClick.AddListener(ShowUnlock);
         GoalButton.onClick.AddListener(ShowGoals);
         ReportButton.onClick.AddListener(ShowSeasonReports);
@@ -70,6 +72,13 @@ public class DashBoardUI : MonoBehaviour
         PatchNotes.SetActive(true);
     }
 
+    public void ShowEvent()
+    {
+        RemoveAll();
+        SeasonManager.Instance.CheckSeasonFinished();
+        Events.SetActive(true);
+    }
+
     public void ShowUnlock()
     {
         RemoveAll();
@@ -83,7 +92,7 @@ public class DashBoardUI : MonoBehaviour
     {
         RemoveAll();
         SeasonManager.Instance.CheckSeasonFinished();
-        
+
         DeveloperGoal.GetComponent<DeveloperGoalUI>().RefreshUI();
         DeveloperGoal.SetActive(true);
     }

@@ -12,7 +12,7 @@ public class CharacterSkill_Bard : CharacterSkill
 
         foreach (BattleCharacter target in targets)
         {
-            target.AddModifier(new BattleStatModifier(CharacterStatType.Defence, BattleStatModifierType.Flat, 10, coefficient * BuffDuration));
+            target.AddModifier(new BattleStatModifier(CharacterStatType.Defence, BattleStatModifierType.Percent, coefficient, coefficient * BuffDuration));
             BattleActionExecutor.AddShield(target, self.GetStat(CharacterStatType.Health) * coefficient, coefficient * BuffDuration);
         }
 

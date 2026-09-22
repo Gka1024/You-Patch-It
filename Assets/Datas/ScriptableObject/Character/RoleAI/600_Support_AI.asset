@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fe00fa09aa01ba4f8079677673bd4a3, type: 3}
   m_Name: 600_Support_AI
   m_EditorClassIdentifier: 
-  prefferedDistance: 6
+  prefferedDistance: 3.6
   roleScoresList:
   - role: 0
     score: 4

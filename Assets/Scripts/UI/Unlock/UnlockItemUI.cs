@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +14,7 @@ public class UnlockItemUI : MonoBehaviour
     [SerializeField] private Sprite UnlockSprite;
 
     [SerializeField] private UnlockCategory category;
+    [SerializeField] private DescriptionPopupUI HoverText;
 
     public UnlockData UnlockData { get; private set; }
 
@@ -29,6 +29,7 @@ public class UnlockItemUI : MonoBehaviour
         unlockUI = ui;
         UnlockData = UnlockManager.Instance.GetUnlockData(unlockID);
         UnlockSprite = ui.UnlockSprite;
+        SetHoverText();
         Refresh();
     }
 
@@ -40,6 +41,11 @@ public class UnlockItemUI : MonoBehaviour
     private void SelfClick()
     {
         unlockUI.SetInspector(this);
+    }
+
+    private void SetHoverText()
+    {
+        HoverText.SetText(UnlockData.unlockName, UnlockData.description);
     }
 
     private void SetUnlockedImage()

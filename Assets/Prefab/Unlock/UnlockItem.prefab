@@ -178,6 +178,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -189,7 +190,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_ActiveFontFeatures: 6e72656bu
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -342,6 +343,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2950060192236565334}
   - component: {fileID: 8468951441682258064}
+  - component: {fileID: 7930884211359532431}
   m_Layer: 5
   m_Name: UnlockItem
   m_TagString: Untagged
@@ -385,6 +387,22 @@ MonoBehaviour:
   unlockUI: {fileID: 0}
   unlockID: 0
   selfClickButton: {fileID: 1763701907508265919}
-  icon: {fileID: 8570507558207887564}
+  BackgroundImage: {fileID: 0}
+  Icon: {fileID: 0}
   UnlockSprite: {fileID: 0}
   category: 0
+  HoverText: {fileID: 7930884211359532431}
+--- !u!114 &7930884211359532431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3339243482376252316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f438bafe47cbf8d48b52ca0e60bc422c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DescriptionPopupUI
+  Name: 
+  Description: 

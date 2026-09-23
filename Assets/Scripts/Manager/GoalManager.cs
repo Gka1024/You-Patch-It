@@ -18,11 +18,15 @@ public class GoalManager : MonoBehaviour
     private readonly HashSet<DeveloperGoal> rewardedGoals = new();
 
     public IReadOnlyList<DeveloperGoal> GetGoals => shuffledGoals;
+    public DeveloperGoal SelectedGoal => selectedGoal;
 
     public bool IsGoalAvailable { get; private set; }
     public bool IsGoalSet => isGoalConfirmed;
 
-    private int currentGoalCount = 1;
+    [SerializeField] private int currentGoalCount = 1;
+
+    private DeveloperGoal selectedGoal;
+
     private int rerollCount;
 
     private bool isRerollAvailable;
@@ -68,6 +72,7 @@ public class GoalManager : MonoBehaviour
 
         GoalUI.Initialize(shuffledGoals, this);
         BottomGoalUI.Initialize(this);
+
         UpdateRerollCostUI();
 
         UnlockManager.Instance.OnUnlockChanged += HandleUnlockChanged;
@@ -91,6 +96,7 @@ public class GoalManager : MonoBehaviour
         goalList.Clear();
 
         goalList.Add(new NerfTopGoal(GoalDifficulty.Easy, GoalType.Challenge));
+
         goalList.Add(new SpecificCharacterWinrateGoal(40, 60, GoalDifficulty.Easy, GoalType.Challenge));
     }
 
@@ -114,11 +120,14 @@ public class GoalManager : MonoBehaviour
             return;
 
         int previousGoalCount = currentGoalCount;
+        int previousGoalListCount = goalList.Count;
 
         SyncUnlocks();
 
-        // 목표 슬롯이 늘었거나 목표 풀이 확장되었으면 새 목표를 구성한다.
-        if (currentGoalCount != previousGoalCount || !isGoalConfirmed)
+        bool goalSlotChanged = currentGoalCount != previousGoalCount;
+        bool goalPoolChanged = goalList.Count != previousGoalListCount;
+
+        if (goalSlotChanged || goalPoolChanged || !isGoalConfirmed)
         {
             SetGoals();
 
@@ -137,22 +146,41 @@ public class GoalManager : MonoBehaviour
             AddGoalOnce(new NoAttackPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
 
             int characterCount = RuntimeCharacterManager.Instance.CharacterCount;
+
             if (characterCount > 0)
             {
-                AddGoalOnce(new MinPickRateGoal((100f / characterCount) * 0.65f, GoalDifficulty.Hard, GoalType.Meta));
+                AddGoalOnce(new MinPickRateGoal(
+                    (100f / characterCount) * 0.65f,
+                    GoalDifficulty.Hard,
+                    GoalType.Meta));
             }
         }
 
         if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_II))
         {
-            AddGoalOnce(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
-            AddGoalOnce(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
-            AddGoalOnce(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
+            AddGoalOnce(new BottomToTopGoal(
+                AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true),
+                3,
+                GoalDifficulty.Normal,
+                GoalType.Balance));
+
+            AddGoalOnce(new PatchCountGoal(
+                3,
+                GoalDifficulty.Normal,
+                GoalType.Patch));
+
+            AddGoalOnce(new PrecisionPatchGoal(
+                GoalDifficulty.Normal,
+                GoalType.Patch));
 
             int characterCount = RuntimeCharacterManager.Instance.CharacterCount;
+
             if (characterCount > 0)
             {
-                AddGoalOnce(new MaxPickRateGoal((100f / characterCount) * 1.15f, GoalDifficulty.Hard, GoalType.Meta));
+                AddGoalOnce(new MaxPickRateGoal(
+                    (100f / characterCount) * 1.15f,
+                    GoalDifficulty.Hard,
+                    GoalType.Meta));
             }
         }
 
@@ -169,14 +197,18 @@ public class GoalManager : MonoBehaviour
                     GoalType.Challenge));
             }
 
-            AddGoalOnce(new ReverseMetaGoal(GoalDifficulty.Hard, GoalType.Meta));
-            AddGoalOnce(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
+            AddGoalOnce(new ReverseMetaGoal(
+                GoalDifficulty.Hard,
+                GoalType.Meta));
+
+            AddGoalOnce(new SingleStatPatchGoal(
+                GoalDifficulty.Hard,
+                GoalType.Patch));
         }
     }
 
     private void AddGoalOnce(DeveloperGoal goal)
     {
-        // DeveloperGoal가 Equals를 별도로 구현하지 않았다면 참조 기준으로 중복을 방지한다.
         if (!goalList.Contains(goal))
             goalList.Add(goal);
     }
@@ -189,13 +221,14 @@ public class GoalManager : MonoBehaviour
     {
         shuffledGoals = GetRandomGoals(currentGoalCount);
 
+        selectedGoal = null;
+
         foreach (DeveloperGoal goal in shuffledGoals)
             goal.Refresh();
 
         if (IsGoalAvailable)
         {
             GoalUI.SetGoals(shuffledGoals);
-            BottomGoalUI.SetText(shuffledGoals);
         }
     }
 
@@ -213,9 +246,26 @@ public class GoalManager : MonoBehaviour
         int selectedCount = Mathf.Clamp(count, 0, result.Count);
 
         if (result.Count > selectedCount)
-            result.RemoveRange(selectedCount, result.Count - selectedCount);
+            result.RemoveRange(
+                selectedCount,
+                result.Count - selectedCount);
 
         return result;
+    }
+
+    public void SelectGoal(int index)
+    {
+        if (isGoalConfirmed)
+            return;
+
+        if (index < 0 || index >= shuffledGoals.Count)
+            return;
+
+        selectedGoal = shuffledGoals[index];
+
+        GoalUI.SetSelectedGoal(index);
+
+        Debug.Log($"선택한 목표: {selectedGoal.Title}");
     }
 
     //=========================================================
@@ -249,7 +299,8 @@ public class GoalManager : MonoBehaviour
     private void UpdateRerollCostUI()
     {
         if (GoalUI != null)
-            GoalUI.SetRerollCostValue(REROLL_REQUIRE_RESOURCE * rerollCount);
+            GoalUI.SetRerollCostValue(
+                REROLL_REQUIRE_RESOURCE * rerollCount);
     }
 
     //=========================================================
@@ -258,7 +309,7 @@ public class GoalManager : MonoBehaviour
 
     public void ConfirmGoals()
     {
-        if (isGoalConfirmed || shuffledGoals.Count == 0)
+        if (isGoalConfirmed || selectedGoal == null)
             return;
 
         if (GoalUI != null)
@@ -266,7 +317,7 @@ public class GoalManager : MonoBehaviour
 
         if (BottomDisplayUI.Instance != null)
         {
-            BottomDisplayUI.Instance.GoalPreview.SetText(shuffledGoals);
+            BottomDisplayUI.Instance.GoalPreview.SetText(selectedGoal);
             BottomDisplayUI.Instance.ShowPreview();
         }
 
@@ -287,6 +338,8 @@ public class GoalManager : MonoBehaviour
         IsGoalAvailable = false;
         isGoalConfirmed = false;
 
+        selectedGoal = null;
+
         rewardedGoals.Clear();
 
         if (GoalUI != null)
@@ -304,10 +357,19 @@ public class GoalManager : MonoBehaviour
         isRerollAvailable = true;
         isGoalConfirmed = false;
 
+        selectedGoal = null;
+
         if (UnlockManager.Instance == null)
+        {
             rerollCount = 1;
+        }
         else
-            rerollCount = UnlockManager.Instance.IsUnlocked(FREE_REROLL) ? 0 : 1;
+        {
+            rerollCount =
+                UnlockManager.Instance.IsUnlocked(FREE_REROLL)
+                ? 0
+                : 1;
+        }
 
         UpdateRerollCostUI();
     }
@@ -320,26 +382,44 @@ public class GoalManager : MonoBehaviour
     {
         rewardTable.Clear();
 
-        rewardTable.Add(GoalDifficulty.Easy, new GoalReward(100, 25));
-        rewardTable.Add(GoalDifficulty.Normal, new GoalReward(150, 35));
-        rewardTable.Add(GoalDifficulty.Hard, new GoalReward(300, 50));
-        rewardTable.Add(GoalDifficulty.Impossible, new GoalReward(500, 75));
+        rewardTable.Add(
+            GoalDifficulty.Easy,
+            new GoalReward(100, 25));
+
+        rewardTable.Add(
+            GoalDifficulty.Normal,
+            new GoalReward(150, 35));
+
+        rewardTable.Add(
+            GoalDifficulty.Hard,
+            new GoalReward(300, 50));
+
+        rewardTable.Add(
+            GoalDifficulty.Impossible,
+            new GoalReward(500, 75));
     }
 
     public GoalReward GetReward(GoalDifficulty difficulty)
     {
-        if (!rewardTable.TryGetValue(difficulty, out GoalReward reward))
+        if (!rewardTable.TryGetValue(
+                difficulty,
+                out GoalReward reward))
+        {
             return new GoalReward(0, 0);
+        }
 
-        float multiplier = UnlockManager.Instance != null &&
-                           UnlockManager.Instance.IsUnlocked(GOAL_REWARD)
-            ? 1.2f
-            : 1f;
+        float multiplier =
+            UnlockManager.Instance != null &&
+            UnlockManager.Instance.IsUnlocked(GOAL_REWARD)
+                ? 1.2f
+                : 1f;
 
-        // 원본 RewardTable의 값을 직접 수정하지 않고 새 보상 객체를 반환한다.
         return new GoalReward(
-            Mathf.RoundToInt(reward.DevelopResource * multiplier),
-            Mathf.RoundToInt(reward.TrustPoint * multiplier));
+            Mathf.RoundToInt(
+                reward.DevelopResource * multiplier),
+
+            Mathf.RoundToInt(
+                reward.TrustPoint * multiplier));
     }
 
     //=========================================================
@@ -348,27 +428,32 @@ public class GoalManager : MonoBehaviour
 
     public void EvaluateAllGoals()
     {
-        foreach (DeveloperGoal goal in shuffledGoals)
-            goal.Evaluate();
+        if (selectedGoal == null)
+            return;
+
+        selectedGoal.Evaluate();
 
         RefreshUI();
     }
 
     public void CalculateGoals()
     {
-        if (!isGoalConfirmed)
+        if (!isGoalConfirmed || selectedGoal == null)
             return;
 
-        EvaluateAllGoals();
+        selectedGoal.Evaluate();
 
-        foreach (DeveloperGoal goal in shuffledGoals)
+        if (selectedGoal.IsComplete &&
+            rewardedGoals.Add(selectedGoal))
         {
-            if (!goal.IsComplete || !rewardedGoals.Add(goal))
-                continue;
+            ResourceManager.Instance.AddReward(
+                selectedGoal.Reward);
 
-            ResourceManager.Instance.AddReward(goal.Reward);
-            Debug.Log($"목표 완료: {goal.Title}");
+            Debug.Log(
+                $"목표 완료: {selectedGoal.Title}");
         }
+
+        RefreshUI();
     }
 
     private void RefreshUI()

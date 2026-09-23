@@ -22,7 +22,7 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
     protected override bool CheckCompleted()
     {
         float winrate = AnalysisManager.Instance.GetAnalysis(character, AnalysisItem.Winrate).CurrentValue;
-        return 60 >= winrate && winrate >= 40;
+        return maxWinrate >= winrate && winrate >= minWinrate;
     }
 
     public override float GetCurrentProgress()

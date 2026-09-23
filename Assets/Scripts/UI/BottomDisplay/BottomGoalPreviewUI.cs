@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class BottomGoalPreviewUI : MonoBehaviour
 {
-    [SerializeField] private TMP_Text[] goalTitle;
+    [SerializeField] private TMP_Text goalTitle;
 
     public Button RerollButton;
     public Button ConfirmButton;
@@ -18,19 +18,15 @@ public class BottomGoalPreviewUI : MonoBehaviour
 
     public void Reset()
     {
-        foreach (TMP_Text text in goalTitle)
-        {
-            text.text = " - ";
-        }
+        goalTitle.text = "";
     }
 
-    public void SetText(List<DeveloperGoal> currentGoals)
+    public void SetText(DeveloperGoal currentGoals)
     {
+        if (currentGoals == null) return;
+
         Reset();
 
-        for (int i = 0; i < currentGoals.Count; i++)
-        {
-            goalTitle[i].text = currentGoals[i].Title + " : " + currentGoals[i].Description;
-        }
+        goalTitle.text = currentGoals.Title;
     }
 }

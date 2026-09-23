@@ -318,7 +318,7 @@ public class SeasonReportUI : MonoBehaviour
         builder.AppendLine($"신뢰도 : {ResourceManager.Instance.GetTrust} ( x {Mathf.Lerp(0.5f, 1f, ResourceManager.Instance.GetTrust * 0.01f)})");
         builder.AppendLine($"플레이어 : {PlayerManager.Instance.GetCurrentPlayer}");
         builder.AppendLine($"시즌 수익 : {ResourceManager.Instance.CurSeasonIncome}");
-        builder.AppendLine($"운영 비용 : {ResourceManager.Instance.CurSeasonOutcome}");
+        builder.AppendLine($"운영 비용 : - {ResourceManager.Instance.CurSeasonOutcome}");
         builder.AppendLine();
 
         builder.AppendLine($"시즌 수익은 플레이어 수와 신뢰도에 비례해 증가합니다.");

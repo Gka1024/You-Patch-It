@@ -307,12 +307,30 @@ public class PlayerManager : MonoBehaviour
         float randomRate = (float)(random.NextDouble() * 0.08 - 0.04);
 
         // 기본 변동률과 시즌 이슈를 합산
-        float finalRate = baseRate + randomRate;
+        float finalRate = baseRate + randomRate + seasonPlayerModifier;
+
+        seasonPlayerModifier = 0f;
 
         currentPlayerCount = Mathf.RoundToInt(currentPlayerCount * (1f + finalRate));
         currentPlayerCount = Mathf.Clamp(currentPlayerCount, 0, 1000000);
 
         Debug.Log($"다음 시즌 목표 인구수: {currentPlayerCount} (변동률: {finalRate:P2})");
+    }
+
+    public void AddPlayerCount(int amount)
+    {
+        currentPlayerCount = Mathf.Clamp(currentPlayerCount + amount, 0, 1000000);
+    }
+
+    private float seasonPlayerModifier;
+
+    public void AddSeasonPlayerModifier(Encounter encounter)
+    {
+        float value = encounter.valueType == ValueType.Percent
+            ? encounter.value * 0.01f
+            : encounter.value;
+
+        seasonPlayerModifier += value;
     }
 }
 

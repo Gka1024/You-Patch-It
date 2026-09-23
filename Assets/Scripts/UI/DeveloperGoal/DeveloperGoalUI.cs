@@ -6,10 +6,12 @@ using UnityEngine.UI;
 public class DeveloperGoalUI : MonoBehaviour
 {
     [SerializeField] private DeveloperGoalItemUI[] goalsUI;
+    [SerializeField] private Button[] GoalSelectButtons;
+
     public GameObject GoalUIPrefab;
 
     [SerializeField] private TMP_Text SeasonText;
-    [SerializeField] private TMP_Text[] TitleText;
+    [SerializeField] private TMP_Text TitleText;
     [SerializeField] private TMP_Text DRReward;
     [SerializeField] private TMP_Text TPReward;
     [SerializeField] private TMP_Text RerollCost;
@@ -18,54 +20,90 @@ public class DeveloperGoalUI : MonoBehaviour
     [SerializeField] private Button ConfirmButton;
     [SerializeField] private GameObject GoalAlert;
 
+    private int selectedIndex = -1;
+
     public void Initialize(List<DeveloperGoal> goals, GoalManager goalManager)
     {
-        for (int i = 0; i < goals.Count; i++)
-        {
-            goalsUI[i].Initialize(goals[i]);
-        }
         ChangeButton.onClick.AddListener(goalManager.ChangeGoals);
         ConfirmButton.onClick.AddListener(goalManager.ConfirmGoals);
+
+        for (int i = 0; i < GoalSelectButtons.Length; i++)
+        {
+            int index = i;
+
+            GoalSelectButtons[i].onClick.AddListener(() => goalManager.SelectGoal(index));
+        }
+
+        SetGoals(goals);
     }
 
     public void SetGoals(List<DeveloperGoal> goals)
     {
-        for (int i = 0; i < goals.Count; i++)
+        selectedIndex = -1;
+
+        for (int i = 0; i < goalsUI.Length; i++)
         {
-            goalsUI[i].Initialize(goals[i]);
+            if (i < goals.Count)
+            {
+                goalsUI[i].Initialize(goals[i]);
+            }
         }
+
+        ConfirmButton.interactable = false;
+
         RefreshUI();
     }
 
-    public void SetGoals(DeveloperGoal goal , int index)
+    public void SetGoals(DeveloperGoal goal, int index)
     {
+        if (index < 0 || index >= goalsUI.Length)
+            return;
+
         goalsUI[index].Initialize(goal);
+    }
+
+    public void SetSelectedGoal(int index)
+    {
+        if (index < 0 || index >= goalsUI.Length)
+            return;
+
+        selectedIndex = index;
+        ConfirmButton.interactable = true;
+        TitleText.text = goalsUI[index].Goal.Title;
+
+        RefreshSelectionUI();
+    }
+
+    private void RefreshSelectionUI()
+    {
+        for (int i = 0; i < GoalSelectButtons.Length; i++)
+        {
+            GoalSelectButtons[i].interactable = i != selectedIndex;
+        }
     }
 
     public void RefreshUI()
     {
-        int index = 0;
-        int DeveloperReward = 0;
-        int TrustPoint = 0;
+        int developerReward = 0;
+        int trustPoint = 0;
 
         foreach (DeveloperGoalItemUI goal in goalsUI)
         {
-            if (goal.Goal == null) continue;
-
-            TitleText[index++].text = goal.Goal.Title;
+            if (goal.Goal == null)
+                continue;
 
             if (goal.Goal.IsComplete)
             {
-                DeveloperReward += goal.Goal.Reward.DevelopResource;
-                TrustPoint += goal.Goal.Reward.TrustPoint;
+                developerReward += goal.Goal.Reward.DevelopResource;
+                trustPoint += goal.Goal.Reward.TrustPoint;
             }
 
             goal.ReflectProgrss();
         }
 
         SeasonText.text = $"시즌 {SeasonManager.Instance.CurrentSeason} - {SeasonManager.Instance.CurrentSubSeason}";
-        DRReward.text = $"+{DeveloperReward}";
-        TPReward.text = $"+{TrustPoint}";
+        DRReward.text = $"+{developerReward}";
+        TPReward.text = $"+{trustPoint}";
     }
 
     public void SetRerollCostValue(int value)
@@ -77,5 +115,4 @@ public class DeveloperGoalUI : MonoBehaviour
     {
         GoalAlert.SetActive(show);
     }
-
 }

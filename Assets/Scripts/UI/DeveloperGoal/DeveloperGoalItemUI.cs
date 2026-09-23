@@ -21,6 +21,8 @@ public class DeveloperGoalItemUI : MonoBehaviour
 
     public void Initialize(DeveloperGoal goal)
     {
+        if (goal == null) return;
+
         this.Goal = goal;
 
         Title.text = goal.Title;

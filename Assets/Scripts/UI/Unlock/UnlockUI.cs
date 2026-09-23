@@ -11,12 +11,14 @@ public class UnlockUI : MonoBehaviour
 
     [Header("Prefab")]
     [SerializeField] private GameObject unlockItemPrefab;
+    [SerializeField] private GameObject unlockPrerequireText;
 
     [Header("Category Parents")]
     [SerializeField] private Transform patchParent;
     [SerializeField] private Transform goalParent;
-    [SerializeField] private Transform informationParent;
     [SerializeField] private Transform operationParent;
+
+    [SerializeField] private Transform PreRequireParent;
 
     [Header("Inspector")]
     [SerializeField] private UnlockItemUI currentItem;
@@ -73,6 +75,20 @@ public class UnlockUI : MonoBehaviour
         unlockName.text = item.UnlockData.unlockName;
         unlockDescription.text = item.UnlockData.description;
         unlockCost.text = item.UnlockData.costResource.ToString();
+
+        foreach (Transform child in PreRequireParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        if (item.UnlockData.prerequisites.Count() > 0)
+        {
+            foreach (UnlockData pre in item.UnlockData.prerequisites)
+            {
+                TMP_Text text = Instantiate(unlockPrerequireText, PreRequireParent).GetComponent<TMP_Text>();
+                text.text = pre.unlockName;
+            }
+        }
     }
 
     private void UnlockItem()

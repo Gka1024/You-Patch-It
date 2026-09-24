@@ -13,6 +13,10 @@ public class PatchHistory
 
     public IReadOnlyList<PatchRecord> Records => records;
 
+    public string PatchDescription => string.Join("\n", records
+        .Select(x => x.PatchDescription)
+        .Where(x => !string.IsNullOrWhiteSpace(x)));
+
     private readonly List<PatchRecord> records;
 
     public PatchHistory(RuntimeCharacter character, int season, int subSeason, float winrate, float pickrate, List<PatchRecord> records)
@@ -25,7 +29,7 @@ public class PatchHistory
         Winrate = winrate;
         Pickrate = pickrate;
 
-        this.records = records;
+        this.records = new(records);
     }
 
     public bool TryGetStatPatch(CharacterStatType stat, out float before, out float after)
@@ -33,27 +37,16 @@ public class PatchHistory
         before = 0;
         after = 0;
 
-        PatchRecord first =
-            records.FirstOrDefault(x =>
-                x.Patches.Any(p => p.StatType == stat));
+        PatchRecord first = records.FirstOrDefault(x => x.Patches.Any(p => p.StatType == stat));
 
         if (first == null)
             return false;
 
-        PatchRecord last =
-            records.Last(x =>
-                x.Patches.Any(p => p.StatType == stat));
+        PatchRecord last = records.Last(x => x.Patches.Any(p => p.StatType == stat));
 
         before = first.Before.Stats[stat].CurrentValue;
         after = last.After.Stats[stat].CurrentValue;
 
         return true;
-    }
-
-    public IEnumerable<PatchReason> GetReasons()
-    {
-        return records
-            .SelectMany(x => x.Reasons)
-            .Distinct();
     }
 }

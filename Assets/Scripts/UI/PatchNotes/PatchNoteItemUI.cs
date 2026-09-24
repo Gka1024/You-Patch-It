@@ -20,20 +20,21 @@ public class PatchNoteItemUI : MonoBehaviour
     [SerializeField] private GameObject specificPatch;
     [SerializeField] private Transform specificPatchParent;
 
-    [SerializeField] private GameObject patchReason;
-    [SerializeField] private Transform patchReasonParent;
+    [SerializeField] private TMP_Text patchDescriptionText;
 
     [Header("Layout")]
     [SerializeField] private LayoutElement layoutElement;
+
     public float CurrentHeight => layoutElement.preferredHeight;
     public RectTransform Rect => transform as RectTransform;
+
     [SerializeField] private float closedHeight = 80f;
     [SerializeField] private float bodyHeaderHeight = 40f;
     [SerializeField] private float patchItemHeight = 50f;
-    [SerializeField] private float reasonItemHeight = 50f;
     [SerializeField] private float bodyPadding = 20f;
 
     [SerializeField] private float animationTime = 0.2f;
+
     private Coroutine animationCoroutine;
 
     [Header("Other")]
@@ -48,7 +49,6 @@ public class PatchNoteItemUI : MonoBehaviour
     private void Awake()
     {
         itemButton.onClick.AddListener(Toggle);
-
 
         if (layoutElement == null)
             layoutElement = GetComponent<LayoutElement>();
@@ -68,23 +68,18 @@ public class PatchNoteItemUI : MonoBehaviour
 
     public void Refresh()
     {
-        currentSeasonText.text =
-            $"시즌 {history.Season}-{history.SubSeason}";
+        if (history == null)
+            return;
 
-        seasonWinrate.text =
-            $"승률 : {history.Winrate:F1}%";
-
-        seasonPickrate.text =
-            $"픽률 : {history.Pickrate:F1}%";
+        currentSeasonText.text = $"시즌 {history.Season}-{history.SubSeason}";
+        seasonWinrate.text = $"승률 : {history.Winrate:F1}%";
+        seasonPickrate.text = $"픽률 : {history.Pickrate:F1}%";
 
         //----------------------------------------
         // 기존 생성 삭제
         //----------------------------------------
 
         foreach (Transform child in specificPatchParent)
-            Destroy(child.gameObject);
-
-        foreach (Transform child in patchReasonParent)
             Destroy(child.gameObject);
 
         //----------------------------------------
@@ -111,15 +106,19 @@ public class PatchNoteItemUI : MonoBehaviour
         patchCount.text = $"패치 수 : {statCount} 개";
 
         //----------------------------------------
-        // Reason
+        // Patch Description
         //----------------------------------------
 
-        foreach (PatchReason reason in history.GetReasons())
-        {
-            Instantiate(patchReason, patchReasonParent)
-                .GetComponent<PatchReasonUI>()
-                .Initialize(reason);
-        }
+        patchDescriptionText.text = history.PatchDescription;
+
+        //----------------------------------------
+        // Layout 갱신
+        //----------------------------------------
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(patchDescriptionText.rectTransform);
+
+        if (opened)
+            SetOpen(true, true);
     }
 
     public void Toggle()
@@ -134,7 +133,10 @@ public class PatchNoteItemUI : MonoBehaviour
         arrow.text = opened ? "▼" : "▶";
 
         if (animationCoroutine != null)
+        {
             StopCoroutine(animationCoroutine);
+            animationCoroutine = null;
+        }
 
         if (instant)
         {
@@ -143,6 +145,8 @@ public class PatchNoteItemUI : MonoBehaviour
             layoutElement.preferredHeight = opened ? GetOpenHeight() : closedHeight;
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(transform.parent as RectTransform);
+
+            OnHeightChanged?.Invoke(this);
 
             return;
         }
@@ -153,13 +157,17 @@ public class PatchNoteItemUI : MonoBehaviour
     private float GetOpenHeight()
     {
         int patchCount = specificPatchParent.childCount;
-        int reasonCount = patchReasonParent.childCount;
 
         float patchHeight = patchCount * patchItemHeight;
 
-        float reasonHeight = reasonCount * reasonItemHeight;
+        float descriptionHeight = 0f;
 
-        float bodyHeight = bodyHeaderHeight + Mathf.Max(patchHeight, reasonHeight) + bodyPadding;
+        if (!string.IsNullOrWhiteSpace(patchDescriptionText.text))
+        {
+            descriptionHeight = patchDescriptionText.preferredHeight;
+        }
+
+        float bodyHeight = bodyHeaderHeight + Mathf.Max(patchHeight, descriptionHeight) + bodyPadding;
 
         return closedHeight + bodyHeight;
     }
@@ -169,14 +177,7 @@ public class PatchNoteItemUI : MonoBehaviour
         float startHeight = layoutElement.preferredHeight;
         float targetHeight = open ? GetOpenHeight() : closedHeight;
 
-        if (open)
-        {
-            body.SetActive(true);
-        }
-        else
-        {
-            body.SetActive(false);
-        }
+        body.SetActive(open);
 
         float elapsed = 0f;
 
@@ -195,6 +196,9 @@ public class PatchNoteItemUI : MonoBehaviour
         }
 
         layoutElement.preferredHeight = targetHeight;
+
         OnHeightChanged?.Invoke(this);
+
+        animationCoroutine = null;
     }
 }

@@ -10,7 +10,6 @@ public class UIManager : MonoBehaviour
 
     public CharacterTableUI characterTableUI;
     public InspectorUI inspectorUI;
-    public PatchReasonPopupUI patchReasonPopupUI;
     public GameObject ShowLackResource;
 
     public DeveloperGoalUI developerGoalUI;

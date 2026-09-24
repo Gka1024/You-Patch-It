@@ -12,8 +12,11 @@ public class InspectorUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private Button applyPatchButton;
-    [SerializeField] private Button undoButton;
+    [SerializeField] private Button WriteReasonButton;
+    [SerializeField] private GameObject PatchReasonUI;
+    [SerializeField] private TMP_InputField PatchReasonInput;
     private readonly Dictionary<Transform, int> originalSiblingIndexes = new();
+
 
     [Header("Image")]
     [SerializeField] private Image roleImage;
@@ -45,20 +48,14 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private Button WinrateButton;
     [SerializeField] private GameObject Winrate;
 
-    [Header("Bellow")]
-    [SerializeField] private PatchReasonPopupUI patchReason;
-    [SerializeField] private Button patchConfirmButton;
-    [SerializeField] private Button simulateButton;
-
     private void Awake()
     {
         Instance = this;
-        applyPatchButton.onClick.AddListener(ShowPatchReason);
+        applyPatchButton.onClick.AddListener(ApplyPatch);
+        WriteReasonButton.onClick.AddListener(ShowPatchReason);
         StatsButton.onClick.AddListener(ShowStats);
         WinrateButton.onClick.AddListener(ShowHistorys);
         AnalysisButton.onClick.AddListener(ShowAnalysis);
-        patchConfirmButton.onClick.AddListener(ApplyPatch);
-        simulateButton.onClick.AddListener(Refresh);
         CacheOriginalSiblingIndexes();
     }
 
@@ -75,7 +72,6 @@ public class InspectorUI : MonoBehaviour
     public void Showcharacter(RuntimeCharacter character)
     {
         currentCharacter = character;
-        patchReason.Show(false);
         SetRoleImage(character.OriginCharacter.role);
         SetCharacterSkillDescription();
         InitializeStatDropDown();
@@ -219,11 +215,9 @@ public class InspectorUI : MonoBehaviour
     private void ShowPatchReason()
     {
         if (currentCharacter == null) return;
-        if (!CheckDelta()) return;
+        // if (!CheckDelta()) return;
 
-        patchReason.Show(true);
-        patchConfirmButton.interactable = false;
-        patchReason.ResourceLackAlert.SetActive(false);
+        PatchReasonUI.SetActive(true);
     }
 
     private bool CheckDelta()
@@ -256,16 +250,18 @@ public class InspectorUI : MonoBehaviour
 
         if (!hasChange)
         {
-            patchReason.Show(false);
+            PatchReasonUI.SetActive(false);
             return;
         }
 
-        List<PatchReason> reasons = patchReason.GetComponent<PatchReasonPopupUI>().GetPatchReasons();
+        string description = PatchReasonInput.text.Trim();
 
-        if (PatchManager.Instance.ApplyPatch(currentCharacter, patches, reasons))
+        if (PatchManager.Instance.ApplyPatch(currentCharacter, patches, description))
         {
             InitializeStats();
-            patchReason.Show(false);
+            PatchReasonUI.SetActive(false);
+
+            PatchReasonInput.text = "";
 
             foreach (GameObject row in StatRows)
             {
@@ -342,7 +338,10 @@ public class InspectorUI : MonoBehaviour
         ShowSpecificStats(dropdownStatTypes[statIndex]);
     }
 
-
+    public void ShowPatchResourceLackAlert(bool show)
+    {
+        //todo
+    }
 
     public void ShowStats()
     {

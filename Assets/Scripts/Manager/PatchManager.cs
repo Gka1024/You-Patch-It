@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -71,18 +70,19 @@ public class PatchManager : MonoBehaviour
         }
     }
 
-    public bool ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, List<PatchReason> reasons)
+    public bool ApplyPatch(RuntimeCharacter character, List<CharacterPatch> patches, string patchDescription = "")
     {
-        if (character == null) return false;
+        if (character == null)
+            return false;
 
-        if (patches == null || patches.Count == 0) return false;
+        if (patches == null || patches.Count == 0)
+            return false;
 
         if (!ResourceManager.Instance.SpendDevelopResource(GetRequiredResource()))
         {
-            UIManager.Instance.patchReasonPopupUI.ResourceLackAlert.SetActive(true);
+            UIManager.Instance.inspectorUI.ShowPatchResourceLackAlert(true);
             return false;
         }
-
 
         RuntimeCharacterSnapshot before = new RuntimeCharacterSnapshot(character);
 
@@ -90,7 +90,7 @@ public class PatchManager : MonoBehaviour
 
         RuntimeCharacterSnapshot after = new RuntimeCharacterSnapshot(character);
 
-        PatchRecord record = new PatchRecord(character, before, after, patches, reasons);
+        PatchRecord record = new PatchRecord(character, before, after, patches, patchDescription);
 
         appliedPatches.Add(record);
         undoStack.Push(record);
@@ -230,19 +230,4 @@ public class PatchManager : MonoBehaviour
 
         return true;
     }
-}
-
-public enum PatchReason
-{
-    None,
-    HighWinrate,
-    LowWinrate,
-    HighPickrate,
-    LowPickrate,
-    HighBanrate,
-    LowBanrate,
-    MetaDiversity,
-    UserFeedBack,
-    InternalTest,
-    Other,
 }

@@ -5,8 +5,8 @@ public class PatchReasonUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text text;
 
-    public void Initialize(PatchReason reason)
+    public void Initialize(string description)
     {
-        text.text = DisplayNameHelper.GetReasonName(reason);
+        text.text = description;
     }
 }

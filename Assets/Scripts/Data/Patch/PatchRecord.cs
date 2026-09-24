@@ -8,12 +8,11 @@ public class PatchRecord
     public RuntimeCharacterSnapshot After { get; }
 
     public IReadOnlyList<CharacterPatch> Patches => patches;
-    public IReadOnlyList<PatchReason> Reasons => reasons;
+    public string PatchDescription { get; }
 
     private readonly List<CharacterPatch> patches;
-    private readonly List<PatchReason> reasons;
 
-    public PatchRecord(RuntimeCharacter character, RuntimeCharacterSnapshot before, RuntimeCharacterSnapshot after, List<CharacterPatch> patches, List<PatchReason> reasons)
+    public PatchRecord(RuntimeCharacter character, RuntimeCharacterSnapshot before, RuntimeCharacterSnapshot after, List<CharacterPatch> patches, string patchDescription)
     {
         Character = character;
 
@@ -21,6 +20,6 @@ public class PatchRecord
         After = after;
 
         this.patches = new(patches);
-        this.reasons = new(reasons);
+        PatchDescription = patchDescription;
     }
 }

@@ -31,7 +31,7 @@ public class PatchHistoryManager : MonoBehaviour
 
     private void AddRecord(PatchRecord record)
     {
-        Debug.Log(string.Join(", ", record.Reasons));
+        Debug.Log(record.PatchDescription);
         currentSeasonRecords.Add(record);
     }
 

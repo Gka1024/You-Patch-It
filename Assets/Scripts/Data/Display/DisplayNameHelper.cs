@@ -19,21 +19,4 @@ public static class DisplayNameHelper
         };
     }
 
-    public static string GetReasonName(PatchReason reason)
-    {
-        return reason switch
-        {
-            PatchReason.HighWinrate => "승률이 너무 높음",
-            PatchReason.LowWinrate => "승률이 너무 낮음",
-            PatchReason.HighPickrate => "픽률이 너무 높음",
-            PatchReason.LowPickrate => "픽률이 너무 낮음",
-            PatchReason.HighBanrate => "밴률이 너무 높음",
-            PatchReason.LowBanrate => "밴률이 너무 낮음",
-            PatchReason.MetaDiversity => "메타 다양성 확보",
-            PatchReason.UserFeedBack => "유저 피드백",
-            PatchReason.InternalTest => "내부 테스트",
-            PatchReason.Other => "기타",
-            _ => "없음"
-        };
-    }
 }

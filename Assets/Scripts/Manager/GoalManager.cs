@@ -443,14 +443,16 @@ public class GoalManager : MonoBehaviour
 
         selectedGoal.Evaluate();
 
-        if (selectedGoal.IsComplete &&
-            rewardedGoals.Add(selectedGoal))
+        if (selectedGoal.IsComplete && rewardedGoals.Add(selectedGoal))
         {
-            ResourceManager.Instance.AddReward(
-                selectedGoal.Reward);
+            ResourceManager.Instance.AddReward(selectedGoal.Reward);
 
-            Debug.Log(
-                $"목표 완료: {selectedGoal.Title}");
+            Debug.Log($"목표 완료: {selectedGoal.Title}");
+        }
+        else
+        {
+            Debug.Log($"목표 실패: {selectedGoal.Title}");
+            EncounterManager.Instance.TestFunction();
         }
 
         RefreshUI();

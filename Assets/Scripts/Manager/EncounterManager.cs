@@ -1,12 +1,33 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EncounterManager : MonoBehaviour
 {
     public static EncounterManager Instance;
 
+    public EncounterList encounterList;
+
+    private Dictionary<int, Encounter> encounterDictionary = new();
+
+    [SerializeField] private EncounterPopupUI encounterPopup;
+
     private void Awake()
     {
         Instance = this;
+        RegisterEncounter();
+    }
+
+    private void RegisterEncounter()
+    {
+        foreach(Encounter encounter in encounterList.Encounters)
+        {
+            encounterDictionary.Add(encounter.id, encounter);
+        }
+    }
+
+    public void TestFunction()
+    {
+        ApplyEncounter(GetEncounter(1));
     }
 
     public void ApplyEncounter(Encounter encounter)
@@ -29,6 +50,20 @@ public class EncounterManager : MonoBehaviour
                 ApplyMoney(encounter);
                 break;
         }
+
+        encounterPopup.gameObject.SetActive(true);
+        encounterPopup.Initialize(encounter);
+    }
+
+    public Encounter GetRandomEncounter() // 고칠 필요 있음
+    {
+        return GetEncounter(Random.Range(0, encounterDictionary.Count));
+    }
+
+    public Encounter GetEncounter(int id)
+    {
+        encounterDictionary.TryGetValue(id, out Encounter encounter);
+        return encounter;
     }
 
     private void ApplyTrust(Encounter encounter)

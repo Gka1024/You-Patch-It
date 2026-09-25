@@ -229,7 +229,7 @@ public class ResourceCalculateManager : MonoBehaviour
 
         float finalScore = totalScore / totalWeight;
 
-        return Mathf.RoundToInt(finalScore);
+        return Mathf.Clamp(Mathf.RoundToInt(finalScore), -30, 10);
     }
 
     private float GetTierWeight(PlayerTier tier)

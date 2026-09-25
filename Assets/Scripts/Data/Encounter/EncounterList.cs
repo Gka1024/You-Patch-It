@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EncounterList : MonoBehaviour
+[CreateAssetMenu(menuName = "ScriptableObject/Data/Encounter/EncounterList")]
+public class EncounterList : ScriptableObject
 {
-    public List<Encounter> encounters;
+    public List<Encounter> Encounters;
 }

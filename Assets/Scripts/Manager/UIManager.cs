@@ -4,25 +4,28 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
+    [Header("Base Tabs")]
     public DashBoardUI dashBoardUI;
     public UpDisplayUI upDisplayUI;
     public BottomDisplayUI bottomDisplayUI;
-
     public CharacterTableUI characterTableUI;
     public InspectorUI inspectorUI;
-    public GameObject ShowLackResource;
 
-    public DeveloperGoalUI developerGoalUI;
-
+    [Header("Additional Tabs")]
     public PatchNoteUI patchNoteUI;
+    public EventUI eventUI;
+     public SeasonReportUI seasonReportUI;
+    public DeveloperGoalUI developerGoalUI;
+   
+    [Header("PopUps")]
+    public GameObject InstantDescription;
+    public EncounterPopupUI encounterPopupUI;
+    public CharacterPreviewUI characterPreviewPopupUI;
 
-    public SeasonReportUI seasonReportUI;
-
+    [Header("TextAlerts")]
+    public GameObject ShowLackResourceAlert;
     public GameObject GameOverText;
     public GameObject GoalUnsetAlert;
-
-    public GameObject InstantDescription;
-
 
     void Awake()
     {

@@ -7,7 +7,7 @@ public class EncounterManager : MonoBehaviour
 
     public EncounterList encounterList;
 
-    private Dictionary<int, Encounter> encounterDictionary = new();
+    private Dictionary<int, Encounter> encounterDictionaryNegative = new();
 
     [SerializeField] private EncounterPopupUI encounterPopup;
 
@@ -19,9 +19,9 @@ public class EncounterManager : MonoBehaviour
 
     private void RegisterEncounter()
     {
-        foreach(Encounter encounter in encounterList.Encounters)
+        foreach (Encounter encounter in encounterList.NegativeEncounters)
         {
-            encounterDictionary.Add(encounter.id, encounter);
+            encounterDictionaryNegative.Add(encounter.id, encounter);
         }
     }
 
@@ -55,14 +55,21 @@ public class EncounterManager : MonoBehaviour
         encounterPopup.Initialize(encounter);
     }
 
-    public Encounter GetRandomEncounter() // 고칠 필요 있음
+    public Encounter GetRandomEncounterNegative()
     {
-        return GetEncounter(Random.Range(0, encounterDictionary.Count));
+        if (encounterDictionaryNegative.Count == 0)
+            return null;
+
+        List<Encounter> encounters = new(encounterDictionaryNegative.Values);
+
+        int index = Random.Range(0, encounters.Count);
+
+        return encounters[index];
     }
 
     public Encounter GetEncounter(int id)
     {
-        encounterDictionary.TryGetValue(id, out Encounter encounter);
+        encounterDictionaryNegative.TryGetValue(id, out Encounter encounter);
         return encounter;
     }
 

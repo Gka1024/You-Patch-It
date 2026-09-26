@@ -452,7 +452,7 @@ public class GoalManager : MonoBehaviour
         else
         {
             Debug.Log($"목표 실패: {selectedGoal.Title}");
-            EncounterManager.Instance.TestFunction();
+            EncounterManager.Instance.ApplyEncounter(EncounterManager.Instance.GetRandomEncounterNegative());
         }
 
         RefreshUI();

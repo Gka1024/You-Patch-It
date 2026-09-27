@@ -42,7 +42,7 @@ public static class CharacterSkillAutoCreator
             return;
         }
 
-        string className = $"CharacterSkill_{character.id:D3}_{safeName}";
+        string className = $"CharacterSkill_{safeName}_{character.id:D3}";
         string scriptPath = $"{CharacterCreatorWindow.SkillScriptFolder}/{className}.cs";
         string skillAssetPath = $"{skillFolderPath}/{className}.asset";
 

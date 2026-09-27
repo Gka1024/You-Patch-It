@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class CharacterPreviewUI : MonoBehaviour
 {
-    public GameObject character_SPUM;
+    [SerializeField] private  CharacterPreviewWorld characterPreviewWorld;
 
     public void SetCharacter(Character character)
     {
-        character_SPUM = character.CharacterPreview_SPUM;
+        characterPreviewWorld.ShowCharacter(character);
     }
+
 }

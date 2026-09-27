@@ -16,7 +16,7 @@ public class Character : ScriptableObject
 {
     public int id;
     public string characterName;
-    public GameObject CharacterPreview_SPUM;
+    public GameObject CharacterPrefab_SPUM;
 
     public CharacterRole role;
 

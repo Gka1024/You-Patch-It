@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5022bbe98f03ed4e86002637f376b7a, type: 3}
-  m_Name: 601_Skill_Bard
+  m_Script: {fileID: 11500000, guid: fdabaeb30684d2045a7738d7bb9866f8, type: 3}
+  m_Name: 102_Berserker_Skill
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: "\uC624\uB77C\uD1A0\uB9AC\uC624"
-  skillDescription: "\uBAA8\uB4E0 \uC544\uAD70\uC5D0\uAC8C \uBCF4\uD638\uB9C9\uACFC \uBC29\uC5B4\uB825 \uC99D\uAC00 \uBC84\uD504\uB97C \uBD80\uC5EC\uD55C\uB2E4."
+  skillName: "\uAD11\uD654"
+  skillDescription: "\uC790\uC2E0\uC758 \uACF5\uACA9\uB825, \uACF5\uACA9 \uC18D\uB3C4, \uC774\uB3D9 \uC18D\uB3C4\uB97C \uC62C\uB9B0\uB2E4."
   ignoreDistance: 1
-  targetType: 4
+  targetType: 0
   targetSelection: 0

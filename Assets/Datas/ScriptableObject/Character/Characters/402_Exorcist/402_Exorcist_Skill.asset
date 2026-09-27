@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfdde4a83b5aba04bb922721439fab16, type: 3}
-  m_Name: 602_Skill_Miko
+  m_Script: {fileID: 11500000, guid: 04e9515a0291a8042b1138b94de7bcaf, type: 3}
+  m_Name: 402_Exorcist_Skill
   m_EditorClassIdentifier: 
   skillOwner: 0
   skillName: 

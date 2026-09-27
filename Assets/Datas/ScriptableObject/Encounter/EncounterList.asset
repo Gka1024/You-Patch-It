@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 156929bcda34c2f4ca93b84e1231e43f, type: 3}
   m_Name: EncounterList
   m_EditorClassIdentifier: Assembly-CSharp::EncounterList
-  Encounters:
+  NegativeEncounters:
   - {fileID: 11400000, guid: e293219b96f2ccb4db436d78f299e239, type: 2}

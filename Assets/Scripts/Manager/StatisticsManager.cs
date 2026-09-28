@@ -7,13 +7,15 @@ public class StatisticsManager : MonoBehaviour
 {
     public static StatisticsManager Instance { get; private set; }
 
-    private Dictionary<int, CharacterStatistics> currentStatistics = new(); // id
+    private Dictionary<int, CharacterStatistics> currentStatistics = new();
     private Dictionary<int, CharacterStatistics> pastStatistics = new();
 
-    private Dictionary<(int, int), MatchupStatistics> currentMatchDatas = new(); // id, id
+    private Dictionary<(int, int), MatchupStatistics> currentMatchDatas = new();
     private Dictionary<(int, int), MatchupStatistics> pastMatchDatas = new();
 
-    private Dictionary<int, Dictionary<int, Dictionary<int, CharacterStatistics>>> seasonStatistics = new(); // id, Season, Subseason
+    private Dictionary<int, Dictionary<int, Dictionary<int, CharacterStatistics>>> seasonStatistics = new();
+    private Dictionary<int, Dictionary<int, int>> seasonBattleCounts = new();
+    private Dictionary<int, Dictionary<int, Dictionary<int, int>>> seasonPickCounts = new();
 
     public bool HasPastSeasonData { get; private set; }
 
@@ -33,13 +35,19 @@ public class StatisticsManager : MonoBehaviour
         currentMatchDatas.Clear();
         pastMatchDatas.Clear();
 
+        seasonStatistics.Clear();
+        seasonBattleCounts.Clear();
+        seasonPickCounts.Clear();
+
         List<Character> characters = database.GetAllCharacters().ToList();
 
         foreach (Character character in characters)
         {
             currentStatistics.Add(character.id, new CharacterStatistics());
             pastStatistics.Add(character.id, new CharacterStatistics());
+
             seasonStatistics.Add(character.id, new Dictionary<int, Dictionary<int, CharacterStatistics>>());
+            seasonPickCounts.Add(character.id, new Dictionary<int, Dictionary<int, int>>());
         }
 
         foreach (Character self in characters)
@@ -56,7 +64,9 @@ public class StatisticsManager : MonoBehaviour
         PastTotalBattles = 0;
     }
 
-    // ===== Raw Data =====
+    // =========================================================
+    // Raw Data
+    // =========================================================
 
     public Dictionary<int, CharacterStatistics> GetAllStatistics()
         => currentStatistics;
@@ -95,20 +105,79 @@ public class StatisticsManager : MonoBehaviour
         return pastStatistics[character.OriginCharacter.id].TierStatistics[tier];
     }
 
-    public List<CharacterStatistics> GetSeasonStatistics(int characterid, int season)
+    public List<CharacterStatistics> GetSeasonStatistics(int characterId, int season)
     {
-        if (seasonStatistics.TryGetValue(characterid, out var seasonData))
+        if (seasonStatistics.TryGetValue(characterId, out var seasonData))
         {
-            if (seasonData.TryGetValue(season, out var data))
+            if (seasonData.TryGetValue(season, out var subSeasonData))
             {
-                return data.Values.ToList();
+                return subSeasonData
+                    .OrderBy(pair => pair.Key)
+                    .Select(pair => pair.Value)
+                    .ToList();
             }
         }
 
         return new List<CharacterStatistics>();
     }
 
-    // ===== Record =====
+    // =========================================================
+    // Season Pick Rate
+    // =========================================================
+
+    public float GetSeasonAveragePickRate(int characterId, int season, int teamSize)
+    {
+        if (teamSize <= 0)
+            return 0f;
+
+        if (!seasonPickCounts.TryGetValue(characterId, out var characterData))
+            return 0f;
+
+        if (!characterData.TryGetValue(season, out var pickData))
+            return 0f;
+
+        if (!seasonBattleCounts.TryGetValue(season, out var battleData))
+            return 0f;
+
+        float totalPickRate = 0f;
+        int validSubSeasonCount = 0;
+
+        foreach (var pair in pickData.OrderBy(pair => pair.Key))
+        {
+            int subSeason = pair.Key;
+            int pickCount = pair.Value;
+
+            if (!battleData.TryGetValue(subSeason, out int cumulativeBattleCount))
+                continue;
+
+            int previousBattleCount = battleData
+                .Where(b => b.Key < subSeason)
+                .Select(b => b.Value)
+                .DefaultIfEmpty(0)
+                .Max();
+
+            int subSeasonBattleCount = cumulativeBattleCount - previousBattleCount;
+
+            if (subSeasonBattleCount <= 0)
+                continue;
+
+            int totalCharacterSlots = subSeasonBattleCount * teamSize * 2;
+
+            float pickRate = (float)pickCount / totalCharacterSlots * 100f;
+
+            totalPickRate += pickRate;
+            validSubSeasonCount++;
+        }
+
+        if (validSubSeasonCount == 0)
+            return 0f;
+
+        return totalPickRate / validSubSeasonCount;
+    }
+
+    // =========================================================
+    // Record
+    // =========================================================
 
     public void RecordBattle(List<BattleResult> results)
     {
@@ -181,13 +250,17 @@ public class StatisticsManager : MonoBehaviour
     {
         CharacterStatistics stat = GetCurrentStatistics(character);
 
-        if (isWinner) stat.WinCount++;
-        else stat.LoseCount++;
+        if (isWinner)
+            stat.WinCount++;
+        else
+            stat.LoseCount++;
 
         TierStatistics tierStat = stat.TierStatistics[tier];
 
-        if (isWinner) tierStat.WinCount++;
-        else tierStat.LoseCount++;
+        if (isWinner)
+            tierStat.WinCount++;
+        else
+            tierStat.LoseCount++;
     }
 
     private void RecordMatchups(BattleResult result)
@@ -229,28 +302,60 @@ public class StatisticsManager : MonoBehaviour
         }
     }
 
-    // ===== Season =====
+    // =========================================================
+    // Season
+    // =========================================================
 
     public void SaveCurrentSubSeason(int season, int subSeason)
     {
+        // 이번 시즌의 서브시즌별 누적 전투 횟수 저장
+        if (!seasonBattleCounts.TryGetValue(season, out var battleData))
+        {
+            battleData = new Dictionary<int, int>();
+            seasonBattleCounts.Add(season, battleData);
+        }
+
+        battleData[subSeason] = TotalBattles;
+
         foreach (var pair in currentStatistics)
         {
             int id = pair.Key;
             CharacterStatistics stat = pair.Value;
 
-            if (!seasonStatistics.TryGetValue(id, out var seasonData))
-            {
-                seasonData = new Dictionary<int, Dictionary<int, CharacterStatistics>>();
-                seasonStatistics.Add(id, seasonData);
-            }
-
-            if (!seasonData.TryGetValue(season, out var subSeasonData))
+            // 시즌 통계 저장소 확보
+            if (!seasonStatistics[id].TryGetValue(season, out var subSeasonData))
             {
                 subSeasonData = new Dictionary<int, CharacterStatistics>();
-                seasonData.Add(season, subSeasonData);
+                seasonStatistics[id].Add(season, subSeasonData);
             }
 
+            // 현재 서브시즌 이전의 가장 최근 스냅샷 검색
+            int previousPickCount = 0;
+
+            var previousEntry = subSeasonData
+                .Where(data => data.Key < subSeason)
+                .OrderByDescending(data => data.Key)
+                .FirstOrDefault();
+
+            if (previousEntry.Value != null)
+            {
+                previousPickCount = previousEntry.Value.MatchCount;
+            }
+
+            // 누적 픽 횟수에서 이전 누적 픽 횟수를 빼 실제 픽 횟수 계산
+            int subSeasonPickCount = stat.MatchCount - previousPickCount;
+
+            // 현재 누적 통계 스냅샷 저장
             subSeasonData[subSeason] = new CharacterStatistics(stat);
+
+            // 실제 서브시즌 픽 횟수 저장
+            if (!seasonPickCounts[id].TryGetValue(season, out var pickData))
+            {
+                pickData = new Dictionary<int, int>();
+                seasonPickCounts[id].Add(season, pickData);
+            }
+
+            pickData[subSeason] = subSeasonPickCount;
         }
     }
 
@@ -290,19 +395,18 @@ public class StatisticsManager : MonoBehaviour
         PastTotalBattles = TotalBattles;
 
         foreach (var pair in currentStatistics)
-            pastStatistics.Add(
-                pair.Key,
-                new CharacterStatistics(pair.Value));
+        {
+            pastStatistics.Add(pair.Key, new CharacterStatistics(pair.Value));
+        }
 
         pastMatchDatas.Clear();
 
         foreach (var pair in currentMatchDatas)
-            pastMatchDatas.Add(
-                pair.Key,
-                new MatchupStatistics(pair.Value));
+        {
+            pastMatchDatas.Add(pair.Key, new MatchupStatistics(pair.Value));
+        }
     }
 }
-
 [Serializable]
 public class MatchupStatistics
 {

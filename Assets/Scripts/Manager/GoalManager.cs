@@ -56,7 +56,7 @@ public class GoalManager : MonoBehaviour
 
         Instance = this;
 
-        IsGoalAvailable = false;
+        IsGoalAvailable = true;
         currentGoalCount = 1;
 
         GenerateRewards();
@@ -335,7 +335,6 @@ public class GoalManager : MonoBehaviour
 
     public void SeasonReset()
     {
-        IsGoalAvailable = false;
         isGoalConfirmed = false;
 
         selectedGoal = null;

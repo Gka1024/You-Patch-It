@@ -5,8 +5,16 @@ using UnityEngine;
 public static class BattleActionExecutor
 {
     private const float TICK = 0.05f;
+    private static float currentDamageMultiplier = 1f;
 
-    public static void ExecuteAction(BattleCharacter self, BattleCharacter enemy, List<BattleCharacter> allies, List<BattleCharacter> enemies, BattleAction action, float tick, System.Random random)
+    public static void SetDamageMultiplier(float multiplier)
+    {
+        currentDamageMultiplier = multiplier;
+    }
+
+    public static void ExecuteAction(
+        BattleCharacter self, BattleCharacter enemy, List<BattleCharacter> allies, List<BattleCharacter> enemies,
+        BattleAction action, float tick, System.Random random)
     {
         action = ApplyDecisionAccuracy(self, action, random);
 
@@ -102,6 +110,7 @@ public static class BattleActionExecutor
 
     public static void DealDamage(BattleCharacter attacker, BattleCharacter target, float damage)
     {
+        damage *= currentDamageMultiplier;
         damage *= 100f / (100f + target.GetStat(CharacterStatType.Defence));
 
         float remainingDamage = damage;
@@ -122,7 +131,6 @@ public static class BattleActionExecutor
         attacker.statistics.damageDealt += damage;
         target.statistics.damageTaken += damage;
     }
-
     public static void AddShield(BattleCharacter target, float amount, float time)
     {
         target.AddShield(amount, time);
@@ -146,7 +154,7 @@ public static class BattleActionExecutor
 
     private static float GetDamageMultiplier(BattleCharacter self)
     {
-        return Mathf.Lerp(0.8f, 1.2f, self.player.ExecutionSkill / 100f);
+        return Mathf.Lerp(0.8f, 1.1f, self.player.ExecutionSkill / 100f);
     }
 
     private static BattleAction ApplyDecisionAccuracy(BattleCharacter self, BattleAction action, System.Random random)

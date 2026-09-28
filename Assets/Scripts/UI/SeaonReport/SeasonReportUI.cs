@@ -84,7 +84,7 @@ public class SeasonReportUI : MonoBehaviour
 
             List<CharacterStatistics> stats = StatisticsManager.Instance.GetSeasonStatistics(character.OriginCharacter.id, currentSeason);
 
-            row.Initialize(character, stats);
+            row.Initialize(character, stats, currentSeason);
 
             CharacterRows.Add(row.gameObject);
         }
@@ -178,7 +178,7 @@ public class SeasonReportUI : MonoBehaviour
         {
             builder.AppendLine("-----");
 
-            builder.AppendLine($"<결과> : {sumTrust / characterCount:F0} " + $"({sumTrust:F1} / {characterCount})");
+            builder.AppendLine($"<결과> : {sumTrust / characterCount:F0} ({sumTrust:F1} / {characterCount})");
         }
 
         return builder.ToString();
@@ -321,7 +321,7 @@ public class SeasonReportUI : MonoBehaviour
         builder.AppendLine($"운영 비용 : - {ResourceManager.Instance.CurSeasonOutcome}");
         builder.AppendLine();
 
-        builder.AppendLine($"시즌 수익은 플레이어 수와 신뢰도에 비례해 증가합니다.");
+        builder.AppendLine("시즌 수익은 플레이어 수와 신뢰도에 비례해 증가합니다.");
 
         return builder.ToString();
     }

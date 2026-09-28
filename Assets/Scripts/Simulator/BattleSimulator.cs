@@ -65,6 +65,7 @@ public class BattleSimulator : MonoBehaviour
         RegisterStatistics(statistics);
 
         float battleTime = 0f;
+        BattleActionExecutor.SetDamageMultiplier(1f);
 
         while (IsTeamAlive(redTeam) && IsTeamAlive(blueTeam))
         {
@@ -76,7 +77,7 @@ public class BattleSimulator : MonoBehaviour
             CollectTeamActions(redTeam, blueTeam);
             CollectTeamActions(blueTeam, redTeam);
 
-            ExecuteActions(battleRandom);
+            ExecuteActions(battleRandom, battleTime);
 
             battleTime += TICK;
 
@@ -323,8 +324,10 @@ public class BattleSimulator : MonoBehaviour
         return attacker.aiState.GetTarget(attacker, enemyTeam);
     }
 
-    private void ExecuteActions(System.Random random)
+    private void ExecuteActions(System.Random random, float battleTime)
     {
+        float damageMultiplier = GetDamageMultiplier(battleTime);
+
         for (int i = 0; i < commands.Count; i++)
         {
             BattleActionCommand command = commands[i];
@@ -354,6 +357,21 @@ public class BattleSimulator : MonoBehaviour
     {
         float multiplier = Mathf.Lerp(1.4f, 0.6f, character.player.ReactionTime / 100f);
         return character.aiState.ReactionTime * multiplier;
+    }
+
+    private const float DAMAGE_RAMP_START_TIME = 60f;
+    private const float DAMAGE_RAMP_INTERVAL = 30f;
+    private const float DAMAGE_RAMP_AMOUNT = 0.1f;
+    private const float MAX_DAMAGE_MULTIPLIER = 1.6f;
+
+    private float GetDamageMultiplier(float battleTime)
+    {
+        if (battleTime <= DAMAGE_RAMP_START_TIME)
+            return 1f;
+
+        int rampCount = Mathf.FloorToInt((battleTime - DAMAGE_RAMP_START_TIME) / DAMAGE_RAMP_INTERVAL);
+
+        return Mathf.Min(1f + rampCount * DAMAGE_RAMP_AMOUNT, MAX_DAMAGE_MULTIPLIER);
     }
 }
 

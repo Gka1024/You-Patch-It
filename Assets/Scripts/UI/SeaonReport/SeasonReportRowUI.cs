@@ -6,28 +6,30 @@ using UnityEngine.UI;
 public class SeasonReportRowUI : MonoBehaviour
 {
     private RuntimeCharacter character;
+
     [SerializeField] private TMP_Text CharacterName;
     [SerializeField] private TMP_Text WinrateText;
     [SerializeField] private TMP_Text PickrateText;
     [SerializeField] private Button GotoPatchNoteButton;
 
-    void Awake()
+    private void Awake()
     {
         GotoPatchNoteButton.onClick.AddListener(MoveTo);
     }
 
-    public void Initialize(RuntimeCharacter character, List<CharacterStatistics> stats)
+    public void Initialize(RuntimeCharacter character, List<CharacterStatistics> stats, int currentSeason)
     {
         this.character = character;
-        SetText(character, stats);
+
+        SetText(character, stats, currentSeason);
     }
 
-    private void SetText(RuntimeCharacter character, List<CharacterStatistics> stats)
+    private void SetText(RuntimeCharacter character, List<CharacterStatistics> stats, int currentSeason)
     {
         CharacterName.text = character.OriginCharacter.characterName;
 
-        string WinrateTextToWrite = "";
-        string PickrateTextToWrite = "";
+        string winrateTextToWrite = "";
+        string pickrateTextToWrite = "";
 
         bool isNewCharacter =
             RuntimeCharacterManager.Instance.AddedRuntimeCharacter != null &&
@@ -36,17 +38,20 @@ public class SeasonReportRowUI : MonoBehaviour
 
         if (isNewCharacter)
         {
-            WinrateTextToWrite += "신규 추가됨";
-            PickrateTextToWrite += " - ";
+            winrateTextToWrite = "신규 추가됨";
+            pickrateTextToWrite = " - ";
         }
         else
         {
-            WinrateTextToWrite += string.Join(" - ", stats.ConvertAll(stat => $"{stat.Winrate:F1}"));
-            PickrateTextToWrite += $"{AnalysisManager.Instance.GetPickRate(character):F1}%";
+            winrateTextToWrite = string.Join(" - ", stats.ConvertAll(stat => $"{stat.Winrate:F1}"));
+
+            float averagePickRate = StatisticsManager.Instance.GetSeasonAveragePickRate(character.OriginCharacter.id, currentSeason, 3);
+
+            pickrateTextToWrite = $"{averagePickRate:F1}%";
         }
 
-        WinrateText.text = WinrateTextToWrite;
-        PickrateText.text = PickrateTextToWrite;
+        WinrateText.text = winrateTextToWrite;
+        PickrateText.text = pickrateTextToWrite;
     }
 
     private void MoveTo()

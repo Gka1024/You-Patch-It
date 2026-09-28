@@ -16,26 +16,28 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField] private TMP_Text livetimeText;
 
     [SerializeField] private Image Symbols;
-
+    [SerializeField] private Image PinImage;
+    [SerializeField] private CharacterRowClickChecker RowClickChecker;
     [SerializeField] private GameObject backgroundImage;
 
-    [SerializeField] private Button button;
-
     private RuntimeCharacter runtimeCharacter;
+    private CharacterTableUI tableUI;
 
     private const int UnlockShowTier = 1021;
     private const int UnlockShowBan = 1022;
     private const int UnlockShowLivetime = 1023;
     private const int UnlockShowDPS = 1024;
 
+    public RuntimeCharacter RuntimeCharacter => runtimeCharacter;
+
     public void Initialize(RuntimeCharacter character, CharacterTableUI tableUI)
     {
         runtimeCharacter = character;
+        this.tableUI = tableUI;
+
         Symbols.sprite = tableUI.GetSymbolSprite(character);
-
+        RowClickChecker.Initialize(this);
         Refresh();
-
-        button.onClick.AddListener(OnClick);
 
         runtimeCharacter.OnStatChanged += Refresh;
         UnlockManager.Instance.OnUnlockChanged += Refresh;
@@ -60,9 +62,9 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         pickRateText.text = $"{AnalysisManager.Instance.GetPickRate(runtimeCharacter):F1}%";
 
-        tierText.text = UnlockManager.Instance.IsUnlocked(UnlockShowTier) ? $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}" : " - "; // 티어 확인
+        tierText.text = UnlockManager.Instance.IsUnlocked(UnlockShowTier) ? $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}" : " - ";
 
-        banRateText.text = UnlockManager.Instance.IsUnlocked(UnlockShowBan) ? $" - " : $" - "; // 밴 추가 후 수정
+        banRateText.text = UnlockManager.Instance.IsUnlocked(UnlockShowBan) ? $" - " : $" - ";
 
         damageText.text = $"{stat.AverageDamage:F0}";
 
@@ -70,16 +72,35 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         DPSText.text = UnlockManager.Instance.IsUnlocked(UnlockShowDPS) ? $"{dps:F1}" : " - ";
 
         livetimeText.text = UnlockManager.Instance.IsUnlocked(UnlockShowLivetime) ?
-        $"{AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue:F1}" : " - ";
+            $"{AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue:F1}" : " - ";
     }
 
-    private void OnClick()
+    // =========================================================
+    // Click
+    // =========================================================
+
+    public void OnClickLeft()
     {
         Debug.Log(runtimeCharacter.OriginCharacter.name);
+
         InspectorUI.Instance.Showcharacter(runtimeCharacter);
         BottomDisplayUI.Instance.SkillDescription.Initialize(runtimeCharacter.OriginCharacter, Symbols);
         UIManager.Instance.characterPreviewPopupUI.SetCharacter(runtimeCharacter.OriginCharacter);
     }
+
+    public void OnClickRight()
+    {
+        tableUI.TogglePinCharacter(this);
+    }
+
+    public void ShowPinImage(bool show)
+    {
+        PinImage.gameObject.SetActive(show);
+    }
+
+    // =========================================================
+    // Hover
+    // =========================================================
 
     public void OnPointerEnter(PointerEventData eventData)
     {

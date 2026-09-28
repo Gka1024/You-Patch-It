@@ -57,6 +57,8 @@ public class PatchManager : MonoBehaviour
             return;
         }
 
+        Debug.Log($"isGoalSet : {GoalManager.Instance.IsGoalSet} | isGoalAvailable : {GoalManager.Instance.IsGoalAvailable}");
+
         if (!GoalManager.Instance.IsGoalSet && GoalManager.Instance.IsGoalAvailable)
         {
             UIManager.Instance.GoalUnsetAlert.GetComponent<TextMeshProUGUI>().color = Color.red;

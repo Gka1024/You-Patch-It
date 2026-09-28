@@ -51,6 +51,7 @@ public class DeveloperGoalUI : MonoBehaviour
 
         ConfirmButton.interactable = false;
 
+        RefreshSelectionUI();
         RefreshUI();
     }
 

@@ -15,6 +15,7 @@ public class DashBoardUI : MonoBehaviour
     [SerializeField] private GameObject CharacterTable;
     [SerializeField] private GameObject Inspector;
     [SerializeField] private GameObject BottomDisplay;
+    [SerializeField] private GameObject CharacterPreview;
 
     [Header("Patch Notes")]
     [SerializeField] private GameObject PatchNotes;
@@ -46,6 +47,7 @@ public class DashBoardUI : MonoBehaviour
     {
         CharacterTable.SetActive(false);
         Inspector.SetActive(false);
+        CharacterPreview.SetActive(false);
         Events.SetActive(false);
         UnlockUI.SetActive(false);
         PatchNotes.SetActive(false);
@@ -62,6 +64,7 @@ public class DashBoardUI : MonoBehaviour
         CharacterTable.SetActive(true);
         Inspector.SetActive(true);
         BottomDisplay.SetActive(true);
+        CharacterPreview.SetActive(true);
     }
 
     public void ShowPatchNote()

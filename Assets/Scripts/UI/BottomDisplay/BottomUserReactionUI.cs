@@ -68,6 +68,7 @@ public class BottomUserReactionUI : MonoBehaviour
     {
         LoopOn = true;
         Debug.Log("TurnOnLoop");
+        Refresh();
     }
 
     private IEnumerator AutoRefresh()

@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,14 +20,23 @@ public class CharacterTableUI : MonoBehaviour
     [SerializeField] private Sprite supportSprite;
 
     private readonly List<CharacterRowUI> rowList = new();
+
     private Dictionary<RuntimeCharacter, CharacterRowUI> rowMap = new();
+
     [SerializeField] private List<GameObject> rankNumList;
+
+    private CharacterRowUI pinnedCharacter;
+    private Character pinnedOriginCharacter;
 
     private void Start()
     {
         GenerateTable();
         InitializeHeaders();
     }
+
+    // =========================================================
+    // Generate
+    // =========================================================
 
     public void GenerateTable()
     {
@@ -43,6 +53,10 @@ public class CharacterTableUI : MonoBehaviour
         }
 
         DisplayRankNumber(rowList.Count);
+
+        RestorePinnedCharacter();
+
+        ArrangeTable(currentSortItem, currentDirection);
     }
 
     private void InitializeHeaders()
@@ -52,6 +66,10 @@ public class CharacterTableUI : MonoBehaviour
             header.Initialize(this);
         }
     }
+
+    // =========================================================
+    // Refresh
+    // =========================================================
 
     public void RefreshTable()
     {
@@ -68,26 +86,130 @@ public class CharacterTableUI : MonoBehaviour
         ArrangeTable(currentSortItem, currentDirection);
     }
 
+    // =========================================================
+    // Pin
+    // =========================================================
+
+    public void TogglePinCharacter(CharacterRowUI row)
+    {
+        if (row == null)
+            return;
+
+        if (pinnedCharacter == row)
+        {
+            pinnedCharacter.ShowPinImage(false);
+
+            pinnedCharacter = null;
+            pinnedOriginCharacter = null;
+        }
+        else
+        {
+            if (pinnedCharacter != null)
+            {
+                pinnedCharacter.ShowPinImage(false);
+            }
+
+            pinnedCharacter = row;
+            pinnedOriginCharacter = row.RuntimeCharacter.OriginCharacter;
+
+            pinnedCharacter.ShowPinImage(true);
+        }
+
+        ArrangeTable(currentSortItem, currentDirection);
+    }
+
+    private void RestorePinnedCharacter()
+    {
+        pinnedCharacter = null;
+
+        if (pinnedOriginCharacter == null)
+            return;
+
+        foreach (CharacterRowUI row in rowList)
+        {
+            if (row.RuntimeCharacter.OriginCharacter == pinnedOriginCharacter)
+            {
+                pinnedCharacter = row;
+                pinnedCharacter.ShowPinImage(true);
+                return;
+            }
+        }
+    }
+
+    // =========================================================
+    // Arrange
+    // =========================================================
+
     private void ArrangeTable(AnalysisItem item, SortDirection direction)
     {
         List<RuntimeCharacter> characters = AnalysisManager.Instance.GetSortedCharacters(item, direction);
 
-        for (int i = characters.Count - 1; i >= 0; i--)
+        int siblingIndex = 0;
+
+        if (pinnedCharacter != null)
         {
-            rowMap[characters[i]].transform.SetSiblingIndex(i);
+            if (rowList.Contains(pinnedCharacter))
+            {
+                pinnedCharacter.ShowPinImage(true);
+                pinnedCharacter.transform.SetSiblingIndex(siblingIndex++);
+            }
+            else
+            {
+                pinnedCharacter.ShowPinImage(false);
+                pinnedCharacter = null;
+            }
+        }
+
+        for (int i = 0; i < characters.Count; i++)
+        {
+            RuntimeCharacter character = characters[i];
+
+            if (!rowMap.TryGetValue(character, out CharacterRowUI row))
+                continue;
+
+            if (row == pinnedCharacter)
+                continue;
+
+            row.ShowPinImage(false);
+            row.transform.SetSiblingIndex(siblingIndex++);
         }
 
         RefreshTable();
     }
 
+    // =========================================================
+    // Add Character
+    // =========================================================
+
     public void AddCharacter(RuntimeCharacter runtimeCharacter)
     {
+        if (rowMap.ContainsKey(runtimeCharacter))
+            return;
+
         CharacterRowUI row = Instantiate(rowPrefab, content);
 
         row.Initialize(runtimeCharacter, this);
 
         rowList.Add(row);
+        rowMap.Add(runtimeCharacter, row);
+
+        DisplayRankNumber(rowList.Count);
+
+        // 새 캐릭터가 기존에 고정된 캐릭터라면
+        // 해당 행을 다시 연결
+        if (pinnedOriginCharacter != null &&
+            runtimeCharacter.OriginCharacter == pinnedOriginCharacter)
+        {
+            pinnedCharacter = row;
+            pinnedCharacter.ShowPinImage(true);
+        }
+
+        ArrangeTable(currentSortItem, currentDirection);
     }
+
+    // =========================================================
+    // Clear
+    // =========================================================
 
     private void ClearTable()
     {
@@ -101,7 +223,13 @@ public class CharacterTableUI : MonoBehaviour
 
         rowList.Clear();
         rowMap.Clear();
+
+        pinnedCharacter = null;
     }
+
+    // =========================================================
+    // Rank
+    // =========================================================
 
     private void DisplayRankNumber(int count)
     {
@@ -110,6 +238,10 @@ public class CharacterTableUI : MonoBehaviour
             rankNumList[i].SetActive(count - 1 >= i);
         }
     }
+
+    // =========================================================
+    // Symbol
+    // =========================================================
 
     public Sprite GetSymbolSprite(RuntimeCharacter character)
     {
@@ -129,6 +261,10 @@ public class CharacterTableUI : MonoBehaviour
             _ => warriorSprite
         };
     }
+
+    // =========================================================
+    // Header
+    // =========================================================
 
     public void OnClickHeader(AnalysisItem item)
     {

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac68511274e536c40a05f791b51c0dd2, type: 3}
+  m_Name: Enounter_1101
+  m_EditorClassIdentifier: Assembly-CSharp::Encounter
+  id: 1101
+  EncounterResources:
+  - isNegative: 1
+    goodsType: 0
+    valueType: 1
+    valueType2: 0
+    value: 10
+  Name: "\uCEE4\uBBA4\uB2C8\uD2F0 \uBD88\uB9CC\uAE00 \uAC8C\uC7AC"
+  Description: "\uCEE4\uBBA4\uB2C8\uD2F0\uC5D0 \uC0AC\uC18C\uD55C \uBD88\uB9CC\uAE00\uC774 \uC62C\uB77C\uC654\uB2E4. \uD574\uB2F9 \uAE00\uC774 \uC778\uAE30\uB97C \uB04C\uC5C8\uB2E4."

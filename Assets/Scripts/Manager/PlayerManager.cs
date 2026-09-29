@@ -324,11 +324,11 @@ public class PlayerManager : MonoBehaviour
 
     private float seasonPlayerModifier;
 
-    public void AddSeasonPlayerModifier(Encounter encounter)
+    public void AddSeasonPlayerModifier(EncounterResource resource)
     {
-        float value = encounter.valueType == ValueType.Percent
-            ? encounter.value * 0.01f
-            : encounter.value;
+        float value = resource.valueFormat == ValueFormat.Percent
+            ? resource.value * 0.01f
+            : resource.value;
 
         seasonPlayerModifier += value;
     }

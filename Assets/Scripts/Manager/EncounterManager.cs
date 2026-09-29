@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +20,8 @@ public class EncounterManager : MonoBehaviour
 
     private void RegisterEncounter()
     {
+        encounterDictionaryNegative.Clear();
+
         foreach (Encounter encounter in encounterList.NegativeEncounters)
         {
             encounterDictionaryNegative.Add(encounter.id, encounter);
@@ -30,30 +33,135 @@ public class EncounterManager : MonoBehaviour
         ApplyEncounter(GetEncounter(1));
     }
 
+    // =========================================================
+    // Apply Encounter
+    // =========================================================
+
     public void ApplyEncounter(Encounter encounter)
     {
-        switch (encounter.goodsType)
+        if (encounter == null)
+            return;
+
+        foreach (EncounterResource resource in encounter.EncounterResources)
         {
-            case GoodsType.Trust:
-                ApplyTrust(encounter);
-                break;
-
-            case GoodsType.DevelopResource:
-                ApplyDevelopResource(encounter);
-                break;
-
-            case GoodsType.Player:
-                ApplyPlayer(encounter);
-                break;
-
-            case GoodsType.Money:
-                ApplyMoney(encounter);
-                break;
+            ApplyResource(resource);
         }
 
         encounterPopup.gameObject.SetActive(true);
         encounterPopup.Initialize(encounter);
     }
+
+    private void ApplyResource(EncounterResource resource)
+    {
+        switch (resource.goodsType)
+        {
+            case GoodsType.Trust:
+                ApplyTrust(resource);
+                break;
+
+            case GoodsType.DevelopResource:
+                ApplyDevelopResource(resource);
+                break;
+
+            case GoodsType.Player:
+                ApplyPlayer(resource);
+                break;
+
+            case GoodsType.Money:
+                ApplyMoney(resource);
+                break;
+        }
+    }
+
+    // =========================================================
+    // Trust
+    // =========================================================
+
+    private void ApplyTrust(EncounterResource resource)
+    {
+        float value = CalculateValue(ResourceManager.Instance.GetTrust, resource);
+
+        ResourceManager.Instance.AddTrust(value);
+    }
+
+    // =========================================================
+    // Develop Resource
+    // =========================================================
+
+    private void ApplyDevelopResource(EncounterResource resource)
+    {
+        int value = Mathf.RoundToInt(CalculateValue(ResourceManager.Instance.GetDevelop, resource));
+
+        ResourceManager.Instance.AddDevelopResource(value);
+
+    }
+
+    // =========================================================
+    // Money
+    // =========================================================
+
+    private void ApplyMoney(EncounterResource resource)
+    {
+        int value = Mathf.RoundToInt(CalculateValue(ResourceManager.Instance.GetMoney, resource));
+
+        if (value >= 0)
+        {
+            ResourceManager.Instance.AddMoney(value);
+        }
+        else
+        {
+            ResourceManager.Instance.SpendMoney(-value);
+        }
+    }
+
+    // =========================================================
+    // Player
+    // =========================================================
+
+    private void ApplyPlayer(EncounterResource resource)
+    {
+        if (resource.valuePeriod == ValuePeriod.Total)
+        {
+            int currentPlayer = PlayerManager.Instance.CurrentPlayerCount;
+
+            int value = Mathf.RoundToInt(CalculateValue(currentPlayer, resource));
+
+            PlayerManager.Instance.AddPlayerCount(value);
+        }
+        else
+        {
+            PlayerManager.Instance.AddSeasonPlayerModifier(resource);
+        }
+    }
+
+    // =========================================================
+    // Calculate
+    // =========================================================
+
+    private float CalculateValue(float currentValue, EncounterResource resource)
+    {
+        float value;
+
+        if (resource.valueFormat == ValueFormat.Flat)
+        {
+            value = resource.value;
+        }
+        else
+        {
+            value = currentValue * resource.value * 0.01f;
+        }
+
+        if (resource.isNegative)
+        {
+            value = -value;
+        }
+
+        return value;
+    }
+
+    // =========================================================
+    // Get Encounter
+    // =========================================================
 
     public Encounter GetRandomEncounterNegative()
     {
@@ -72,53 +180,6 @@ public class EncounterManager : MonoBehaviour
         encounterDictionaryNegative.TryGetValue(id, out Encounter encounter);
         return encounter;
     }
-
-    private void ApplyTrust(Encounter encounter)
-    {
-        float value = CalculateValue(ResourceManager.Instance.GetTrust, encounter);
-        ResourceManager.Instance.AddTrust(value);
-    }
-
-    private void ApplyDevelopResource(Encounter encounter)
-    {
-        int value = Mathf.RoundToInt(CalculateValue(ResourceManager.Instance.GetDevelop, encounter));
-        ResourceManager.Instance.AddDevelopResource(value);
-    }
-
-    private void ApplyMoney(Encounter encounter)
-    {
-        int value = Mathf.RoundToInt(CalculateValue(ResourceManager.Instance.GetMoney, encounter));
-
-        if (value >= 0)
-            ResourceManager.Instance.AddMoney(value);
-        else
-            ResourceManager.Instance.SpendMoney(-value);
-    }
-
-    private void ApplyPlayer(Encounter encounter)
-    {
-        if (encounter.valueType2 == ValueType2.Current)
-        {
-            int currentPlayer = PlayerManager.Instance.CurrentPlayerCount;
-
-            int value = encounter.valueType == ValueType.Percent
-                ? Mathf.RoundToInt(currentPlayer * encounter.value * 0.01f)
-                : Mathf.RoundToInt(encounter.value);
-
-            PlayerManager.Instance.AddPlayerCount(value);
-            return;
-        }
-
-        PlayerManager.Instance.AddSeasonPlayerModifier(encounter);
-    }
-
-    private float CalculateValue(float currentValue, Encounter encounter)
-    {
-        if (encounter.valueType == ValueType.Flat)
-            return encounter.value;
-
-        return currentValue * encounter.value * 0.01f;
-    }
 }
 
 public enum GoodsType
@@ -129,14 +190,14 @@ public enum GoodsType
     Money
 }
 
-public enum ValueType
+public enum ValueFormat
 {
     Percent,
     Flat
 }
 
-public enum ValueType2
+public enum ValuePeriod
 {
-    Current,
-    Season
+    Total,
+    CurrentSeason
 }

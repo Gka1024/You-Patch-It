@@ -132,6 +132,12 @@ public class    ResourceManager : MonoBehaviour
 
     public int AddDevelopResource(int amount)
     {
+        if(amount < 0)
+        {
+            SpendDevelopResource(-amount);
+            return amount;
+        }
+
         developResource += Mathf.Max(0, amount);
         return amount;
     }

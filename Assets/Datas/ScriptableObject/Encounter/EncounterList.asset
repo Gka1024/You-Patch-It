@@ -13,4 +13,23 @@ MonoBehaviour:
   m_Name: EncounterList
   m_EditorClassIdentifier: Assembly-CSharp::EncounterList
   NegativeEncounters:
-  - {fileID: 11400000, guid: e293219b96f2ccb4db436d78f299e239, type: 2}
+  - {fileID: 11400000, guid: 329aebe4f16d4ca44b88a95216241424, type: 2}
+  - {fileID: 11400000, guid: 549148ef87b3d8d4eb2516c0530aa8c0, type: 2}
+  - {fileID: 11400000, guid: 799e3c79d7f7fec41bec70e495a0ee66, type: 2}
+  - {fileID: 11400000, guid: ac1a5ec747fa17340ba552c54469d95f, type: 2}
+  - {fileID: 11400000, guid: 85f430f81dafbad4481a5e300614f101, type: 2}
+  - {fileID: 11400000, guid: df457e044ac567c49a85bab4b2299cf9, type: 2}
+  - {fileID: 11400000, guid: 8d5afb56b9fe87144b12af982b456587, type: 2}
+  - {fileID: 11400000, guid: e6de242cf9bb10643ab9f84ec15a983c, type: 2}
+  - {fileID: 11400000, guid: df9863f8406ff0c4caacb5aa505774d0, type: 2}
+  - {fileID: 11400000, guid: 2545b236d810ba8478cafc1bacb14004, type: 2}
+  - {fileID: 11400000, guid: 4fd731952c6ec6e4887cfc99e9c2f5ef, type: 2}
+  - {fileID: 11400000, guid: 6819f24a9f39e5c498a6d1a0a8740cf0, type: 2}
+  - {fileID: 11400000, guid: ba4db9aace379f443aa31ed6ad40d935, type: 2}
+  - {fileID: 11400000, guid: f775820d1e82596408910cb413089934, type: 2}
+  - {fileID: 11400000, guid: b3550f5268b89c14f93a9f72fcd09e32, type: 2}
+  - {fileID: 11400000, guid: 2c245ef157f96dd48b41edf32285ed22, type: 2}
+  - {fileID: 11400000, guid: 418ce8e4a1cc46943bbae9bce7f21c62, type: 2}
+  - {fileID: 11400000, guid: 1b4b764fdb7475647bc55d5a97918fbd, type: 2}
+  - {fileID: 11400000, guid: 9735de5c5186cec458efadd70fcd4019, type: 2}
+  - {fileID: 11400000, guid: 80c887856d444b14e861ec99d9bde8eb, type: 2}

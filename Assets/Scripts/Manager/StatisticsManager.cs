@@ -14,8 +14,8 @@ public class StatisticsManager : MonoBehaviour
     private Dictionary<(int, int), MatchupStatistics> pastMatchDatas = new();
 
     private Dictionary<int, Dictionary<int, Dictionary<int, CharacterStatistics>>> seasonStatistics = new();
-    private Dictionary<int, Dictionary<int, int>> seasonBattleCounts = new();
-    private Dictionary<int, Dictionary<int, Dictionary<int, int>>> seasonPickCounts = new();
+    private Dictionary<int, Dictionary<int, int>> seasonBattleCounts = new(); // 각각 순서대로 메인시즌, 서브시즌, 전투 횟수
+    private Dictionary<int, Dictionary<int, Dictionary<int, int>>> seasonPickCounts = new(); // 각각 순서대로 캐릭터 ID, 메인 시즌, 서브 시즌, 픽 횟수
 
     public bool HasPastSeasonData { get; private set; }
 
@@ -125,7 +125,7 @@ public class StatisticsManager : MonoBehaviour
     // Season Pick Rate
     // =========================================================
 
-    public float GetSeasonAveragePickRate(int characterId, int season, int teamSize)
+    public float GetSeasonPickRate(int characterId, int season, int teamSize)
     {
         if (teamSize <= 0)
             return 0f;
@@ -139,40 +139,29 @@ public class StatisticsManager : MonoBehaviour
         if (!seasonBattleCounts.TryGetValue(season, out var battleData))
             return 0f;
 
-        float totalPickRate = 0f;
-        int validSubSeasonCount = 0;
+        int totalPickCount = 0;
 
-        foreach (var pair in pickData.OrderBy(pair => pair.Key))
+        for (int subSeason = 1; subSeason <= 3; subSeason++)
         {
-            int subSeason = pair.Key;
-            int pickCount = pair.Value;
-
-            if (!battleData.TryGetValue(subSeason, out int cumulativeBattleCount))
-                continue;
-
-            int previousBattleCount = battleData
-                .Where(b => b.Key < subSeason)
-                .Select(b => b.Value)
-                .DefaultIfEmpty(0)
-                .Max();
-
-            int subSeasonBattleCount = cumulativeBattleCount - previousBattleCount;
-
-            if (subSeasonBattleCount <= 0)
-                continue;
-
-            int totalCharacterSlots = subSeasonBattleCount * teamSize * 2;
-
-            float pickRate = (float)pickCount / totalCharacterSlots * 100f;
-
-            totalPickRate += pickRate;
-            validSubSeasonCount++;
+            if (pickData.TryGetValue(subSeason, out int pickCount))
+            {
+                totalPickCount += pickCount;
+            }
         }
 
-        if (validSubSeasonCount == 0)
+        int totalBattleCount = battleData.Values.DefaultIfEmpty(0).Max();
+
+        if (totalBattleCount <= 0)
             return 0f;
 
-        return totalPickRate / validSubSeasonCount;
+        int totalCharacterSlots = totalBattleCount * teamSize * 2;
+
+        Debug.Log($"Season: {season}");
+        Debug.Log($"SubSeason 1: {pickData.GetValueOrDefault(1)}");
+        Debug.Log($"SubSeason 2: {pickData.GetValueOrDefault(2)}");
+        Debug.Log($"SubSeason 3: {pickData.GetValueOrDefault(3)}");
+
+        return (float)totalPickCount / totalCharacterSlots * 100f;
     }
 
     // =========================================================
@@ -308,15 +297,17 @@ public class StatisticsManager : MonoBehaviour
 
     public void SaveCurrentSubSeason(int season, int subSeason)
     {
-        // 이번 시즌의 서브시즌별 누적 전투 횟수 저장
+        // 1. 메인 시즌의 서브시즌별 전투 횟수 저장
         if (!seasonBattleCounts.TryGetValue(season, out var battleData))
         {
             battleData = new Dictionary<int, int>();
             seasonBattleCounts.Add(season, battleData);
         }
 
+        // ResetSeason()이 서브시즌마다 호출되므로 현재 전투 횟수를 그대로 저장
         battleData[subSeason] = TotalBattles;
 
+        // 2. 캐릭터별 현재 서브시즌 통계 저장
         foreach (var pair in currentStatistics)
         {
             int id = pair.Key;
@@ -329,34 +320,21 @@ public class StatisticsManager : MonoBehaviour
                 seasonStatistics[id].Add(season, subSeasonData);
             }
 
-            // 현재 서브시즌 이전의 가장 최근 스냅샷 검색
-            int previousPickCount = 0;
-
-            var previousEntry = subSeasonData
-                .Where(data => data.Key < subSeason)
-                .OrderByDescending(data => data.Key)
-                .FirstOrDefault();
-
-            if (previousEntry.Value != null)
-            {
-                previousPickCount = previousEntry.Value.MatchCount;
-            }
-
-            // 누적 픽 횟수에서 이전 누적 픽 횟수를 빼 실제 픽 횟수 계산
-            int subSeasonPickCount = stat.MatchCount - previousPickCount;
-
-            // 현재 누적 통계 스냅샷 저장
+            // 현재 서브시즌의 통계 스냅샷 저장
             subSeasonData[subSeason] = new CharacterStatistics(stat);
 
-            // 실제 서브시즌 픽 횟수 저장
+            // 3. 캐릭터별 서브시즌 픽 횟수 저장
             if (!seasonPickCounts[id].TryGetValue(season, out var pickData))
             {
                 pickData = new Dictionary<int, int>();
                 seasonPickCounts[id].Add(season, pickData);
             }
 
-            pickData[subSeason] = subSeasonPickCount;
+            // 이전 서브시즌의 누적값을 빼지 않고 현재 MatchCount를 그대로 저장
+            pickData[subSeason] = stat.MatchCount;
         }
+
+        Debug.Log($"[SaveCurrentSubSeason] Season: {season}, SubSeason: {subSeason}, Battles: {TotalBattles}");
     }
 
     public void ResetSeason()

@@ -62,6 +62,11 @@ public class AnalysisManager : MonoBehaviour
         return GetValue(character, AnalysisItem.Pickrate, false);
     }
 
+    public float GetSeasonPickRate(int characterId, int currentSeason)
+    {
+        return StatisticsManager.Instance.GetSeasonPickRate(characterId, currentSeason, currentTeamSize) / currentTeamSize;
+    }
+
     public float GetAveragePickRate(CharacterRole role)
     {
         List<RuntimeCharacter> characters = RuntimeCharacterManager.Instance.GetCharactersInRole(role).ToList();

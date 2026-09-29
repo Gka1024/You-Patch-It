@@ -95,9 +95,8 @@ public class GoalManager : MonoBehaviour
     {
         goalList.Clear();
 
-        goalList.Add(new NerfTopGoal(GoalDifficulty.Easy, GoalType.Challenge));
 
-        goalList.Add(new SpecificCharacterWinrateGoal(40, 60, GoalDifficulty.Easy, GoalType.Challenge));
+        goalList.Add(new SpecificCharacterWinrateGoal(45, 55, GoalDifficulty.Easy, GoalType.Challenge));
     }
 
     private void SyncUnlocks()
@@ -140,6 +139,7 @@ public class GoalManager : MonoBehaviour
     {
         if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_I))
         {
+            AddGoalOnce(new NerfTopGoal(GoalDifficulty.Normal, GoalType.Challenge));
             AddGoalOnce(new WinrateBandGoal(49f, 54f, 3, GoalDifficulty.Hard, GoalType.Balance));
             AddGoalOnce(new SingleStarGoal(55f, GoalDifficulty.Normal, GoalType.Balance));
             AddGoalOnce(new MobilityPatchGoal(GoalDifficulty.Easy, GoalType.Patch));
@@ -149,29 +149,15 @@ public class GoalManager : MonoBehaviour
 
             if (characterCount > 0)
             {
-                AddGoalOnce(new MinPickRateGoal(
-                    (100f / characterCount) * 0.65f,
-                    GoalDifficulty.Hard,
-                    GoalType.Meta));
+                AddGoalOnce(new MinPickRateGoal((100f / characterCount) * 0.65f, GoalDifficulty.Hard, GoalType.Meta));
             }
         }
 
         if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_II))
         {
-            AddGoalOnce(new BottomToTopGoal(
-                AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true),
-                3,
-                GoalDifficulty.Normal,
-                GoalType.Balance));
-
-            AddGoalOnce(new PatchCountGoal(
-                3,
-                GoalDifficulty.Normal,
-                GoalType.Patch));
-
-            AddGoalOnce(new PrecisionPatchGoal(
-                GoalDifficulty.Normal,
-                GoalType.Patch));
+            AddGoalOnce(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
+            AddGoalOnce(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
+            AddGoalOnce(new PrecisionPatchGoal(GoalDifficulty.Normal, GoalType.Patch));
 
             int characterCount = RuntimeCharacterManager.Instance.CharacterCount;
 
@@ -190,20 +176,11 @@ public class GoalManager : MonoBehaviour
 
             if (characterCount > 2)
             {
-                AddGoalOnce(new PredictCharacterWinrateRank(
-                    RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter,
-                    UnityEngine.Random.Range(2, characterCount - 1),
-                    GoalDifficulty.Impossible,
-                    GoalType.Challenge));
+                AddGoalOnce(new PredictCharacterWinrateRank(RuntimeCharacterManager.Instance.GetRandomCharacter().OriginCharacter, UnityEngine.Random.Range(2, characterCount - 1), GoalDifficulty.Impossible, GoalType.Challenge));
             }
 
-            AddGoalOnce(new ReverseMetaGoal(
-                GoalDifficulty.Hard,
-                GoalType.Meta));
-
-            AddGoalOnce(new SingleStatPatchGoal(
-                GoalDifficulty.Hard,
-                GoalType.Patch));
+            AddGoalOnce(new ReverseMetaGoal(GoalDifficulty.Hard, GoalType.Meta));
+            AddGoalOnce(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
         }
     }
 

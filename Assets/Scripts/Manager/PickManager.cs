@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,12 @@ public class PickManager : MonoBehaviour
 
     private const int TEAM_SIZE_3 = 3051;
 
-    private const float MIN_META_LEARNING_RATE = 0.03f;
-    private const float MAX_META_LEARNING_RATE = 0.25f;
+    private const float MIN_META_LEARNING_RATE = 0.15f;
+    private const float MAX_META_LEARNING_RATE = 0.6f;
+
+    [Header("Pick Score Weights")]
+    [SerializeField] private float winrateWeight = 1f;
+    [SerializeField] private float pickrateWeight = 1f;
 
     private void Awake()
     {
@@ -34,10 +39,6 @@ public class PickManager : MonoBehaviour
         if (Instance == this)
             Instance = null;
     }
-
-    //=========================================================
-    // Match Making
-    //=========================================================
 
     private void CheckTeamSize()
     {
@@ -65,7 +66,6 @@ public class PickManager : MonoBehaviour
 
             if (bluePlayers == null)
             {
-                // 상대를 찾지 못한 플레이어를 다시 큐에 넣어 유실을 방지한다.
                 foreach (RuntimePlayer player in redPlayers)
                     queues[player.Tier].Enqueue(player);
 
@@ -172,10 +172,6 @@ public class PickManager : MonoBehaviour
         return null;
     }
 
-    //=========================================================
-    // Pick
-    //=========================================================
-
     private List<RuntimeCharacter> PickTeamCharacters(List<RuntimePlayer> players, System.Random random)
     {
         List<RuntimeCharacter> characters = new();
@@ -234,16 +230,43 @@ public class PickManager : MonoBehaviour
     {
         float score = 50f;
 
-        score += WinrateScore(character, player);
-        score += PickRateScore(character, player);
+        score += WinrateScore(character, player) * winrateWeight;
+        score += PickRateScore(character, player) * pickrateWeight;
         score += PreferenceScore(character, player);
 
         return Mathf.Max(1f, score);
     }
 
-    //---------------------------------------------------------
-    // Meta Knowledge
-    //---------------------------------------------------------
+    private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
+    {
+        float winRate = StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;
+        float delta = winRate - 50f;
+
+        float experimentWeight = 1f - player.RiskTaking / 200f;
+        float metaWeight = player.MetaKnowledge / 100f;
+
+        return delta * 2f * metaWeight * experimentWeight;
+    }
+
+    private float PickRateScore(RuntimeCharacter character, RuntimePlayer player)
+    {
+        if (!player.KnownPickRates.TryGetValue(character, out float knownPickRate))
+            knownPickRate = AnalysisManager.Instance.GetPickRate(character);
+
+        float metaWeight = player.MetaKnowledge / 100f;
+
+        return knownPickRate * metaWeight;
+    }
+
+    private float PreferenceScore(RuntimeCharacter character, RuntimePlayer player)
+    {
+        if (!player.ClassPreferences.TryGetValue(character.OriginCharacter.role, out float preference))
+            return 0f;
+
+        float weight = (100f - player.MetaDependence) / 100f;
+
+        return (preference - 30f) * weight;
+    }
 
     public void UpdatePlayerMetaKnowledge(IReadOnlyList<RuntimePlayer> players)
     {
@@ -272,37 +295,5 @@ public class PickManager : MonoBehaviour
                     learningRate);
             }
         }
-    }
-
-    //---------------------------------------------------------
-    // Pick Score
-    //---------------------------------------------------------
-
-    private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
-    {
-        float winRate = StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;
-        float delta = winRate - 50f;
-
-        float experimentWeight = 1f - player.RiskTaking / 200f;
-
-        return delta * 2f * (player.MetaKnowledge / 100f) * experimentWeight;
-    }
-
-    private float PickRateScore(RuntimeCharacter character, RuntimePlayer player)
-    {
-        if (!player.KnownPickRates.TryGetValue(character, out float knownPickRate))
-            knownPickRate = AnalysisManager.Instance.GetPickRate(character);
-
-        return knownPickRate * 0.3f;
-    }
-
-    private float PreferenceScore(RuntimeCharacter character, RuntimePlayer player)
-    {
-        if (!player.ClassPreferences.TryGetValue(character.OriginCharacter.role, out float preference))
-            return 0f;
-
-        float weight = (100f - player.MetaDependence) / 100f;
-
-        return (preference - 30f) * weight;
     }
 }

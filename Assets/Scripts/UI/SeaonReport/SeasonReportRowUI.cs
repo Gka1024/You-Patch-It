@@ -45,7 +45,7 @@ public class SeasonReportRowUI : MonoBehaviour
         {
             winrateTextToWrite = string.Join(" - ", stats.ConvertAll(stat => $"{stat.Winrate:F1}"));
 
-            float averagePickRate = StatisticsManager.Instance.GetSeasonAveragePickRate(character.OriginCharacter.id, currentSeason, 3);
+            float averagePickRate = AnalysisManager.Instance.GetSeasonPickRate(character.OriginCharacter.id, currentSeason);
 
             pickrateTextToWrite = $"{averagePickRate:F1}%";
         }

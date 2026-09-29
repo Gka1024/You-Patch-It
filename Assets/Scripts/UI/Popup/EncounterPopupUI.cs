@@ -54,12 +54,7 @@ public class EncounterPopupUI : MonoBehaviour
                 break;
         }
 
-        if (resource.isNegative)
-        {
-            text += "-";
-        }
-
-        text += $" : {resource.value}";
+        text += $" : {(resource.isNegative ? "-" : "")}{resource.value}";
 
         if (resource.valueFormat == ValueFormat.Percent)
         {

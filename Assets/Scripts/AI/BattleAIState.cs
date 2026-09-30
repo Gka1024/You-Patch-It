@@ -9,16 +9,16 @@ public class BattleAIState
     private readonly BattleAI originAI;
     private readonly RuntimePlayer player;
 
-    public BattleAIState(BattleAI originAI, RuntimePlayer player, Random random)
+    public BattleAIState(BattleAI originAI, RuntimeCharacter character, RuntimePlayer player, Random random)
     {
         this.originAI = originAI;
         this.player = player;
-        Initialize(random);
+        Initialize(character, random);
     }
 
-    private void Initialize(Random random)
+    private void Initialize(RuntimeCharacter character, Random random)
     {
-        PreferredDistance = GetRandomValue(originAI.prefferedDistance, player.Consistency, random);
+        PreferredDistance = GetRandomValue(character.GetStat(CharacterStatType.AttackRange) * 0.8f, player.Consistency, random);
         ReactionTime = GetReactionTime(player.ReactionTime, player.Consistency, random);
     }
 

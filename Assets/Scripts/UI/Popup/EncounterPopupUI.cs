@@ -27,6 +27,11 @@ public class EncounterPopupUI : MonoBehaviour
 
     private void SetContents(Encounter encounter)
     {
+        foreach (Transform child in EncounterContentParent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
         foreach (EncounterResource resource in encounter.EncounterResources)
         {
             TMP_Text text = Instantiate(EncounterContentTextPrefab, EncounterContentParent.transform).GetComponent<TextMeshProUGUI>();

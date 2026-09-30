@@ -16,8 +16,8 @@ MonoBehaviour:
   EncounterResources:
   - isNegative: 1
     goodsType: 3
-    valueType: 0
-    valueType2: 1
-    value: 50
+    valueFormat: 1
+    valuePeriod: 0
+    value: 200
   Name: "\uC11C\uBC84 \uBE44\uC6A9 \uC99D\uAC00"
   Description: "BWS\uAC00 \uB2E8\uAE30\uC801\uC778 \uC11C\uBC84 \uBE44\uC6A9 \uC778\uC0C1\uC744 \uBC1C\uD45C\uD588\uB2E4. \uCD94\uAC00 \uC6B4\uC601 \uBE44\uC6A9\uC774 \uC608\uC0C1\uB41C\uB2E4. "

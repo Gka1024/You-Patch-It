@@ -6,7 +6,7 @@ public class CharacterSkill_Warrior : CharacterSkill
 {
     public override void Execute(BattleCharacter self, List<BattleCharacter> enemies, List<BattleCharacter> allies, float coefficient, System.Random random)
     {
-        List<BattleCharacter> targets = GetTargets(self, enemies, allies, random);
+        List<BattleCharacter> targets = GetTargets(self, allies, enemies, random);
 
         if (targets.Count == 0)
             return;

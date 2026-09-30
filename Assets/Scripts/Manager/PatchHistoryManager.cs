@@ -46,9 +46,6 @@ public class PatchHistoryManager : MonoBehaviour
                 .Where(x => x.Character == character)
                 .ToList();
 
-            if (records.Count == 0)
-                continue;
-
             PatchHistory history =
                 new PatchHistory(
                     character,

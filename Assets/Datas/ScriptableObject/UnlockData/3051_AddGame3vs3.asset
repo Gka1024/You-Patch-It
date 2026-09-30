@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: 3051_AddGame3vs3
   m_EditorClassIdentifier: 
   id: 3051
-  unlockName: "3 vs 3 \uCD94\uAC00\uD558\uAE30"
-  description: "\uAC8C\uC784\uC5D0 3:3 \uBAA8\uB4DC\uB97C \uCD94\uAC00\uD569\uB2C8\uB2E4.
-    \uCD94\uAC00\uC801\uC73C\uB85C \uC5BB\uB294 \uB9AC\uC18C\uC2A4\uAC00 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  unlockName: "\uC11C\uBE0C\uC2DC\uC98C \uB298\uB9AC\uAE30"
+  description: "\uC11C\uBE0C\uC2DC\uC98C\uC744 4\uBC88\uC73C\uB85C \uB298\uB9BD\uB2C8\uB2E4. \uB354 \uB9CE\uC740 \uD328\uCE58 \uAE30\uD68C\uB97C \uC81C\uACF5\uD569\uB2C8\uB2E4."
   category: 2
   costResource: 100
   icon: {fileID: 0}

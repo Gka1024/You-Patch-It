@@ -172,6 +172,8 @@ public class ResourceCalculateManager : MonoBehaviour
     // Evaluation
     //====================================================
 
+    // -- 승률 평가 : 승률이 50%에 모일수록 고득점
+
     private int EvaluateWinRate(IReadOnlyList<RuntimeCharacter> characters)
     {
         if (characters.Count == 0)
@@ -196,7 +198,6 @@ public class ResourceCalculateManager : MonoBehaviour
                     continue;
 
                 float score = CalculateWinRateScore(tierStat.WinRate);
-                score = Mathf.Clamp(score, -20f, 10f);
 
                 float tierWeight = GetTierWeight(tier);
                 float sampleWeight =
@@ -229,7 +230,7 @@ public class ResourceCalculateManager : MonoBehaviour
 
         float finalScore = totalScore / totalWeight;
 
-        return Mathf.Clamp(Mathf.RoundToInt(finalScore), -30, 10);
+        return Mathf.Clamp(Mathf.RoundToInt(finalScore), -50, 10);
     }
 
     private float GetTierWeight(PlayerTier tier)
@@ -261,21 +262,10 @@ public class ResourceCalculateManager : MonoBehaviour
 
     private float CalculateWinRateScore(float winRate)
     {
-        float delta = Mathf.Abs(winRate - 50f);
+        float delta = winRate - 50f;
+        float score = 10f - 0.5f * delta * delta;
 
-        if (delta <= 10f)
-            return 10f - delta;
-
-        if (delta <= 20f)
-            return Mathf.Lerp(0f, -4f, (delta - 10f) / 10f);
-
-        if (delta <= 30f)
-            return Mathf.Lerp(-4f, -7f, (delta - 20f) / 10f);
-
-        if (delta <= 40f)
-            return Mathf.Lerp(-7f, -13f, (delta - 30f) / 10f);
-
-        return Mathf.Lerp(-13f, -20f, (delta - 40f) / 10f);
+        return Mathf.Clamp(score, -50f, 10f);
     }
 
     // -- 아이덴티티 평가 : 캐릭터가 다르면 다를수록 고득점
@@ -403,7 +393,7 @@ public class ResourceCalculateManager : MonoBehaviour
             std
         );
 
-        return Mathf.RoundToInt(score * 10f);
+        return Mathf.Clamp(Mathf.RoundToInt(score * 10f), -10, 5);
     }
 
     // -- 직업군 평가 : 직업군별로 승률이 분포하면 고득점
@@ -454,7 +444,7 @@ public class ResourceCalculateManager : MonoBehaviour
             score -= Mathf.RoundToInt(penalty);
         }
 
-        return Mathf.Clamp(score, -20, 10);
+        return Mathf.Clamp(score, -20, 5);
     }
 }
 

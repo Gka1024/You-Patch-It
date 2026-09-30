@@ -20,13 +20,13 @@ MonoBehaviour:
   - statType: 0
     value: 34
   - statType: 1
-    value: 320
+    value: 280
   - statType: 2
     value: 14
   - statType: 3
-    value: 5.7
+    value: 4.8
   - statType: 4
-    value: 1.1
+    value: 0.9
   - statType: 5
     value: 1
   - statType: 6

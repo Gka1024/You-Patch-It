@@ -1,9 +1,11 @@
-
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterTableUI : MonoBehaviour
 {
+    private const int CHARACTERS_PER_PAGE = 10;
+
     [SerializeField] private CharacterRowUI rowPrefab;
     [SerializeField] private Transform content;
 
@@ -19,19 +21,42 @@ public class CharacterTableUI : MonoBehaviour
     [SerializeField] private Sprite tankSprite;
     [SerializeField] private Sprite supportSprite;
 
-    private readonly List<CharacterRowUI> rowList = new();
-
-    private Dictionary<RuntimeCharacter, CharacterRowUI> rowMap = new();
-
     [SerializeField] private List<GameObject> rankNumList;
+
+    [Header("Page")]
+    [SerializeField] private Button previousPageButton;
+    [SerializeField] private Button nextPageButton;
+
+    private readonly List<CharacterRowUI> rowList = new();
+    private readonly Dictionary<RuntimeCharacter, CharacterRowUI> rowMap = new();
+
+    // 실제 화면에 표시되는 순서
+    private readonly List<RuntimeCharacter> displayCharacters = new();
 
     private CharacterRowUI pinnedCharacter;
     private Character pinnedOriginCharacter;
+
+    private int currentPage = 0;
+
+    private int TotalPage =>
+        Mathf.Max(1, Mathf.CeilToInt((float)displayCharacters.Count / CHARACTERS_PER_PAGE));
 
     private void Start()
     {
         GenerateTable();
         InitializeHeaders();
+
+        previousPageButton.onClick.AddListener(PreviousPage);
+        nextPageButton.onClick.AddListener(NextPage);
+    }
+
+    private void OnDestroy()
+    {
+        if (previousPageButton != null)
+            previousPageButton.onClick.RemoveListener(PreviousPage);
+
+        if (nextPageButton != null)
+            nextPageButton.onClick.RemoveListener(NextPage);
     }
 
     // =========================================================
@@ -52,6 +77,8 @@ public class CharacterTableUI : MonoBehaviour
             rowMap.Add(runtimeCharacter, row);
         }
 
+        currentPage = 0;
+
         DisplayRankNumber(rowList.Count);
 
         RestorePinnedCharacter();
@@ -62,9 +89,7 @@ public class CharacterTableUI : MonoBehaviour
     private void InitializeHeaders()
     {
         foreach (CharacterTableHeaderUI header in headers)
-        {
             header.Initialize(this);
-        }
     }
 
     // =========================================================
@@ -75,15 +100,87 @@ public class CharacterTableUI : MonoBehaviour
     {
         foreach (CharacterRowUI row in rowList)
         {
-            row.Refresh();
+            if (row != null)
+                row.Refresh();
         }
 
         DisplayRankNumber(rowList.Count);
+
+        RefreshCharacterPage();
     }
 
     public void ReArrangetable()
     {
         ArrangeTable(currentSortItem, currentDirection);
+    }
+
+    // =========================================================
+    // Page
+    // =========================================================
+
+    private void RefreshCharacterPage()
+    {
+        if (displayCharacters.Count == 0)
+        {
+            currentPage = 0;
+            UpdatePageButtons();
+            return;
+        }
+
+        if (currentPage >= TotalPage)
+            currentPage = TotalPage - 1;
+
+        int startIndex = currentPage * CHARACTERS_PER_PAGE;
+        int endIndex = Mathf.Min(
+            startIndex + CHARACTERS_PER_PAGE,
+            displayCharacters.Count);
+
+        // 일단 모든 Row를 비활성화
+        foreach (CharacterRowUI row in rowList)
+        {
+            if (row != null)
+                row.gameObject.SetActive(false);
+        }
+
+        // 현재 페이지에 해당하는 Row만 활성화
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            RuntimeCharacter character = displayCharacters[i];
+
+            if (rowMap.TryGetValue(character, out CharacterRowUI row))
+                row.gameObject.SetActive(true);
+        }
+
+        UpdatePageButtons();
+    }
+
+    private void UpdatePageButtons()
+    {
+        if (previousPageButton != null)
+            previousPageButton.interactable = currentPage > 0;
+
+        if (nextPageButton != null)
+            nextPageButton.interactable = currentPage < TotalPage - 1;
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage <= 0)
+            return;
+
+        currentPage--;
+
+        RefreshCharacterPage();
+    }
+
+    private void NextPage()
+    {
+        if (currentPage >= TotalPage - 1)
+            return;
+
+        currentPage++;
+
+        RefreshCharacterPage();
     }
 
     // =========================================================
@@ -97,6 +194,7 @@ public class CharacterTableUI : MonoBehaviour
 
         if (pinnedCharacter == row)
         {
+            // 고정 해제
             pinnedCharacter.ShowPinImage(false);
 
             pinnedCharacter = null;
@@ -104,16 +202,19 @@ public class CharacterTableUI : MonoBehaviour
         }
         else
         {
+            // 기존 고정 해제
             if (pinnedCharacter != null)
-            {
                 pinnedCharacter.ShowPinImage(false);
-            }
 
+            // 새로운 캐릭터 고정
             pinnedCharacter = row;
             pinnedOriginCharacter = row.RuntimeCharacter.OriginCharacter;
 
             pinnedCharacter.ShowPinImage(true);
         }
+
+        // 고정 상태가 바뀌면 1페이지로 이동
+        currentPage = 0;
 
         ArrangeTable(currentSortItem, currentDirection);
     }
@@ -142,37 +243,55 @@ public class CharacterTableUI : MonoBehaviour
 
     private void ArrangeTable(AnalysisItem item, SortDirection direction)
     {
-        List<RuntimeCharacter> characters = AnalysisManager.Instance.GetSortedCharacters(item, direction);
+        List<RuntimeCharacter> sortedCharacters =
+            AnalysisManager.Instance.GetSortedCharacters(item, direction);
 
-        int siblingIndex = 0;
+        displayCharacters.Clear();
 
-        if (pinnedCharacter != null)
+        // =====================================================
+        // 1. 고정 캐릭터를 가장 먼저 추가
+        // =====================================================
+
+        if (pinnedCharacter != null &&
+            rowMap.ContainsKey(pinnedCharacter.RuntimeCharacter))
         {
-            if (rowList.Contains(pinnedCharacter))
-            {
-                pinnedCharacter.ShowPinImage(true);
-                pinnedCharacter.transform.SetSiblingIndex(siblingIndex++);
-            }
-            else
-            {
-                pinnedCharacter.ShowPinImage(false);
-                pinnedCharacter = null;
-            }
+            displayCharacters.Add(pinnedCharacter.RuntimeCharacter);
         }
 
-        for (int i = 0; i < characters.Count; i++)
+        // =====================================================
+        // 2. 나머지 캐릭터를 정렬 순서대로 추가
+        // =====================================================
+
+        foreach (RuntimeCharacter character in sortedCharacters)
         {
-            RuntimeCharacter character = characters[i];
+            if (pinnedCharacter != null &&
+                character == pinnedCharacter.RuntimeCharacter)
+            {
+                continue;
+            }
+
+            displayCharacters.Add(character);
+        }
+
+        // =====================================================
+        // 3. Hierarchy도 displayCharacters 순서대로 정렬
+        // =====================================================
+
+        for (int i = 0; i < displayCharacters.Count; i++)
+        {
+            RuntimeCharacter character = displayCharacters[i];
 
             if (!rowMap.TryGetValue(character, out CharacterRowUI row))
                 continue;
 
-            if (row == pinnedCharacter)
-                continue;
+            row.ShowPinImage(row == pinnedCharacter);
 
-            row.ShowPinImage(false);
-            row.transform.SetSiblingIndex(siblingIndex++);
+            row.transform.SetSiblingIndex(i);
         }
+
+        // =====================================================
+        // 4. 현재 페이지 갱신
+        // =====================================================
 
         RefreshTable();
     }
@@ -183,6 +302,9 @@ public class CharacterTableUI : MonoBehaviour
 
     public void AddCharacter(RuntimeCharacter runtimeCharacter)
     {
+        if (runtimeCharacter == null)
+            return;
+
         if (rowMap.ContainsKey(runtimeCharacter))
             return;
 
@@ -195,8 +317,6 @@ public class CharacterTableUI : MonoBehaviour
 
         DisplayRankNumber(rowList.Count);
 
-        // 새 캐릭터가 기존에 고정된 캐릭터라면
-        // 해당 행을 다시 연결
         if (pinnedOriginCharacter != null &&
             runtimeCharacter.OriginCharacter == pinnedOriginCharacter)
         {
@@ -216,13 +336,12 @@ public class CharacterTableUI : MonoBehaviour
         foreach (CharacterRowUI row in rowList)
         {
             if (row != null)
-            {
                 Destroy(row.gameObject);
-            }
         }
 
         rowList.Clear();
         rowMap.Clear();
+        displayCharacters.Clear();
 
         pinnedCharacter = null;
     }
@@ -233,10 +352,8 @@ public class CharacterTableUI : MonoBehaviour
 
     private void DisplayRankNumber(int count)
     {
-        for (int i = 0; i < 10; i++)
-        {
+        for (int i = 0; i < rankNumList.Count; i++)
             rankNumList[i].SetActive(count - 1 >= i);
-        }
     }
 
     // =========================================================
@@ -246,9 +363,7 @@ public class CharacterTableUI : MonoBehaviour
     public Sprite GetSymbolSprite(RuntimeCharacter character)
     {
         if (character == null)
-        {
             return null;
-        }
 
         return character.OriginCharacter.role switch
         {
@@ -281,11 +396,16 @@ public class CharacterTableUI : MonoBehaviour
             currentDirection = SortDirection.Descending;
         }
 
+        // 정렬 기준이 바뀌면 1페이지부터
+        currentPage = 0;
+
         ArrangeTable(currentSortItem, currentDirection);
 
         foreach (CharacterTableHeaderUI header in headers)
         {
-            header.Refresh(currentSortItem == header.Item, currentDirection);
+            header.Refresh(
+                currentSortItem == header.Item,
+                currentDirection);
         }
     }
 }

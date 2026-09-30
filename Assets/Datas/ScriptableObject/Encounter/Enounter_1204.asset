@@ -16,8 +16,8 @@ MonoBehaviour:
   EncounterResources:
   - isNegative: 1
     goodsType: 1
-    valueType: 1
-    valueType2: 0
-    value: 50
+    valueFormat: 0
+    valuePeriod: 0
+    value: 5
   Name: "QA \uCD94\uAC00 \uC791\uC5C5"
   Description: "\uC774\uBC88 \uD328\uCE58\uC758 \uACB0\uACFC\uAC00 \uC608\uC0C1\uACFC \uB2EC\uB77C \uCD94\uAC00 \uD14C\uC2A4\uD2B8\uAC00 \uD544\uC694\uD574\uC84C\uB2E4. QA\uD300\uC774 \uC77C\uC815 \uC5F0\uC7A5\uC744 \uC694\uCCAD\uD588\uB2E4."

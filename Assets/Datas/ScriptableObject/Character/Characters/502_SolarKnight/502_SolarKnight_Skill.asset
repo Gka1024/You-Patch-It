@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: 502_SolarKnight_Skill
   m_EditorClassIdentifier: 
   skillOwner: 0
-  skillName: 
-  skillDescription: 
+  skillName: "\uD0DC\uC591\uC758 \uAC00\uD638"
+  skillDescription: "\uC8FC\uC704 \uC544\uAD70\uC5D0\uAC8C \uBCF4\uD638\uB9C9\uC744 \uBD80\uC5EC\uD55C\uB2E4. "
   ignoreDistance: 0
+  targetType: 4
+  targetSelection: 0
+  shieldRange: 5
+  shieldCoefficient: 1
+  shieldDuration: 5

@@ -6,14 +6,13 @@ using UnityEngine.UI;
 public class BottomGoalPreviewUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text goalTitle;
+    [SerializeField] private TMP_Text goalDescription;
 
-    public Button RerollButton;
-    public Button ConfirmButton;
+    public Button MoveToButton;
 
     public void Initialize(GoalManager manager)
     {
-        RerollButton.onClick.AddListener(manager.ChangeGoals);
-        ConfirmButton.onClick.AddListener(manager.ConfirmGoals);
+        MoveToButton.onClick.AddListener(UIManager.Instance.dashBoardUI.ShowGoals);
     }
 
     public void Reset()
@@ -21,12 +20,13 @@ public class BottomGoalPreviewUI : MonoBehaviour
         goalTitle.text = "";
     }
 
-    public void SetText(DeveloperGoal currentGoals)
+    public void SetText(DeveloperGoal currentGoal)
     {
-        if (currentGoals == null) return;
+        if (currentGoal == null) return;
 
         Reset();
 
-        goalTitle.text = currentGoals.Title;
+        goalTitle.text = currentGoal.Title;
+        goalDescription.text = currentGoal.Description;
     }
 }

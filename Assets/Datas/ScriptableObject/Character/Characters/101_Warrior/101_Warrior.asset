@@ -22,11 +22,11 @@ MonoBehaviour:
   - statType: 1
     value: 370
   - statType: 2
-    value: 22
+    value: 20
   - statType: 3
-    value: 3.8
+    value: 4.2
   - statType: 4
-    value: 1.4
+    value: 1.5
   - statType: 5
     value: 1.8
   - statType: 6

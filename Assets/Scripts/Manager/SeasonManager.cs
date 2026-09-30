@@ -20,7 +20,8 @@ public class SeasonManager : MonoBehaviour
 {
     public static SeasonManager Instance { get; private set; }
 
-    private const int SubSeasonCount = 3;
+    private int SubSeasonCount = 3;
+    private const int ADDITIONAL_SUBSEASON = 3051;
 
     public int CurrentSeason { get; private set; } = 1;
     public int CurrentSubSeason { get; private set; } = 1;
@@ -54,6 +55,7 @@ public class SeasonManager : MonoBehaviour
 
     private void Start()
     {
+        UnlockManager.Instance.OnUnlockChanged += IsSubSeasonChaged;
         StartSeason();
     }
 
@@ -66,6 +68,17 @@ public class SeasonManager : MonoBehaviour
     public int NextSeed()
     {
         return seasonRandom.Next();
+    }
+
+    private void IsSubSeasonChaged()
+    {
+        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_SUBSEASON))
+        {
+            Debug.Log("!@#");
+
+            SubSeasonCount = 4;
+            UnlockManager.Instance.OnUnlockChanged -= IsSubSeasonChaged;
+        }
     }
 
     //====================================================

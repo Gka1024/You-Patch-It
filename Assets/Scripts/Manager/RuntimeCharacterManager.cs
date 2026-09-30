@@ -53,6 +53,8 @@ public class RuntimeCharacterManager : MonoBehaviour
                 lockedCharacters.Add(character);
             }
         }
+
+        AddedRuntimeCharacter = null;
     }
 
     public RuntimeCharacter AddRandomCharacter(System.Random random)

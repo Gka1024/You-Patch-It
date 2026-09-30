@@ -16,8 +16,8 @@ MonoBehaviour:
   EncounterResources:
   - isNegative: 1
     goodsType: 2
-    valueType: 0
-    valueType2: 1
+    valueFormat: 0
+    valuePeriod: 1
     value: 50
   Name: "\uC2E0\uADDC \uC720\uC800 \uC720\uC785 \uAC10\uC18C"
   Description: "\uD604\uC7AC \uAC8C\uC784\uC5D0 \uB300\uD55C \uBD80\uC815\uC801\uC778 \uC5EC\uB860\uC774 \uD655\uC0B0\uB418\uC5B4 \uC0C8\uB85C \uAC8C\uC784\uC5D0 \uC720\uC785\uB418\uB294 \uC720\uC800\uB4E4\uC774 \uC904\uC5B4\uB4E4\uC5C8\uB2E4."

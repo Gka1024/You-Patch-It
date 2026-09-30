@@ -149,7 +149,7 @@ public class BattleSimulator : MonoBehaviour
             if (runtimeCharacter == null || runtimePlayer == null)
                 continue;
 
-            BattleAIState aiState = new BattleAIState(runtimeCharacter.OriginCharacter.battleAI, runtimePlayer, random);
+            BattleAIState aiState = new BattleAIState(runtimeCharacter.OriginCharacter.battleAI, runtimeCharacter, runtimePlayer, random);
             BattleCharacter character = GetBattleCharacter();
 
             character.Initialize(runtimeCharacter, runtimePlayer, aiState, startingPosition);

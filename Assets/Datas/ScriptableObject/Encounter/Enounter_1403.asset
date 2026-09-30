@@ -16,8 +16,8 @@ MonoBehaviour:
   EncounterResources:
   - isNegative: 1
     goodsType: 3
-    valueType: 1
-    valueType2: 0
-    value: 700
+    valueFormat: 1
+    valuePeriod: 0
+    value: 250
   Name: "E-Sports \uACC4\uC57D \uBCC0\uACBD"
   Description: "\uB300\uD68C \uC6B4\uC601 \uACC4\uD68D\uC774 \uBCC0\uACBD\uB418\uC5C8\uB2E4. \uAE30\uC874 \uD611\uB825 \uC5C5\uCCB4\uC640\uC758 \uACC4\uC57D\uC744 \uC870\uC815\uD558\uBA74\uC11C \uBE44\uC6A9\uC774 \uBC1C\uC0DD\uD588\uB2E4."

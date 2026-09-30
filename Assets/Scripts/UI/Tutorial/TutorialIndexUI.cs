@@ -10,6 +10,8 @@ public class TutorialIndexUI : MonoBehaviour, IPointerClickHandler
 
     [SerializeField] private GameObject RootObject;
 
+    protected virtual void OnSeasonProceeded() { }
+
     protected virtual void Awake()
     {
         index = 0;
@@ -37,15 +39,18 @@ public class TutorialIndexUI : MonoBehaviour, IPointerClickHandler
         }
 
         contents[index].SetActive(true);
+        OnSeasonProceeded();
     }
 
     private void ShowNextTutorial()
     {
-        if(nextUI == null)
+        if (nextUI == null)
         {
             RootObject.SetActive(false);
         }
-
-        nextUI.SetActive(true);
+        else
+        {
+            nextUI.SetActive(true);
+        }
     }
 }

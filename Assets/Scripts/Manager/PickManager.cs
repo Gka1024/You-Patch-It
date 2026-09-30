@@ -12,8 +12,8 @@ public class PickManager : MonoBehaviour
 
     private const int TEAM_SIZE_3 = 3051;
 
-    private const float MIN_META_LEARNING_RATE = 0.15f;
-    private const float MAX_META_LEARNING_RATE = 0.6f;
+    private const float MIN_META_LEARNING_RATE = 0.35f;
+    private const float MAX_META_LEARNING_RATE = 0.75f;
 
     [Header("Pick Score Weights")]
     [SerializeField] private float winrateWeight = 1f;
@@ -240,12 +240,16 @@ public class PickManager : MonoBehaviour
     private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
     {
         float winRate = StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;
-        float delta = winRate - 50f;
 
-        float experimentWeight = 1f - player.RiskTaking / 200f;
+        if (winRate == 0 && RuntimeCharacterManager.Instance.AddedRuntimeCharacter == character) winRate = 70f; // 초반 캐릭터 승률 조정
+
         float metaWeight = player.MetaKnowledge / 100f;
+        float experimentWeight = 1f - player.RiskTaking / 200f;
 
-        return delta * 2f * metaWeight * experimentWeight;
+        float delta = winRate - 50f;
+        float score = delta * Mathf.Abs(delta) * 0.5f;
+
+        return score * metaWeight * experimentWeight;
     }
 
     private float PickRateScore(RuntimeCharacter character, RuntimePlayer player)

@@ -26,7 +26,7 @@ public class SeasonReportRowUI : MonoBehaviour
 
     private void SetText(RuntimeCharacter character, List<CharacterStatistics> stats, int currentSeason)
     {
-        CharacterName.text = character.OriginCharacter.characterName;
+        CharacterName.text = $"{character.OriginCharacter.characterName} : ";
 
         string winrateTextToWrite = "";
         string pickrateTextToWrite = "";

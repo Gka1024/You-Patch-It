@@ -18,7 +18,7 @@ MonoBehaviour:
   consistency: 25
   executionSkill: 27
   decisionAccuracy: 26
-  metaKnowledge: 30
+  metaKnowledge: 50
   combatVariance: 40
   knowledgeVariance: 45
   preferenceVariance: 50

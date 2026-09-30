@@ -1,23 +1,34 @@
 public class IntroduceTutorialUI : TutorialIndexUI
 {
-    protected void Start()
+    protected override void OnSeasonProceeded()
     {
-        PatchManager.Instance.OnPatchConfirmed += OnSeasonProceeded;
-    }
+        switch (index)
+        {
+            case 2:
+                UIManager.Instance.dashBoardUI.ShowCharacter();
+                break;
 
-    void OnDisable()
-    {
-        PatchManager.Instance.OnPatchConfirmed -= OnSeasonProceeded;
+            case 3:
+                UIManager.Instance.dashBoardUI.ShowPatchNote();
+                break;
 
-    }
+            case 4:
+                UIManager.Instance.dashBoardUI.ShowUnlock();
+                break;
 
-    private void OnSeasonProceeded()
-    {
-        if (index != 3)
-            return;
+            case 5:
+                UIManager.Instance.dashBoardUI.ShowGoals();
+                break;
 
-        PatchManager.Instance.OnPatchConfirmed -= OnSeasonProceeded;
-        EnterNextPage();
+            case 6:
+                UIManager.Instance.dashBoardUI.ShowSeasonReports();
+                break;
 
+            case 7:
+                UIManager.Instance.dashBoardUI.ShowCharacter();
+                break;
+
+            default: break;
+        }
     }
 }

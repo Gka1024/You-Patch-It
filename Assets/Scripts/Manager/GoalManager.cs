@@ -360,42 +360,31 @@ public class GoalManager : MonoBehaviour
 
         rewardTable.Add(
             GoalDifficulty.Easy,
-            new GoalReward(100, 25));
+            new GoalReward(100, 10));
 
         rewardTable.Add(
             GoalDifficulty.Normal,
-            new GoalReward(150, 35));
+            new GoalReward(150, 25));
 
         rewardTable.Add(
             GoalDifficulty.Hard,
-            new GoalReward(300, 50));
+            new GoalReward(300, 40));
 
         rewardTable.Add(
             GoalDifficulty.Impossible,
-            new GoalReward(500, 75));
+            new GoalReward(500, 70));
     }
 
     public GoalReward GetReward(GoalDifficulty difficulty)
     {
-        if (!rewardTable.TryGetValue(
-                difficulty,
-                out GoalReward reward))
+        if (!rewardTable.TryGetValue(difficulty, out GoalReward reward))
         {
             return new GoalReward(0, 0);
         }
 
-        float multiplier =
-            UnlockManager.Instance != null &&
-            UnlockManager.Instance.IsUnlocked(GOAL_REWARD)
-                ? 1.2f
-                : 1f;
+        float multiplier = UnlockManager.Instance != null && UnlockManager.Instance.IsUnlocked(GOAL_REWARD) ? 1.2f : 1f;
 
-        return new GoalReward(
-            Mathf.RoundToInt(
-                reward.DevelopResource * multiplier),
-
-            Mathf.RoundToInt(
-                reward.TrustPoint * multiplier));
+        return new GoalReward(Mathf.RoundToInt(reward.DevelopResource * multiplier), Mathf.RoundToInt(reward.TrustPoint * multiplier));
     }
 
     //=========================================================

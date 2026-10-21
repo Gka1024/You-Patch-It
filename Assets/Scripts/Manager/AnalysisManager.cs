@@ -66,6 +66,7 @@ public class AnalysisManager : MonoBehaviour
     {
         return StatisticsManager.Instance.GetSeasonPickRate(characterId, currentSeason, currentTeamSize) / currentTeamSize;
     }
+    
 
     public float GetAveragePickRate(CharacterRole role)
     {
@@ -299,6 +300,7 @@ public class AnalysisManager : MonoBehaviour
 
         return result;
     }
+
 
     //=========================================================
     // Value

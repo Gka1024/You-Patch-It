@@ -97,7 +97,7 @@ public class BattleSimulationDebug : MonoBehaviour
         }
         else
         {
-            outcome = $"승리: {FormatCharacters(result.winner)}";
+            outcome = $"승리: ";
         }
 
         StringBuilder log = new StringBuilder();
@@ -116,7 +116,19 @@ public class BattleSimulationDebug : MonoBehaviour
         }
 
         Debug.Log(log.ToString(), this);
-    } 
+    }
+
+    private string FormatCharacters(List<BattleCharacter> characters)
+    {
+        List<RuntimeCharacter> list = new();
+
+        foreach (BattleCharacter character in characters)
+        {
+            list.Add(character.runtimeCharacter);
+        }
+
+        return FormatCharacters(list);
+    }
 
     private string FormatCharacters(List<RuntimeCharacter> characters)
     {

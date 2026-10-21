@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BattleSimulator : MonoBehaviour
@@ -114,7 +115,7 @@ public class BattleSimulator : MonoBehaviour
             isDraw = true;
         }
 
-        BattleResult result = new BattleResult(redPlayers, bluePlayers, winner, loser, statistics);
+        BattleResult result = WriteResult(redTeam, blueTeam, redAlive, blueAlive, statistics);
         result.isDraw = isDraw;
         result.battleTime = battleTime;
 
@@ -122,6 +123,29 @@ public class BattleSimulator : MonoBehaviour
         ReleaseTeams();
 
         return result;
+    }
+
+    private BattleResult WriteResult(List<BattleCharacter> redTeam, List<BattleCharacter> blueTeam, bool redAlive, bool blueAlive, BattleStatistics statistics)
+    {
+        List<int> redList = new();
+        List<int> blueList = new();
+
+        List<PlayerTier> redTier = new();
+        List<PlayerTier> blueTier = new();
+
+        foreach (BattleCharacter character in redTeam)
+        {
+            redList.Add(character.runtimeCharacter.OriginCharacter.id);
+            redTier.Add(character.player.Tier);
+        }
+
+        foreach (BattleCharacter character in blueTeam)
+        {
+            blueList.Add(character.runtimeCharacter.OriginCharacter.id);
+            blueTier.Add(character.player.Tier);
+        }
+
+        return new BattleResult(redList, blueList, redTier, blueTier, redAlive, blueAlive, statistics);
     }
 
     private void PrepareTeams(List<RuntimeCharacter> redCharacters, List<RuntimePlayer> redPlayers, List<RuntimeCharacter> blueCharacters, List<RuntimePlayer> bluePlayers, System.Random random)

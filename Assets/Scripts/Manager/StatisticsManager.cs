@@ -171,7 +171,9 @@ public class StatisticsManager : MonoBehaviour
     public void RecordBattle(List<BattleResult> results)
     {
         foreach (BattleResult result in results)
+        {
             RecordBattle(result);
+        }
     }
 
     public void RecordBattle(BattleResult result)
@@ -179,20 +181,24 @@ public class StatisticsManager : MonoBehaviour
         TotalBattles++;
 
         for (int i = 0; i < result.statistics.Red.Count; i++)
-            RecordCharacter(result.statistics.Red[i], result.redPlayer[i].Tier);
+            RecordCharacter(result.statistics.Red[i], result.redTiers[i]);
 
         for (int i = 0; i < result.statistics.Blue.Count; i++)
-            RecordCharacter(result.statistics.Blue[i], result.bluePlayer[i].Tier);
+            RecordCharacter(result.statistics.Blue[i], result.blueTiers[i]);
 
         if (result.isDraw)
             return;
 
-        foreach (RuntimeCharacter character in result.winner)
-            RecordWinLose(character, GetPlayerTier(result, character), true);
+        for (int i = 0; i < result.redCharacter.Count; i++)
+        {
+            RecordWinLose(result.redCharacter[i], result.redTiers[i], result.isRedWin);
+        }
 
-        foreach (RuntimeCharacter character in result.loser)
-            RecordWinLose(character, GetPlayerTier(result, character), false);
-
+        for (int i = 0; i < result.blueCharacter.Count; i++)
+        {
+            RecordWinLose(result.blueCharacter[i], result.blueTiers[i], result.isBlueWin);
+        }
+        
         RecordMatchups(result);
     }
 
@@ -201,13 +207,13 @@ public class StatisticsManager : MonoBehaviour
         for (int i = 0; i < result.statistics.Red.Count; i++)
         {
             if (ReferenceEquals(result.statistics.Red[i].runtimeCharacter, character))
-                return result.redPlayer[i].Tier;
+                return result.redTiers[i];
         }
 
         for (int i = 0; i < result.statistics.Blue.Count; i++)
         {
             if (ReferenceEquals(result.statistics.Blue[i].runtimeCharacter, character))
-                return result.bluePlayer[i].Tier;
+                return result.blueTiers[i];
         }
 
         return PlayerTier.Bronze;
@@ -235,9 +241,9 @@ public class StatisticsManager : MonoBehaviour
         tierStat.SkillCount += battleStat.skillCount;
     }
 
-    private void RecordWinLose(RuntimeCharacter character, PlayerTier tier, bool isWinner)
+    private void RecordWinLose(int id, PlayerTier tier, bool isWinner)
     {
-        CharacterStatistics stat = GetCurrentStatistics(character);
+        CharacterStatistics stat = GetCurrentStatistics(id);
 
         if (isWinner)
             stat.WinCount++;
@@ -258,11 +264,9 @@ public class StatisticsManager : MonoBehaviour
         {
             foreach (CharacterBattleStatistics blue in result.statistics.Blue)
             {
-                if (red.runtimeCharacter.OriginCharacter.id == blue.runtimeCharacter.OriginCharacter.id)
-                    continue;
 
-                bool redWin = result.winner.Contains(red.runtimeCharacter);
-                bool blueWin = result.winner.Contains(blue.runtimeCharacter);
+                bool redWin = result.isRedWin;
+                bool blueWin = result.isBlueWin;
 
                 RecordMatchup(red.runtimeCharacter, blue.runtimeCharacter, GetPlayerTier(result, red.runtimeCharacter), redWin);
                 RecordMatchup(blue.runtimeCharacter, red.runtimeCharacter, GetPlayerTier(result, blue.runtimeCharacter), blueWin);
@@ -289,6 +293,8 @@ public class StatisticsManager : MonoBehaviour
             matchup.WinCount++;
             tierStat.WinCount++;
         }
+
+        Debug.Log($"[Matchup] {self.OriginCharacter.characterName} vs {enemy.OriginCharacter.characterName} | Tier: {tier} | Winner: {isWinner} | Win: {matchup.WinCount}/{matchup.MatchCount} | Rate: {matchup.WinRate:F1}%");
     }
 
     // =========================================================
@@ -385,6 +391,7 @@ public class StatisticsManager : MonoBehaviour
         }
     }
 }
+
 [Serializable]
 public class MatchupStatistics
 {

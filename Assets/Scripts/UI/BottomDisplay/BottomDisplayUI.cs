@@ -8,6 +8,7 @@ public class BottomDisplayUI : MonoBehaviour
     public Button userReactionButton;
     public Button skillDescriptionButton;
     public Button goalPreviewButton;
+    public Button removePatchReasonButton;
 
     public BottomUserReactionUI UserReaction;
     public BottomSkillDescriptionUI SkillDescription;
@@ -16,6 +17,7 @@ public class BottomDisplayUI : MonoBehaviour
     public GameObject UserReactionObject;
     public GameObject SkillDescriptionObject;
     public GameObject GoalPreviewObject;
+    public GameObject PatchReasonObject;
 
     void Awake()
     {
@@ -28,6 +30,7 @@ public class BottomDisplayUI : MonoBehaviour
         userReactionButton.onClick.AddListener(ShowReaction);
         skillDescriptionButton.onClick.AddListener(ShowDescription);
         goalPreviewButton.onClick.AddListener(ShowPreview);
+        removePatchReasonButton.onClick.AddListener(RemovePatchReason);
     }
 
     private void Removeall()
@@ -35,6 +38,7 @@ public class BottomDisplayUI : MonoBehaviour
         UserReactionObject.SetActive(false);
         SkillDescriptionObject.SetActive(false);
         GoalPreviewObject.SetActive(false);
+        PatchReasonObject.SetActive(false);
     }
 
     public void ShowReaction()
@@ -53,5 +57,10 @@ public class BottomDisplayUI : MonoBehaviour
     {
         Removeall();
         GoalPreviewObject.SetActive(true);
+    }
+
+    public void RemovePatchReason()
+    {
+        PatchReasonObject.SetActive(false);
     }
 }

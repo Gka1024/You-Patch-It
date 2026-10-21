@@ -19,24 +19,6 @@ public class BattlePredictor : MonoBehaviour
     /// </summary>
     public float PredictBattle(RuntimeCharacter baseCharacter, RuntimeCharacter opponentCharacter, int simulationCount = -1)
     {
-        if (simulationCount <= 0) simulationCount = defaultSimulationCount;
-
-        int winCount = 0;
-
-        // 예측용 Random
-        System.Random random = new System.Random(Guid.NewGuid().GetHashCode());
-
-        for (int i = 0; i < simulationCount; i++)
-        {
-            RuntimePlayer redPlayer = PlayerManager.Instance.GenerateRandomPlayer(random);
-            RuntimePlayer bluePlayer = PlayerManager.Instance.GenerateRandomPlayer(random);
-
-            BattleResult result = BattleSimulator.Instance.Simulate(baseCharacter, redPlayer, opponentCharacter, bluePlayer, random.Next());
-
-            if (result.winner[0] == baseCharacter)
-                winCount++;
-        }
-
-        return (float)winCount / simulationCount * 100f;
+        return 0;
     }
 }

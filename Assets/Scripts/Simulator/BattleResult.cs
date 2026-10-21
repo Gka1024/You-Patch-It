@@ -2,24 +2,30 @@ using System.Collections.Generic;
 
 public class BattleResult
 {
-    public List<RuntimePlayer> redPlayer;
-    public List<RuntimePlayer> bluePlayer;
+    public List<int> redCharacter;
+    public List<int> blueCharacter;
 
-    public List<RuntimeCharacter> winner;
-    public List<RuntimeCharacter> loser;
+    public List<PlayerTier> redTiers;
+    public List<PlayerTier> blueTiers;
+
+    public bool isRedWin;
+    public bool isBlueWin;
 
     public bool isDraw;
     public float battleTime;
 
     public BattleStatistics statistics;
 
-    public BattleResult(List<RuntimePlayer> redPlayer, List<RuntimePlayer> bluePlayer, List<RuntimeCharacter> winner, List<RuntimeCharacter> loser, BattleStatistics statistics)
+    public BattleResult(List<int> redCharacter, List<int> blueCharacter, List<PlayerTier> redTiers, List<PlayerTier> blueTiers, bool isRedWin, bool isBlueWin, BattleStatistics statistics)
     {
-        this.redPlayer = redPlayer;
-        this.bluePlayer = bluePlayer;
+        this.redCharacter = redCharacter;
+        this.blueCharacter = blueCharacter;
 
-        this.winner = winner;
-        this.loser = loser;
+        this.redTiers = redTiers;
+        this.blueTiers = blueTiers;
+
+        this.isRedWin = isRedWin;
+        this.isBlueWin = isBlueWin;
 
         this.statistics = statistics;
     }

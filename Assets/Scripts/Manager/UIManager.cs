@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Additional Tabs")]
     public PatchNoteUI patchNoteUI;
-    public EventUI eventUI;
+    public CharacterWinRateGraphUI graphUI;
      public SeasonReportUI seasonReportUI;
     public DeveloperGoalUI developerGoalUI;
    

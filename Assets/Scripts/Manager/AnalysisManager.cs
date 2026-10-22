@@ -66,7 +66,42 @@ public class AnalysisManager : MonoBehaviour
     {
         return StatisticsManager.Instance.GetSeasonPickRate(characterId, currentSeason, currentTeamSize) / currentTeamSize;
     }
-    
+
+    public float GetSeasonWinRate(int characterId, int season)
+    {
+        List<CharacterStatistics> statistics =
+            StatisticsManager.Instance.GetSeasonStatistics(characterId, season);
+
+        int totalWins = 0;
+        int totalLosses = 0;
+
+        foreach (CharacterStatistics stat in statistics)
+        {
+            totalWins += stat.WinCount;
+            totalLosses += stat.LoseCount;
+        }
+
+        int totalMatches = totalWins + totalLosses;
+
+        if (totalMatches == 0)
+            return -1f;
+
+        return (float)totalWins / totalMatches * 100f;
+    }
+
+    public List<SeasonWinRatePoint> GetSeasonWinRateHistory(int characterId, int firstSeason, int lastSeason)
+    {
+        List<SeasonWinRatePoint> history = new();
+
+        for (int season = firstSeason; season <= lastSeason; season++)
+        {
+            float winRate = GetSeasonWinRate(characterId, season);
+
+            history.Add(new SeasonWinRatePoint(season, winRate));
+        }
+
+        return history;
+    }
 
     public float GetAveragePickRate(CharacterRole role)
     {

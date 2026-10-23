@@ -67,6 +67,11 @@ public class AnalysisManager : MonoBehaviour
         return StatisticsManager.Instance.GetSeasonPickRate(characterId, currentSeason, currentTeamSize) / currentTeamSize;
     }
 
+    public float GetSubSeasonPickRate(int characterId, int season, int subSeason)
+    {
+        return StatisticsManager.Instance.GetSubSeasonPickRate(characterId, season, subSeason, currentTeamSize);
+    }
+
     public float GetSeasonWinRate(int characterId, int season)
     {
         List<CharacterStatistics> statistics =
@@ -87,6 +92,21 @@ public class AnalysisManager : MonoBehaviour
             return -1f;
 
         return (float)totalWins / totalMatches * 100f;
+    }
+
+    public float GetSubSeasonWinRate(int characterId, int season, int subSeason)
+    {
+        return StatisticsManager.Instance.GetSubSeasonWinRate(characterId, season, subSeason);
+    }
+
+    public List<int> GetAvailableSeasons()
+    {
+        return StatisticsManager.Instance.GetAvailableSeasons();
+    }
+
+    public List<int> GetAvailableSubSeasons(int season)
+    {
+        return StatisticsManager.Instance.GetAvailableSubSeasons(season);
     }
 
     public List<SeasonWinRatePoint> GetSeasonWinRateHistory(int characterId, int firstSeason, int lastSeason)

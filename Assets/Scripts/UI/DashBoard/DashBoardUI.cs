@@ -5,7 +5,7 @@ public class DashBoardUI : MonoBehaviour
 {
     [SerializeField] private Button CharacterButton;
     [SerializeField] private Button PatchNoteButton;
-    [SerializeField] private Button EventButton;
+    [SerializeField] private Button GraphButton;
     [SerializeField] private Button SeasonReportButton;
     [SerializeField] private Button UnlockButton;
     [SerializeField] private Button GoalButton;
@@ -20,8 +20,8 @@ public class DashBoardUI : MonoBehaviour
     [Header("Patch Notes")]
     [SerializeField] private GameObject PatchNotes;
 
-    [Header("Events")]
-    [SerializeField] private GameObject Events;
+    [Header("Graphs")]
+    [SerializeField] private GameObject Graphs;
 
     [Header("Unlock System")]
     [SerializeField] private GameObject UnlockUI;
@@ -33,14 +33,21 @@ public class DashBoardUI : MonoBehaviour
     [Header("Season Reports")]
     [SerializeField] private GameObject SeasonReport;
 
+    private bool isSeasonFinished = false;
+
     void Awake()
     {
         CharacterButton.onClick.AddListener(ShowCharacter);
         PatchNoteButton.onClick.AddListener(ShowPatchNote);
-        EventButton.onClick.AddListener(ShowEvent);
+        GraphButton.onClick.AddListener(ShowDataGraph);
         UnlockButton.onClick.AddListener(ShowUnlock);
         GoalButton.onClick.AddListener(ShowGoals);
         ReportButton.onClick.AddListener(ShowSeasonReports);
+    }
+
+    public void SetSeasonFinish(bool value)
+    {
+        isSeasonFinished = value;
     }
 
     private void RemoveAll()
@@ -48,7 +55,7 @@ public class DashBoardUI : MonoBehaviour
         CharacterTable.SetActive(false);
         Inspector.SetActive(false);
         CharacterPreview.SetActive(false);
-        Events.SetActive(false);
+        Graphs.SetActive(false);
         UnlockUI.SetActive(false);
         PatchNotes.SetActive(false);
         DeveloperGoal.SetActive(false);
@@ -59,7 +66,7 @@ public class DashBoardUI : MonoBehaviour
     public void ShowCharacter()
     {
         RemoveAll();
-        SeasonManager.Instance.CheckSeasonFinished();
+        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         CharacterTable.SetActive(true);
         Inspector.SetActive(true);
@@ -70,22 +77,22 @@ public class DashBoardUI : MonoBehaviour
     public void ShowPatchNote()
     {
         RemoveAll();
-        SeasonManager.Instance.CheckSeasonFinished();
+        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         PatchNotes.SetActive(true);
     }
 
-    public void ShowEvent()
+    public void ShowDataGraph()
     {
         RemoveAll();
-        SeasonManager.Instance.CheckSeasonFinished();
-        Events.SetActive(true);
+        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
+        Graphs.SetActive(true);
     }
 
     public void ShowUnlock()
     {
         RemoveAll();
-        SeasonManager.Instance.CheckSeasonFinished();
+        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         UnlockUI.SetActive(true);
         OnUnlockUIOpen?.Invoke();
@@ -94,7 +101,7 @@ public class DashBoardUI : MonoBehaviour
     public void ShowGoals()
     {
         RemoveAll();
-        SeasonManager.Instance.CheckSeasonFinished();
+        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         DeveloperGoal.GetComponent<DeveloperGoalUI>().RefreshUI();
         DeveloperGoal.SetActive(true);

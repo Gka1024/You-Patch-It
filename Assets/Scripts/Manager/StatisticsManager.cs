@@ -122,7 +122,7 @@ public class StatisticsManager : MonoBehaviour
     }
 
     // =========================================================
-    // Season Pick Rate
+    // API
     // =========================================================
 
     public float GetSeasonPickRate(int characterId, int season, int teamSize)
@@ -156,12 +156,64 @@ public class StatisticsManager : MonoBehaviour
 
         int totalCharacterSlots = totalBattleCount * teamSize * 2;
 
-        Debug.Log($"Season: {season}");
-        Debug.Log($"SubSeason 1: {pickData.GetValueOrDefault(1)}");
-        Debug.Log($"SubSeason 2: {pickData.GetValueOrDefault(2)}");
-        Debug.Log($"SubSeason 3: {pickData.GetValueOrDefault(3)}");
-
         return (float)totalPickCount / totalCharacterSlots * 100f;
+    }
+
+    public float GetSubSeasonWinRate(int characterId, int season, int subSeason)
+    {
+        if (!seasonStatistics.TryGetValue(characterId, out var characterData))
+            return -1f;
+
+        if (!characterData.TryGetValue(season, out var seasonData))
+            return -1f;
+
+        if (!seasonData.TryGetValue(subSeason, out CharacterStatistics stat))
+            return -1f;
+
+        int totalMatches = stat.WinCount + stat.LoseCount;
+
+        if (totalMatches == 0)
+            return -1f;
+
+        return (float)stat.WinCount / totalMatches * 100f;
+    }
+
+    public float GetSubSeasonPickRate(int characterId, int season, int subSeason, int teamSize)
+    {
+        if (teamSize <= 0)
+            return -1f;
+
+        if (!seasonPickCounts.TryGetValue(characterId, out var characterData))
+            return -1f;
+
+        if (!characterData.TryGetValue(season, out var seasonData))
+            return -1f;
+
+        if (!seasonData.TryGetValue(subSeason, out int pickCount))
+            return -1f;
+
+        if (!seasonBattleCounts.TryGetValue(season, out var battleData))
+            return -1f;
+
+        if (!battleData.TryGetValue(subSeason, out int battleCount) || battleCount <= 0)
+            return -1f;
+
+        int totalCharacterSlots = battleCount * teamSize * 2;
+
+        return (float)pickCount / totalCharacterSlots * 100f;
+    }
+
+    public List<int> GetAvailableSeasons()
+    {
+        return seasonBattleCounts.Keys.OrderBy(x => x).ToList();
+    }
+
+    public List<int> GetAvailableSubSeasons(int season)
+    {
+        if (!seasonBattleCounts.TryGetValue(season, out var battleData))
+            return new List<int>();
+
+        return battleData.Keys.OrderBy(x => x).ToList();
     }
 
     // =========================================================
@@ -198,7 +250,7 @@ public class StatisticsManager : MonoBehaviour
         {
             RecordWinLose(result.blueCharacter[i], result.blueTiers[i], result.isBlueWin);
         }
-        
+
         RecordMatchups(result);
     }
 
@@ -294,7 +346,7 @@ public class StatisticsManager : MonoBehaviour
             tierStat.WinCount++;
         }
 
-        Debug.Log($"[Matchup] {self.OriginCharacter.characterName} vs {enemy.OriginCharacter.characterName} | Tier: {tier} | Winner: {isWinner} | Win: {matchup.WinCount}/{matchup.MatchCount} | Rate: {matchup.WinRate:F1}%");
+       // Debug.Log($"[Matchup] {self.OriginCharacter.characterName} vs {enemy.OriginCharacter.characterName} | Tier: {tier} | Winner: {isWinner} | Win: {matchup.WinCount}/{matchup.MatchCount} | Rate: {matchup.WinRate:F1}%");
     }
 
     // =========================================================

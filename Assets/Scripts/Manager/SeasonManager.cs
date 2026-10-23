@@ -129,7 +129,11 @@ public class SeasonManager : MonoBehaviour
     public void CheckSeasonFinished()
     {
         if (isSeasonFinished)
+        {
             NextSeason();
+            UIManager.Instance.dashBoardUI.SetSeasonFinish(false);
+        }
+
     }
 
     //====================================================
@@ -260,6 +264,7 @@ public class SeasonManager : MonoBehaviour
                 OnSeasonEnd?.Invoke();
 
                 GoalManager.Instance.ChangeGoals();
+                UIManager.Instance.dashBoardUI.SetSeasonFinish(true);
                 UIManager.Instance.dashBoardUI.ShowSeasonReports();
                 UIManager.Instance.seasonReportUI.Initialize(CurrentSeason);
                 UIManager.Instance.bottomDisplayUI.GoalPreview.Reset();

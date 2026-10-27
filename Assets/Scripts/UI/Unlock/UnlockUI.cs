@@ -89,6 +89,12 @@ public class UnlockUI : MonoBehaviour
                 text.text = pre.unlockName;
             }
         }
+        else
+        {
+            TMP_Text text = Instantiate(unlockPrerequireText, PreRequireParent).GetComponent<TMP_Text>();
+            text.SetText("없음");
+            // 또는 아예 선행 해금 필요 텍스트 자체를 비활성화 하는것도 방법
+        }
     }
 
     private void UnlockItem()

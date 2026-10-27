@@ -63,10 +63,19 @@ public class DashBoardUI : MonoBehaviour
         SeasonReport.SetActive(false);
     }
 
+    private void CheckSeasonFinished()
+    {
+        if (!isSeasonFinished)
+            return;
+
+        SeasonManager.Instance.CheckSeasonFinished();
+        isSeasonFinished = false;
+    }
+
     public void ShowCharacter()
     {
+        CheckSeasonFinished();
         RemoveAll();
-        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         CharacterTable.SetActive(true);
         Inspector.SetActive(true);
@@ -76,23 +85,23 @@ public class DashBoardUI : MonoBehaviour
 
     public void ShowPatchNote()
     {
+        CheckSeasonFinished();
         RemoveAll();
-        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         PatchNotes.SetActive(true);
     }
 
     public void ShowDataGraph()
     {
+        CheckSeasonFinished();
         RemoveAll();
-        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
         Graphs.SetActive(true);
     }
 
     public void ShowUnlock()
     {
+        CheckSeasonFinished();
         RemoveAll();
-        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         UnlockUI.SetActive(true);
         OnUnlockUIOpen?.Invoke();
@@ -100,8 +109,8 @@ public class DashBoardUI : MonoBehaviour
 
     public void ShowGoals()
     {
+        CheckSeasonFinished();
         RemoveAll();
-        if (!isSeasonFinished) SeasonManager.Instance.CheckSeasonFinished();
 
         DeveloperGoal.GetComponent<DeveloperGoalUI>().RefreshUI();
         DeveloperGoal.SetActive(true);

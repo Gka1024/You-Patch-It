@@ -16,6 +16,10 @@ public class SeasonReportUI : MonoBehaviour
     [SerializeField] private GameObject CharacterRowParent;
     [SerializeField] private GameObject CharacterRowPrefab;
 
+    [Header("Title")]
+    [SerializeField] private TMP_Text ReportTitle;
+    [SerializeField] private TMP_Text ReportSubtitle;
+
     [Header("Report")]
     [SerializeField] private TMP_Text BalanceCheck;
 
@@ -58,6 +62,7 @@ public class SeasonReportUI : MonoBehaviour
     public void Initialize(int currentSeason)
     {
         IsSeasonFinished = true;
+        SetTitle(currentSeason);
 
         InitializeCharacterRows(currentSeason);
 
@@ -68,6 +73,12 @@ public class SeasonReportUI : MonoBehaviour
         SetTrustText();
         SetCostText();
         SetResourceText();
+    }
+
+    public void SetTitle(int currentSeason)
+    {
+        ReportTitle.SetText($"시즌 리포트 - 시즌 {currentSeason}");
+        ReportSubtitle.SetText($" {currentSeason}-1 | {currentSeason}-2 | {currentSeason}-3");
     }
 
     // =========================================================

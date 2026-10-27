@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 501
   characterName: "\uC911\uAE30\uC0AC"
-  CharacterPrefab_SPUM: {fileID: 0}
+  CharacterPrefab_SPUM: {fileID: 1190898248873455992, guid: 16e03b6466d7b4541bb6413bbf894c04, type: 3}
   role: 4
   stats:
   - statType: 0

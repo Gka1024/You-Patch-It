@@ -12,8 +12,8 @@ public class PickManager : MonoBehaviour
 
     private const int TEAM_SIZE_3 = 3051;
 
-    private const float MIN_META_LEARNING_RATE = 0.35f;
-    private const float MAX_META_LEARNING_RATE = 0.75f;
+    private const float MIN_META_LEARNING_RATE = 0.6f;
+    private const float MAX_META_LEARNING_RATE = 0.9f;
 
     [Header("Pick Score Weights")]
     [SerializeField] private float winrateWeight = 1f;

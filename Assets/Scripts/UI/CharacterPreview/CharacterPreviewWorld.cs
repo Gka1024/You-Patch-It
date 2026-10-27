@@ -46,6 +46,7 @@ public class CharacterPreviewWorld : MonoBehaviour
         GameObject newCharacter = Instantiate(character.CharacterPrefab_SPUM, new Vector3(0, -150, 0), quaternion.identity, characterParent);
 
         newCharacter.transform.localScale = new Vector3(400, 400, 400);
+        newCharacter.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -150f);
 
         characterInstances.Add(character.id, newCharacter);
 

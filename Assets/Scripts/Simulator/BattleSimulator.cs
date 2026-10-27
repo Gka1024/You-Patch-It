@@ -385,8 +385,8 @@ public class BattleSimulator : MonoBehaviour
 
     private const float DAMAGE_RAMP_START_TIME = 60f;
     private const float DAMAGE_RAMP_INTERVAL = 30f;
-    private const float DAMAGE_RAMP_AMOUNT = 0.1f;
-    private const float MAX_DAMAGE_MULTIPLIER = 1.6f;
+    private const float DAMAGE_RAMP_AMOUNT = 0.2f;
+    private const float MAX_DAMAGE_MULTIPLIER = 2.0f;
 
     private float GetDamageMultiplier(float battleTime)
     {

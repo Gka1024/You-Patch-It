@@ -128,12 +128,11 @@ public class SeasonManager : MonoBehaviour
 
     public void CheckSeasonFinished()
     {
-        if (isSeasonFinished)
-        {
-            NextSeason();
-            UIManager.Instance.dashBoardUI.SetSeasonFinish(false);
-        }
+        if (!isSeasonFinished)
+            return;
 
+        NextSeason();
+        UIManager.Instance.dashBoardUI.SetSeasonFinish(false);
     }
 
     //====================================================
@@ -236,7 +235,9 @@ public class SeasonManager : MonoBehaviour
                 RuntimeCharacterManager.Instance.ResetAllCharacter();
 
                 if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn)
+                {
                     UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();
+                }
 
                 UIManager.Instance.bottomDisplayUI.ShowReaction();
                 break;

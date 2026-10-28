@@ -96,6 +96,7 @@ public class PatchManager : MonoBehaviour
 
         appliedPatches.Add(record);
         undoStack.Push(record);
+        UIManager.Instance.alertUI.RegisterPatch(record);
 
         OnPatchApplied?.Invoke(record);
 

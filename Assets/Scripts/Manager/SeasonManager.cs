@@ -240,6 +240,7 @@ public class SeasonManager : MonoBehaviour
                 }
 
                 UIManager.Instance.bottomDisplayUI.ShowReaction();
+                UIManager.Instance.alertUI.ClearAlerts();
                 break;
 
             case SeasonState.Trust:

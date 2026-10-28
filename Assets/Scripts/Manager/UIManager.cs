@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     public BottomDisplayUI bottomDisplayUI;
     public CharacterTableUI characterTableUI;
     public InspectorUI inspectorUI;
+    public PatchAlertUI alertUI;
 
     [Header("Additional Tabs")]
     public PatchNoteUI patchNoteUI;

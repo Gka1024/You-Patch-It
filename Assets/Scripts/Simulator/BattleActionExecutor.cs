@@ -4,7 +4,6 @@ using UnityEngine;
 
 public static class BattleActionExecutor
 {
-    private const float TICK = 0.05f;
     private static float currentDamageMultiplier = 1f;
 
     public static void SetDamageMultiplier(float multiplier)
@@ -12,10 +11,11 @@ public static class BattleActionExecutor
         currentDamageMultiplier = multiplier;
     }
 
-    public static void ExecuteAction(
-        BattleCharacter self, BattleCharacter enemy, List<BattleCharacter> allies, List<BattleCharacter> enemies,
-        BattleAction action, float tick, System.Random random)
+    public static void ExecuteAction(BattleCharacter self, BattleCharacter enemy, List<BattleCharacter> allies, List<BattleCharacter> enemies, BattleAction action, float tick, System.Random random)
     {
+        if (self.IsDead || self.isUsingSkills)
+            return;
+
         action = ApplyDecisionAccuracy(self, action, random);
 
         switch (action)
@@ -46,9 +46,7 @@ public static class BattleActionExecutor
         float directionAfter = Mathf.Sign(enemy.position - self.position);
 
         if (directionAfter != direction)
-        {
             self.position = enemy.position - 0.01f;
-        }
     }
 
     public static void MoveToTarget(BattleCharacter self, BattleCharacter target, float distance)
@@ -60,9 +58,7 @@ public static class BattleActionExecutor
         self.statistics.moveDistance += distance;
 
         if (Mathf.Sign(target.position - self.position) != direction)
-        {
             self.position = target.position - direction * 0.01f;
-        }
     }
 
     public static void MoveAway(BattleCharacter self, BattleCharacter enemy, float tick)
@@ -82,6 +78,9 @@ public static class BattleActionExecutor
 
     public static void Attack(BattleCharacter self, BattleCharacter enemy)
     {
+        if (self.IsDead || enemy == null || enemy.IsDead)
+            return;
+
         float damage = self.GetStat(CharacterStatType.Attack) * GetDamageMultiplier(self);
 
         self.currentMana += self.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 40f;
@@ -91,25 +90,49 @@ public static class BattleActionExecutor
         self.attackCooldown = 1f / self.GetStat(CharacterStatType.AttackSpeed);
         self.actionLockTime = 0.4f / self.GetStat(CharacterStatType.AttackSpeed);
 
+        if (self.skill != null)
+            self.skill.OnAttackHit(self);
+
         self.statistics.attackCount++;
     }
 
     public static void UseSkill(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, System.Random random)
     {
-        self.currentMana = 0f;
+        if (self.IsDead || self.isUsingSkills)
+            return;
 
         if (self.skill == null)
         {
-            Debug.Log($"{self.runtimeCharacter.OriginCharacter.characterName} 가 스킬이 없습니다!");
+            Debug.Log($"{self.runtimeCharacter.OriginCharacter.characterName}가 스킬이 없습니다!");
             return;
         }
 
-        self.skill.Execute(self, allies, enemies, self.runtimeCharacter.GetStat(CharacterStatType.SkillCoefficient), random);
+        float coefficient = self.runtimeCharacter.GetStat(CharacterStatType.SkillCoefficient);
+
+        BattleSkillInstance skillInstance = self.skill.CreateInstance(self, allies, enemies, coefficient, random);
+
+        // 다단계 스킬
+        if (skillInstance != null)
+        {
+            self.currentMana = 0f;
+
+            if (self.StartSkill(skillInstance))
+                self.statistics.skillCount++;
+
+            return;
+        }
+
+        // 기존 즉시 실행형 스킬
+        self.currentMana = 0f;
+        self.skill.Execute(self, allies, enemies, coefficient, random);
         self.statistics.skillCount++;
     }
 
     public static void DealDamage(BattleCharacter attacker, BattleCharacter target, float damage)
     {
+        if (attacker == null || target == null || target.IsDead || damage <= 0f)
+            return;
+
         damage *= currentDamageMultiplier;
         damage *= 100f / (100f + target.GetStat(CharacterStatType.Defence));
 
@@ -124,13 +147,12 @@ public static class BattleActionExecutor
         }
 
         if (remainingDamage > 0f)
-        {
             target.currentHealth -= remainingDamage;
-        }
 
         attacker.statistics.damageDealt += damage;
         target.statistics.damageTaken += damage;
     }
+
     public static void AddShield(BattleCharacter target, float amount, float time)
     {
         target.AddShield(amount, time);
@@ -162,9 +184,7 @@ public static class BattleActionExecutor
         float failChance = Mathf.Lerp(0.3f, 0f, self.player.DecisionAccuracy / 100f);
 
         if (random.NextDouble() > failChance)
-        {
             return action;
-        }
 
         BattleAction[] actions = (BattleAction[])Enum.GetValues(typeof(BattleAction));
 
@@ -175,10 +195,8 @@ public static class BattleActionExecutor
 public enum BattleAction
 {
     None,
-
     MoveTowards,
     MoveAway,
-
     Attack,
     UseSkill
 }

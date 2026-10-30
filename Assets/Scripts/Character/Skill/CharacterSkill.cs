@@ -16,6 +16,13 @@ public abstract class CharacterSkill : ScriptableObject
     public abstract void Execute(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random);
     protected virtual float GetAreaRange(BattleCharacter self, float coefficient) { return 1f; }
 
+    public virtual void OnAttackHit(BattleCharacter self) { }
+    public virtual BattleSkillInstance CreateInstance(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random)
+    {
+        return null;
+    }
+    // ===== Target Check
+
     protected List<BattleCharacter> GetTargets(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, System.Random random, float coefficient = 1f)
     {
         List<BattleCharacter> candidates = GetCandidates(self, allies, enemies);

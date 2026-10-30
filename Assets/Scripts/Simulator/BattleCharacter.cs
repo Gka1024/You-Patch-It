@@ -9,6 +9,11 @@ public class BattleCharacter
     public CharacterBattleStatistics statistics;
 
     public CharacterSkill skill;
+    public int skillStack;
+
+    // 스킬 실행 상태
+    public bool isUsingSkills;
+    public BattleSkillInstance activeSkill;
 
     // 현재 적용 중인 모디파이어
     private readonly Dictionary<CharacterStatType, List<BattleStatModifier>> modifiers = new();
@@ -62,6 +67,8 @@ public class BattleCharacter
 
     public void Initialize(RuntimeCharacter runtimeCharacter, RuntimePlayer player, BattleAIState ai, float startPosition)
     {
+        StopSkill();
+
         this.runtimeCharacter = runtimeCharacter;
         this.statistics = new CharacterBattleStatistics { runtimeCharacter = runtimeCharacter };
 
@@ -84,6 +91,7 @@ public class BattleCharacter
         skillDelayTimer = 0f;
 
         isSkillReady = false;
+        skillStack = 0;
 
         currentTarget = null;
         targetUpdateTimer = 0f;
@@ -106,6 +114,8 @@ public class BattleCharacter
 
     public void Reset()
     {
+        StopSkill();
+
         currentMana = 0f;
         currentShield = 0f;
         shieldRemainingTime = 0f;
@@ -116,11 +126,65 @@ public class BattleCharacter
         skillDelayTimer = 0f;
 
         isSkillReady = false;
+        skillStack = 0;
 
         currentTarget = null;
         targetUpdateTimer = 0f;
 
         damageOverTimes.Clear();
+    }
+
+    // ============================================================
+    // Skill
+    // ============================================================
+
+    public bool StartSkill(BattleSkillInstance skillInstance)
+    {
+        if (skillInstance == null || isUsingSkills || IsDead)
+            return false;
+
+        activeSkill = skillInstance;
+        isUsingSkills = true;
+
+        activeSkill.Start();
+
+        if (activeSkill.IsFinished)
+            ClearActiveSkill();
+
+        return true;
+    }
+
+    public void TickActiveSkill(float tick)
+    {
+        if (!isUsingSkills || activeSkill == null)
+            return;
+
+        if (IsDead)
+        {
+            StopSkill();
+            return;
+        }
+
+        activeSkill.Tick(tick);
+
+        if (activeSkill.IsFinished)
+            ClearActiveSkill();
+    }
+
+    public void StopSkill()
+    {
+        if (activeSkill != null)
+            activeSkill.Cancel();
+
+        ClearActiveSkill();
+    }
+
+    
+
+    private void ClearActiveSkill()
+    {
+        activeSkill = null;
+        isUsingSkills = false;
     }
 
     // ============================================================
@@ -158,9 +222,7 @@ public class BattleCharacter
             return;
 
         if (list.Remove(modifier))
-        {
             CalculateStat(modifier.statType);
-        }
     }
 
     // ============================================================
@@ -190,9 +252,7 @@ public class BattleCharacter
             }
 
             if (changed)
-            {
                 CalculateStat(statType);
-            }
         }
     }
 
@@ -209,7 +269,7 @@ public class BattleCharacter
         shieldRemainingTime = duration;
     }
 
-    public void TickShield(float tick) // 이거 적용시킬것
+    public void TickShield(float tick)
     {
         if (currentShield <= 0f)
         {

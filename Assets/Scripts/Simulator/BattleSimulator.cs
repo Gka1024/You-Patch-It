@@ -70,6 +70,8 @@ public class BattleSimulator : MonoBehaviour
 
         while (IsTeamAlive(redTeam) && IsTeamAlive(blueTeam))
         {
+            BattleActionExecutor.SetDamageMultiplier(GetDamageMultiplier(battleTime));
+
             TickTeam(redTeam);
             TickTeam(blueTeam);
 
@@ -84,8 +86,8 @@ public class BattleSimulator : MonoBehaviour
 
             if (battleTime > BATTLE_TIME_LIMIT)
             {
-                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) ||  {redCharacters[0].OriginCharacter.characterName} vs {blueCharacters[0].OriginCharacter.characterName}");
-                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) ||  {redPlayers[0].Tier} vs {bluePlayers[0].Tier}");
+                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) || {redCharacters[0].OriginCharacter.characterName} vs {blueCharacters[0].OriginCharacter.characterName}");
+                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) || {redPlayers[0].Tier} vs {bluePlayers[0].Tier}");
                 break;
             }
         }
@@ -242,6 +244,13 @@ public class BattleSimulator : MonoBehaviour
         character.TickShield(TICK);
         character.TickDamageOverTimes(TICK);
 
+        // 도트 피해 등으로 사망했다면 스킬을 취소하고 처리를 종료한다.
+        if (character.IsDead)
+        {
+            character.StopSkill();
+            return;
+        }
+
         HealCharacter(character, character.runtimeCharacter.GetStat(CharacterStatType.HealthRegen) / 100f);
         RegenManaOnTick(character, character.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 100f);
 
@@ -249,6 +258,9 @@ public class BattleSimulator : MonoBehaviour
             character.skillDelayTimer = Mathf.Max(0f, character.skillDelayTimer - TICK);
 
         UpdateSkillReady(character);
+
+        // 활성 스킬을 틱 단위로 진행한다.
+        character.TickActiveSkill(TICK);
     }
 
     private void UpdateSkillReady(BattleCharacter character)
@@ -280,7 +292,7 @@ public class BattleSimulator : MonoBehaviour
         {
             BattleCharacter character = team[i];
 
-            if (character.IsDead || !character.CanAct || !character.CanThink)
+            if (character.IsDead || character.isUsingSkills || !character.CanAct || !character.CanThink)
                 continue;
 
             UpdateTarget(character, enemyTeam);
@@ -350,8 +362,6 @@ public class BattleSimulator : MonoBehaviour
 
     private void ExecuteActions(System.Random random, float battleTime)
     {
-        float damageMultiplier = GetDamageMultiplier(battleTime);
-
         for (int i = 0; i < commands.Count; i++)
         {
             BattleActionCommand command = commands[i];

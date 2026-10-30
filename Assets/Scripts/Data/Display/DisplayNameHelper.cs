@@ -5,8 +5,10 @@ public static class DisplayNameHelper
         return stat switch
         {
             CharacterStatType.Attack => "공격력",
+            CharacterStatType.Magic => "마법력",
             CharacterStatType.Health => "체력",
             CharacterStatType.Defence => "방어력",
+            CharacterStatType.MagicResist => "마법 방어",
             CharacterStatType.AttackSpeed => "공격 속도",
             CharacterStatType.MoveSpeed => "이동 속도",
             CharacterStatType.AttackRange => "사거리",

@@ -11,8 +11,10 @@ public class CharacterStat
 public enum CharacterStatType
 {
     Attack,
+    Magic,
     Health,
     Defence,
+    MagicResist,
     MoveSpeed,
     AttackSpeed,
     AttackRange,

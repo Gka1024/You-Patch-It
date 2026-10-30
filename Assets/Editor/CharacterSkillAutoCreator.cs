@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Compilation;
 using UnityEngine;
 
 [InitializeOnLoad]
@@ -42,9 +41,11 @@ public static class CharacterSkillAutoCreator
             return;
         }
 
-        string className = $"CharacterSkill_{safeName}_{character.id:D3}";
+        string characterFileName = $"{character.id:D3}_{safeName}";
+        string className = $"CharacterSkill_{characterFileName}_Skill";
+
         string scriptPath = $"{CharacterCreatorWindow.SkillScriptFolder}/{className}.cs";
-        string skillAssetPath = $"{skillFolderPath}/{className}.asset";
+        string skillAssetPath = $"{skillFolderPath}/{characterFileName}_Skill.asset";
 
         if (File.Exists(scriptPath))
         {
@@ -125,7 +126,6 @@ public class {className} : CharacterSkill
 
             if (skillType == null)
             {
-                // 새 스크립트의 타입이 아직 등록되지 않았다면 다음 update에서 다시 확인한다.
                 return;
             }
 

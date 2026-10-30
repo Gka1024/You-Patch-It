@@ -14,30 +14,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 402
   characterName: "\uD1F4\uB9C8\uC0AC"
+  CharacterPrefab_SPUM: {fileID: 0}
   role: 3
   stats:
   - statType: 0
     value: 23
   - statType: 1
-    value: 240
+    value: 1.7
   - statType: 2
-    value: 12
+    value: 240
   - statType: 3
-    value: 6.3
+    value: 12
   - statType: 4
-    value: 3.4
+    value: 1.7
   - statType: 5
-    value: 1
+    value: 6.3
   - statType: 6
-    value: 4
+    value: 3.4
   - statType: 7
-    value: 7
+    value: 1
   - statType: 8
-    value: 100
+    value: 4
   - statType: 9
-    value: 100
+    value: 7
   - statType: 10
+    value: 100
+  - statType: 11
+    value: 100
+  - statType: 12
     value: 1.7
   skill: {fileID: 11400000, guid: 938edf52cdd9eed49930f749ac22f261, type: 2}
-  defaultEditableStats: 000000000500000003000000070000000a000000
+  defaultEditableStats: 000000000500000003000000070000000a000000i
   battleAI: {fileID: 11400000, guid: fc75c955ca2252548bb85522572f79f7, type: 2}

@@ -20,24 +20,28 @@ MonoBehaviour:
   - statType: 0
     value: 19
   - statType: 1
-    value: 240
+    value: 1.7
   - statType: 2
-    value: 8
+    value: 240
   - statType: 3
-    value: 4.2
+    value: 8
   - statType: 4
-    value: 1.1
+    value: 1.7
   - statType: 5
-    value: 7.5
+    value: 4.2
   - statType: 6
-    value: 4
+    value: 1.1
   - statType: 7
-    value: 17
+    value: 7.5
   - statType: 8
-    value: 100
+    value: 4
   - statType: 9
-    value: 100
+    value: 17
   - statType: 10
+    value: 100
+  - statType: 11
+    value: 100
+  - statType: 12
     value: 1.7
   skill: {fileID: 11400000, guid: c2852eec8e4028b40b9baf1a61f1e751, type: 2}
   defaultEditableStats: 010000000300000007000000050000000a000000i

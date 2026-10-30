@@ -8,7 +8,8 @@ public class CharacterCreatorWindow : EditorWindow
     public const string SkillScriptFolder = "Assets/Scripts/Character/Skill";
 
     private int characterId;
-    private string characterName = "NewCharacter";
+    private string koreanName = "캐릭터 이름";
+    private string englishName = "NewCharacter";
     private CharacterRole characterRole;
 
     private CharacterDatabase characterDatabase;
@@ -30,7 +31,8 @@ public class CharacterCreatorWindow : EditorWindow
         EditorGUILayout.LabelField("Character", EditorStyles.boldLabel);
 
         characterId = EditorGUILayout.IntField("ID", characterId);
-        characterName = EditorGUILayout.TextField("Name", characterName);
+        koreanName = EditorGUILayout.TextField("Korean Name", koreanName);
+        englishName = EditorGUILayout.TextField("English Name", englishName);
         characterRole = (CharacterRole)EditorGUILayout.EnumPopup("Role", characterRole);
 
         EditorGUILayout.Space();
@@ -54,16 +56,22 @@ public class CharacterCreatorWindow : EditorWindow
             }
         }
 
-        if (string.IsNullOrWhiteSpace(characterName))
+        if (string.IsNullOrWhiteSpace(koreanName))
         {
-            EditorGUILayout.HelpBox("캐릭터 이름을 입력해줘.", MessageType.Warning);
+            EditorGUILayout.HelpBox("한글 캐릭터 이름을 입력해줘.", MessageType.Warning);
+        }
+
+        if (string.IsNullOrWhiteSpace(englishName))
+        {
+            EditorGUILayout.HelpBox("영어 캐릭터 이름을 입력해줘.", MessageType.Warning);
         }
     }
 
     private bool CanCreateCharacter()
     {
         return characterId >= 0
-            && !string.IsNullOrWhiteSpace(characterName)
+            && !string.IsNullOrWhiteSpace(koreanName)
+            && !string.IsNullOrWhiteSpace(englishName)
             && characterDatabase != null
             && characterAIDatabase != null;
     }
@@ -90,11 +98,11 @@ public class CharacterCreatorWindow : EditorWindow
 
     private void CreateCharacter()
     {
-        string safeName = SanitizeName(characterName);
+        string safeName = SanitizeName(englishName);
 
         if (string.IsNullOrEmpty(safeName))
         {
-            Debug.LogError("캐릭터 이름에서 유효한 파일명을 만들 수 없습니다.");
+            Debug.LogError("영어 캐릭터 이름에서 유효한 파일명을 만들 수 없습니다.");
             return;
         }
 
@@ -129,11 +137,11 @@ public class CharacterCreatorWindow : EditorWindow
 
         AssetDatabase.CreateFolder(CharacterRootFolder, characterFolderName);
 
-        string characterAssetPath = $"{characterFolderPath}/{safeName}.asset";
+        string characterAssetPath = $"{characterFolderPath}/{characterFolderName}.asset";
 
         Character character = CreateInstance<Character>();
         character.id = characterId;
-        character.characterName = characterName.Trim();
+        character.characterName = koreanName.Trim();
         character.role = characterRole;
         character.battleAI = selectedAI;
 
@@ -152,12 +160,12 @@ public class CharacterCreatorWindow : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        CharacterSkillAutoCreator.CreateSkillClassAndConnect(character, characterAssetPath, character.characterName, characterFolderPath);
+        CharacterSkillAutoCreator.CreateSkillClassAndConnect(character, characterAssetPath, englishName.Trim(), characterFolderPath);
 
         Selection.activeObject = character;
         EditorGUIUtility.PingObject(character);
 
-        Debug.Log($"캐릭터 생성 완료. 스킬 클래스 컴파일 후 SO 생성 예정: {character.characterName}");
+        Debug.Log($"캐릭터 생성 완료. 스킬 클래스 컴파일 후 SO 생성 예정: {koreanName.Trim()} ({safeName})");
     }
 
     private static string SanitizeName(string value)
@@ -184,4 +192,5 @@ public class CharacterCreatorWindow : EditorWindow
 
         return result;
     }
+
 }

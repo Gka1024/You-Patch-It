@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d69d0ebeac54ac4e8e0a4e1f0c627bb, type: 3}
+  m_Name: 403_Reaper
+  m_EditorClassIdentifier: Assembly-CSharp::Character
+  id: 403
+  characterName: "\uB9AC\uD37C"
+  CharacterPrefab_SPUM: {fileID: 0}
+  role: 3
+  stats:
+  - statType: 0
+    value: 34
+  - statType: 1
+    value: 1.7
+  - statType: 2
+    value: 280
+  - statType: 3
+    value: 14
+  - statType: 4
+    value: 1.7
+  - statType: 5
+    value: 4.8
+  - statType: 6
+    value: 0.9
+  - statType: 7
+    value: 1
+  - statType: 8
+    value: 4
+  - statType: 9
+    value: 5
+  - statType: 10
+    value: 100
+  - statType: 11
+    value: 100
+  - statType: 12
+    value: 1.7
+  skill: {fileID: 11400000, guid: 400851262df346541b2c1fc1a23a4f86, type: 2}
+  defaultEditableStats: 
+  battleAI: {fileID: 11400000, guid: fc75c955ca2252548bb85522572f79f7, type: 2}

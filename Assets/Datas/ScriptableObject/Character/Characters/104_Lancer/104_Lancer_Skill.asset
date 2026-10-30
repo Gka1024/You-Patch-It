@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04425fbacc671c44fafb859ba7abce18, type: 3}
+  m_Name: 104_Lancer_Skill
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_104_Lancer_skill
+  skillOwner: 104
+  skillName: CharacterSkill_104_Lancer_skill
+  skillDescription: 
+  ignoreDistance: 0
+  targetType: 0
+  targetSelection: 0

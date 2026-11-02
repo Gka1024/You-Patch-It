@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: 104_Lancer_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_104_Lancer_skill
   skillOwner: 104
-  skillName: CharacterSkill_104_Lancer_skill
+  skillName: "\uC790\uC138 \uC804\uD658"
   skillDescription: 
   ignoreDistance: 0
   targetType: 0
   targetSelection: 0
+  knockbackDistance: 3
+  pullDistance: 3
+  damageCoefficient: 1
+  rangeIncrease: 3

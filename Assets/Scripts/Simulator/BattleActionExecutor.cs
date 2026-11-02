@@ -133,6 +133,9 @@ public static class BattleActionExecutor
         if (attacker == null || target == null || target.IsDead || damage <= 0f)
             return;
 
+        if (target.isInvulnerable)
+            return;
+
         damage *= currentDamageMultiplier;
         damage *= 100f / (100f + target.GetStat(CharacterStatType.Defence));
 
@@ -141,7 +144,6 @@ public static class BattleActionExecutor
         if (target.currentShield > 0f)
         {
             float absorbedDamage = Mathf.Min(target.currentShield, remainingDamage);
-
             target.currentShield -= absorbedDamage;
             remainingDamage -= absorbedDamage;
         }
@@ -172,6 +174,20 @@ public static class BattleActionExecutor
     public static void AddDamageOverTime(BattleCharacter source, BattleCharacter target, float damage, float duration, float tickInterval)
     {
         target.AddDamageOverTime(new BattleDamageOverTime(source, target, damage, duration, tickInterval, DealDamage));
+    }
+
+    public static void ExecuteTarget(BattleCharacter attacker, BattleCharacter target)
+    {
+        if (attacker == null || target == null || target.IsDead)
+            return;
+
+        float damage = target.currentHealth + target.currentShield;
+
+        target.currentHealth = 0f;
+        target.currentShield = 0f;
+
+        attacker.statistics.damageDealt += damage;
+        target.statistics.damageTaken += damage;
     }
 
     private static float GetDamageMultiplier(BattleCharacter self)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class BattleCharacter
 {
@@ -37,6 +38,7 @@ public class BattleCharacter
     public float position;
 
     public bool IsDead => currentHealth <= 0f;
+    public bool isInvulnerable;
 
     public float attackCooldown;
     public float actionLockTime;
@@ -140,11 +142,11 @@ public class BattleCharacter
 
     public bool StartSkill(BattleSkillInstance skillInstance)
     {
-        if (skillInstance == null || isUsingSkills || IsDead)
+        if (skillInstance == null || activeSkill != null || IsDead)
             return false;
 
         activeSkill = skillInstance;
-        isUsingSkills = true;
+        isUsingSkills = activeSkill.BlocksActions;
 
         activeSkill.Start();
 
@@ -156,7 +158,7 @@ public class BattleCharacter
 
     public void TickActiveSkill(float tick)
     {
-        if (!isUsingSkills || activeSkill == null)
+        if (activeSkill == null)
             return;
 
         if (IsDead)
@@ -179,7 +181,7 @@ public class BattleCharacter
         ClearActiveSkill();
     }
 
-    
+
 
     private void ClearActiveSkill()
     {
@@ -223,6 +225,52 @@ public class BattleCharacter
 
         if (list.Remove(modifier))
             CalculateStat(modifier.statType);
+    }
+
+    public void RemoveModifiers(CharacterStatType statType, BattleStatModifierType modifierType, float value)
+    {
+        if (!modifiers.TryGetValue(statType, out List<BattleStatModifier> list))
+            return;
+
+        bool changed = false;
+
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            BattleStatModifier modifier = list[i];
+
+            if (modifier.modifierType != modifierType || !Mathf.Approximately(modifier.value, value))
+                continue;
+
+            list.RemoveAt(i);
+            changed = true;
+        }
+
+        if (changed)
+            CalculateStat(statType);
+    }
+
+    public void RemoveModifiersBySource(object source)
+    {
+        if (source == null)
+            return;
+
+        foreach (var pair in modifiers)
+        {
+            List<BattleStatModifier> list = pair.Value;
+            bool changed = false;
+
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (list[i].Source != source)
+                    continue;
+
+                list.RemoveAt(i);
+                changed = true;
+            }
+
+            if (changed)
+                CalculateStat(pair.Key);
+        }
     }
 
     // ============================================================

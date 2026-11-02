@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterDatabase: {fileID: 11400000, guid: 614e2339c1b6451449e0799da850a2e7, type: 2}
-  startingCharacterIds: 65000000c90000002d01000091010000f5010000i
+  startingCharacterIds: 6500000066000000670000006800000069000000i
   primalAdditionalCharacterIds: 59020000i
 --- !u!1 &15425858
 GameObject:
@@ -7222,6 +7222,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 278961381}
+  - component: {fileID: 278961382}
   m_Layer: 5
   m_Name: Texts
   m_TagString: Untagged
@@ -7247,9 +7248,23 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 50, y: -10}
+  m_SizeDelta: {x: 900, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &278961382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278961380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f438bafe47cbf8d48b52ca0e60bc422c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DescriptionPopupUI
+  Name: 
+  Description: 
 --- !u!1 &291162941
 GameObject:
   m_ObjectHideFlags: 0
@@ -7482,7 +7497,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &296478992
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29083,7 +29098,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1098534846
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29121,6 +29136,7 @@ MonoBehaviour:
   skillName: {fileID: 0}
   skillDescription: {fileID: 1887635450}
   RoleImage: {fileID: 589551481}
+  PopupSkillDescription: {fileID: 278961382}
 --- !u!1 &1100885322
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,14 +13,26 @@ public abstract class CharacterSkill : ScriptableObject
     public SkillTargetType targetType;
     public SkillTargetSelection targetSelection;
 
+    protected List<SkillEffectInfo> skillEffectInfos = new();
+
     public abstract void Execute(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random);
     protected virtual float GetAreaRange(BattleCharacter self, float coefficient) { return 1f; }
 
     public virtual void OnAttackHit(BattleCharacter self) { }
+
     public virtual BattleSkillInstance CreateInstance(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random)
     {
         return null;
     }
+
+    public virtual void RefreshInfo(RuntimeCharacter character) { }
+
+    public virtual List<SkillEffectInfo> GetEffectInfo(RuntimeCharacter character)
+    {
+        RefreshInfo(character);
+        return skillEffectInfos;
+    }
+
     // ===== Target Check
 
     protected List<BattleCharacter> GetTargets(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, System.Random random, float coefficient = 1f)
@@ -306,6 +318,20 @@ public abstract class CharacterSkill : ScriptableObject
             return 0f;
 
         return target.currentHealth / maxHealth;
+    }
+}
+
+public class SkillEffectInfo
+{
+    public string effectName;
+    public float value;
+    public string unit;
+
+    public SkillEffectInfo(string effectName, float value, string unit = "")
+    {
+        this.effectName = effectName;
+        this.value = value;
+        this.unit = unit;
     }
 }
 

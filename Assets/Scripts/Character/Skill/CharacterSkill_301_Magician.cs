@@ -17,6 +17,5 @@ public class CharacterSkill_Magician : CharacterSkill
         {
             BattleActionExecutor.DealDamage(self, character, self.GetStat(CharacterStatType.Attack) * coefficient);
         }
-
     }
 }

@@ -9,6 +9,7 @@ public abstract class BattleSkillInstance
     protected readonly float coefficient;
     protected readonly System.Random random;
 
+    public virtual bool BlocksActions => true;
     public bool IsFinished { get; private set; }
 
     private bool hasStarted;

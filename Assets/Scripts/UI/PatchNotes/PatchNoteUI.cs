@@ -95,7 +95,7 @@ public class PatchNoteUI : MonoBehaviour
     {
         if (currentCharacter == null)
         {
-            currentCharacter = RuntimeCharacterManager.Instance.GetRuntimeCharacter(101);
+            return;
         }
 
         ShowCharacter(currentCharacter);

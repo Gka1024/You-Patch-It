@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 103_FistEmperor
   m_EditorClassIdentifier: Assembly-CSharp::Character
   id: 103
-  characterName: FistEmperor
+  characterName: "\uAD8C\uC655"
   CharacterPrefab_SPUM: {fileID: 0}
   role: 0
   stats:

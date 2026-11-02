@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 104_Lancer
   m_EditorClassIdentifier: Assembly-CSharp::Character
   id: 104
-  characterName: Lancer
+  characterName: "\uCC3D\uC220\uC0AC"
   CharacterPrefab_SPUM: {fileID: 0}
   role: 0
   stats:

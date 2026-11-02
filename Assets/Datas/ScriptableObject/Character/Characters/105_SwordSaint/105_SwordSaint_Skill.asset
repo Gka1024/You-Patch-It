@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 105_SwordSaint_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_105_SwordSaint_Skill
   skillOwner: 105
-  skillName: CharacterSkill_105_SwordSaint_Skill
-  skillDescription: 
+  skillName: "\uC774\uAE30\uC5B4\uAC80\uC220"
+  skillDescription: asdf
   ignoreDistance: 0
-  targetType: 0
-  targetSelection: 0
+  targetType: 1
+  targetSelection: 1

@@ -105,6 +105,13 @@ public class RuntimeCharacterManager : MonoBehaviour
         return character;
     }
 
+    public RuntimeCharacter GetRuntimeCharacter(Character character)
+    {
+        runtimeCharacters.TryGetValue(character.id, out RuntimeCharacter runtimeCharacter);
+
+        return runtimeCharacter;
+    }
+
     public bool HasLockedCharacter()
     {
         return lockedCharacters.Count > 0;

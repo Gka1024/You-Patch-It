@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: 103_FistEmperor_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_FistEmperor_103
   skillOwner: 103
-  skillName: CharacterSkill_FistEmperor_103
+  skillName: "\uAD8C\uC655\uC758 \uC2EC\uD310"
   skillDescription: 
   ignoreDistance: 0
   targetType: 0
   targetSelection: 0
+  baseHealthDamageCoefficient: 0.1
+  knockbackDistance: 3
+  damageRadius: 2

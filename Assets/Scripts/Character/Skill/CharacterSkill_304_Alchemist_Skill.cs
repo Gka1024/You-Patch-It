@@ -16,6 +16,21 @@ public class CharacterSkill_304_Alchemist_Skill : CharacterSkill
     [Header("Ally Effects")]
     [SerializeField] private float healRatio = 0.15f;
 
+    private float CalculateDamage(float attack, float coefficient)
+    {
+        return attack * damageRatio * coefficient;
+    }
+
+    private float CalculateHealing(float health, float coefficient)
+    {
+        return health * healRatio * coefficient;
+    }
+
+    private int CalculateTickCount()
+    {
+        return 1 + Mathf.FloorToInt((duration - 0.0001f) / Mathf.Max(0.01f, tickInterval));
+    }
+
     public override void Execute(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random)
     {
         // CreateInstance에서 생성한 BattleSkillInstance를 사용한다.
@@ -46,6 +61,34 @@ public class CharacterSkill_304_Alchemist_Skill : CharacterSkill
         );
     }
 
+    public override void RefreshInfo(RuntimeCharacter character)
+    {
+        skillEffectInfos.Clear();
+
+        float attack = character.GetStat(CharacterStatType.Magic);
+        float health = character.GetStat(CharacterStatType.Health);
+        float coefficient = character.GetStat(CharacterStatType.SkillCoefficient);
+
+        float damage = CalculateDamage(attack, coefficient);
+        float healing = CalculateHealing(health, coefficient);
+
+        int tickCount = CalculateTickCount();
+
+        float totalDamage = damage * tickCount;
+        float totalHealing = healing * tickCount;
+
+        skillEffectInfos.Add(new SkillEffectInfo("범위 반경", areaRadius));
+        skillEffectInfos.Add(new SkillEffectInfo("지속 시간", duration, "초"));
+        skillEffectInfos.Add(new SkillEffectInfo("효과 적용 간격", tickInterval, "초"));
+
+        skillEffectInfos.Add(new SkillEffectInfo("적 1회 피해량", damage));
+        skillEffectInfos.Add(new SkillEffectInfo("아군 1회 회복량", healing));
+        skillEffectInfos.Add(new SkillEffectInfo("적 이동 속도 감소", slowRatio * 100f, "%"));
+
+        skillEffectInfos.Add(new SkillEffectInfo("최대 총 피해량", totalDamage));
+        skillEffectInfos.Add(new SkillEffectInfo("최대 총 회복량", totalHealing));
+    }
+
     private class AlchemistSkillInstance : BattleSkillInstance
     {
         private readonly float impactPosition;
@@ -65,19 +108,7 @@ public class CharacterSkill_304_Alchemist_Skill : CharacterSkill
 
         public override bool BlocksActions => true;
 
-        public AlchemistSkillInstance(
-            BattleCharacter self,
-            List<BattleCharacter> allies,
-            List<BattleCharacter> enemies,
-            float coefficient,
-            System.Random random,
-            float impactPosition,
-            float areaRadius,
-            float duration,
-            float tickInterval,
-            float damageRatio,
-            float healRatio,
-            float slowRatio)
+        public AlchemistSkillInstance(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random, float impactPosition, float areaRadius, float duration, float tickInterval, float damageRatio, float healRatio, float slowRatio)
             : base(self, allies, enemies, coefficient, random)
         {
             this.impactPosition = impactPosition;
@@ -155,14 +186,14 @@ public class CharacterSkill_304_Alchemist_Skill : CharacterSkill
 
         private void ApplyDamageAndHealing()
         {
-            float damage = self.GetStat(CharacterStatType.Attack) * damageRatio * coefficient;
+            float damage = self.GetStat(CharacterStatType.Magic) * damageRatio * coefficient;
 
             foreach (BattleCharacter enemy in affectedEnemies)
             {
                 if (enemy == null || enemy.IsDead)
                     continue;
 
-                BattleActionExecutor.DealDamage(self, enemy, damage);
+                BattleActionExecutor.DealDamage(self, enemy, damage, true);
             }
 
             foreach (BattleCharacter ally in affectedAllies)

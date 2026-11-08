@@ -17,7 +17,7 @@ public class BottomSkillDescriptionUI : MonoBehaviour
         if (character == null || character.skill == null)
             return;
 
-        characterName.text = character.characterName;
+        characterName.text = $"{character.characterName} - {character.skill.skillName}";
         skillDescription.text = character.skill.skillDescription;
 
         RoleImage.sprite = image.sprite;
@@ -33,6 +33,6 @@ public class BottomSkillDescriptionUI : MonoBehaviour
             description.AppendLine($"{effect.effectName} : {effect.value:0.##}{effect.unit}");
         }
 
-        PopupSkillDescription.SetText("", description.ToString());
+        PopupSkillDescription.SetText(character.skill.skillName, description.ToString());
     }
 }

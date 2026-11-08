@@ -7,18 +7,20 @@ public class BattleDamageOverTime
     private readonly float value;
     private readonly float duration;
     private readonly float tickInterval;
-    private readonly Action<BattleCharacter, BattleCharacter, float> effect;
+    private readonly bool isDamageMagic;
+    private readonly Action<BattleCharacter, BattleCharacter, float, bool> effect;
 
     private float remainingTime;
     private float tickTimer;
 
-    public BattleDamageOverTime(BattleCharacter source, BattleCharacter target, float value, float duration, float tickInterval, Action<BattleCharacter, BattleCharacter, float> effect)
+    public BattleDamageOverTime(BattleCharacter source, BattleCharacter target, float value, float duration, float tickInterval, bool isDamageMagic, Action<BattleCharacter, BattleCharacter, float, bool> effect)
     {
         this.source = source;
         this.target = target;
         this.value = value;
         this.duration = duration;
         this.tickInterval = tickInterval;
+        this.isDamageMagic = isDamageMagic;
         this.effect = effect;
 
         remainingTime = duration;
@@ -35,7 +37,7 @@ public class BattleDamageOverTime
 
         if (tickTimer <= 0f)
         {
-            effect(source, target, value);
+            effect(source, target, value, isDamageMagic);
             tickTimer += tickInterval;
         }
 

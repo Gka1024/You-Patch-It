@@ -98,18 +98,21 @@ public class InstantDescriptionUI : MonoBehaviour
         // 상하
         // ====================================================
 
+        // 화면 경계에 여유 공간을 추가해 감지 범위를 넓힘
+        float detectionMargin = screenMargin * 3f;
+
         float popupTop = finalPosition.y + halfHeight;
         float popupBottom = finalPosition.y - halfHeight;
 
-        // 위쪽으로 넘어간 만큼 아래로 이동
-        if (popupTop + screenMargin / 2 > canvasTop)
+        // 위쪽 경계에 가까워지면 아래로 이동
+        if (popupTop + detectionMargin > canvasTop)
         {
             float overflow = popupTop - canvasTop;
 
             finalPosition.y -= overflow + screenMargin;
         }
-        // 아래쪽으로 넘어간 만큼 위로 이동
-        else if (popupBottom + screenMargin / 2 < canvasBottom)
+        // 아래쪽 경계에 가까워지면 위로 이동
+        else if (popupBottom - detectionMargin < canvasBottom)
         {
             float overflow = canvasBottom - popupBottom;
 

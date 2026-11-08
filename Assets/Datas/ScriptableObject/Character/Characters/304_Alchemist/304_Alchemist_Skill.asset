@@ -13,8 +13,14 @@ MonoBehaviour:
   m_Name: 304_Alchemist_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_304_Alchemist_Skill
   skillOwner: 304
-  skillName: CharacterSkill_304_Alchemist_Skill
-  skillDescription: 
+  skillName: "\uC774\uC911 \uBB3C\uC57D"
+  skillDescription: "\uC5F0\uAE08\uC220\uB85C \uC0DD\uC131\uD55C \uBB3C\uC57D\uC744 \uB358\uC838 \uC801\uC5D0\uAC8C\uB294 \uC9C0\uC18D \uD53C\uD574\uB97C, \uC544\uAD70\uC5D0\uAC8C\uB294 \uC9C0\uC18D \uD68C\uBCF5\uC744 \uC8FC\uB294 \uC9C0\uC5ED\uC744 \uC0DD\uC131\uD55C\uB2E4."
   ignoreDistance: 0
-  targetType: 0
-  targetSelection: 0
+  targetType: 1
+  targetSelection: 1
+  areaRadius: 2.5
+  duration: 5
+  tickInterval: 1
+  damageRatio: 0.2
+  slowRatio: 0.25
+  healRatio: 0.15

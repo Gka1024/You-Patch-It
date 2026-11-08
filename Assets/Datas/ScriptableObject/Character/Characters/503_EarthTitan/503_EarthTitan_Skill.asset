@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 503_EarthTitan_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_503_EarthTitan_Skill
   skillOwner: 503
-  skillName: CharacterSkill_503_EarthTitan_Skill
-  skillDescription: 
+  skillName: "\uB2E8\uC21C\uBB34\uC2DD\uD55C \uAC70\uC778"
+  skillDescription: "\uB300\uC9C0\uAC70\uC778\uC740 \uC2A4\uD0AC\uC744 \uC0AC\uC6A9\uD558\uC9C0 \uBABB\uD55C\uB2E4."
   ignoreDistance: 0
   targetType: 0
   targetSelection: 0

@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: 505_DarkKnight_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_505_DarkKnight_Skill
   skillOwner: 505
-  skillName: CharacterSkill_505_DarkKnight_Skill
-  skillDescription: 
+  skillName: "\uC554\uD751\uC758 \uC800\uC8FC"
+  skillDescription: "\uC790\uC2E0\uC758 \uCCB4\uB825\uC758 20%\uB97C \uC18C\uBAA8\uD558\uC5EC \uC8FC\uC704\uC758 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C \uC900\uB2E4. \uC2A4\uD0AC\uC744 \uC0AC\uC6A9\uD560 \uC218 \uC5C6\uC73C\uBA74 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD55C\uB2E4."
   ignoreDistance: 0
   targetType: 0
   targetSelection: 0
+  healthCostRatio: 0.2
+  healRatio: 0.1
+  healThreshold: 0.3
+  attackRange: 2

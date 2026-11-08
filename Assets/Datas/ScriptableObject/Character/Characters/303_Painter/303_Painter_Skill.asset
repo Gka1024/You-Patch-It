@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 303_Painter_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_303_Painter_Skill
   skillOwner: 303
-  skillName: CharacterSkill_303_Painter_Skill
-  skillDescription: 
+  skillName: "\uB367\uCE60\uD558\uAE30"
+  skillDescription: "\uC801\uC5D0\uAC8C \uBB3C\uAC10\uC744 \uBB3B\uD600 \uC21C\uC11C\uB300\uB85C \uC774\uB3D9\uC18D\uB3C4 \uAC10\uC18C, \uACF5\uACA9\uC18D\uB3C4 \uAC10\uC18C, \uC9C0\uC18D \uB370\uBBF8\uC9C0, \uB9C8\uB098 \uAC10\uC18C, \uC989\uC0AC\uC758 \uD6A8\uACFC\uB97C \uC900\uB2E4.\n\uC2A4\uD0AC \uACC4\uC218\uC5D0 \uC601\uD5A5\uBC1B\uC9C0 \uC54A\uB294\uB2E4."
   ignoreDistance: 0
-  targetType: 0
-  targetSelection: 0
+  targetType: 1
+  targetSelection: 1

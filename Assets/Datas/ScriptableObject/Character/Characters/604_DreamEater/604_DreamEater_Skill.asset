@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: 604_DreamEater_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_604_DreamEater_Skill
   skillOwner: 604
-  skillName: CharacterSkill_604_DreamEater_Skill
-  skillDescription: 
+  skillName: "\uB2EC\uCF64\uD55C \uAFC8"
+  skillDescription: "\uC801\uC5D0\uAC8C \uAFC8\uC744 \uBCF4\uC5EC\uC8FC\uC5B4 \uACF5\uACA9\uB825\uACFC \uACF5\uACA9 \uC18D\uB3C4\uB97C \uAC10\uC18C\uC2DC\uD0A8\uB2E4."
   ignoreDistance: 0
-  targetType: 0
+  targetType: 3
   targetSelection: 0
+  duration: 5

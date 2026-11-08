@@ -25,7 +25,11 @@ public abstract class CharacterSkill : ScriptableObject
         return null;
     }
 
-    public virtual void RefreshInfo(RuntimeCharacter character) { }
+    public virtual void RefreshInfo(RuntimeCharacter character)
+    {
+        skillEffectInfos.Clear();
+        float coefficient = character.GetStat(CharacterStatType.SkillCoefficient);
+    }
 
     public virtual List<SkillEffectInfo> GetEffectInfo(RuntimeCharacter character)
     {
@@ -327,7 +331,7 @@ public class SkillEffectInfo
     public float value;
     public string unit;
 
-    public SkillEffectInfo(string effectName, float value, string unit = "")
+    public SkillEffectInfo(string effectName, float value = 0, string unit = "")
     {
         this.effectName = effectName;
         this.value = value;

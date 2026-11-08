@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: 204_Chakramer_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_204_Chakramer_Skill
   skillOwner: 204
-  skillName: CharacterSkill_204_Chakramer_Skill
-  skillDescription: 
+  skillName: "\uD295\uAE30\uB294 \uBD80\uBA54\uB791"
+  skillDescription: "\uC801\uC5D0\uAC8C \uD295\uAE30\uB294 \uBD80\uBA54\uB791\uC744 \uB358\uC838 \uD53C\uD574\uB97C \uC785\uD78C\uB2E4."
   ignoreDistance: 0
-  targetType: 0
-  targetSelection: 0
+  targetType: 1
+  targetSelection: 1
+  tickInterval: 5
+  maxBounceCount: 5
+  damageCoefficient: 0.5

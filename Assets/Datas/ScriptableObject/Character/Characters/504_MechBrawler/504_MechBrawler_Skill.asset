@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: 504_MechBrawler_Skill
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_504_MechBrawler_Skill
   skillOwner: 504
-  skillName: CharacterSkill_504_MechBrawler_Skill
-  skillDescription: 
+  skillName: "\uC9D1\uAC8C\uC190"
+  skillDescription: "\uC801\uC744 \uC9D1\uAC8C\uB85C \uBD99\uC7A1\uC544 \uAC00\uAE4C\uC774\uB85C \uB04C\uACE0 \uC628\uB2E4. \uB04C\uB9B0 \uC801\uC740 \uC77C\uC815 \uC2DC\uAC04\uB3D9\uC548 \uC6C0\uC9C1\uC77C \uC218 \uC5C6\uB2E4."
   ignoreDistance: 0
-  targetType: 0
-  targetSelection: 0
+  targetType: 1
+  targetSelection: 2
+  pullDistance: 0.5
+  baseMaxRange: 3
+  baseStunDuration: 1
+  stunCoefficient: 0.5

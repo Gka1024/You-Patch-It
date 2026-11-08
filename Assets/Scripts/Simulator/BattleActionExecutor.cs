@@ -83,7 +83,7 @@ public static class BattleActionExecutor
 
         float damage = self.GetStat(CharacterStatType.Attack) * GetDamageMultiplier(self);
 
-        self.currentMana += self.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 40f;
+        self.currentMana += self.runtimeCharacter.GetStat(CharacterStatType.GainMana) / 20f;
 
         DealDamage(self, enemy, damage);
 
@@ -128,7 +128,7 @@ public static class BattleActionExecutor
         self.statistics.skillCount++;
     }
 
-    public static void DealDamage(BattleCharacter attacker, BattleCharacter target, float damage)
+    public static void DealDamage(BattleCharacter attacker, BattleCharacter target, float damage, bool isDamageMagic = false)
     {
         if (attacker == null || target == null || target.IsDead || damage <= 0f)
             return;
@@ -136,8 +136,13 @@ public static class BattleActionExecutor
         if (target.isInvulnerable)
             return;
 
+        CharacterStatType resistanceType = isDamageMagic
+        ? CharacterStatType.MagicResist
+        : CharacterStatType.Defence;
+
+        float resistance = target.GetStat(resistanceType);
+        damage *= 100f / (100f + resistance);
         damage *= currentDamageMultiplier;
-        damage *= 100f / (100f + target.GetStat(CharacterStatType.Defence));
 
         float remainingDamage = damage;
 
@@ -171,9 +176,9 @@ public static class BattleActionExecutor
         target.targetUpdateTimer = Mathf.Max(target.targetUpdateTimer, duration);
     }
 
-    public static void AddDamageOverTime(BattleCharacter source, BattleCharacter target, float damage, float duration, float tickInterval)
+    public static void AddDamageOverTime(BattleCharacter source, BattleCharacter target, float damage, float duration, float tickInterval, bool isDamageMagic = false)
     {
-        target.AddDamageOverTime(new BattleDamageOverTime(source, target, damage, duration, tickInterval, DealDamage));
+        target.AddDamageOverTime(new BattleDamageOverTime(source, target, damage, duration, tickInterval, isDamageMagic, DealDamage));
     }
 
     public static void ExecuteTarget(BattleCharacter attacker, BattleCharacter target)

@@ -40,6 +40,24 @@ public class CharacterSkill_402_Arachne_Skill : CharacterSkill
         );
     }
 
+    private float CalculateDamage(float attack, float coefficient)
+    {
+        return attack * damageRatio * coefficient;
+    }
+
+    public override void RefreshInfo(RuntimeCharacter character)
+    {
+        skillEffectInfos.Clear();
+
+        float attack = character.GetStat(CharacterStatType.Magic);
+        float coefficient = character.GetStat(CharacterStatType.SkillCoefficient);
+
+        skillEffectInfos.Add(new SkillEffectInfo("돌진 속도", dashSpeed));
+        skillEffectInfos.Add(new SkillEffectInfo("정지 거리", stopDistance));
+        skillEffectInfos.Add(new SkillEffectInfo("기절 지속 시간", stunDuration, "초"));
+        skillEffectInfos.Add(new SkillEffectInfo("피해량", CalculateDamage(attack, coefficient)));
+    }
+
     private class ArachneSkillInstance : BattleSkillInstance
     {
         private readonly BattleCharacter target;
@@ -137,7 +155,7 @@ public class CharacterSkill_402_Arachne_Skill : CharacterSkill
         private void ApplyDamage()
         {
             float damage = self.GetStat(CharacterStatType.Attack) * damageRatio * coefficient;
-            BattleActionExecutor.DealDamage(self, target, damage);
+            BattleActionExecutor.DealDamage(self, target, damage, true);
         }
     }
 }

@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSkill_603_TarotReader_Skill
   skillOwner: 603
   skillName: CharacterSkill_603_TarotReader_Skill
-  skillDescription: 
+  skillDescription: "\uC801\uC5D0\uAC8C \uAFC8\uC744 \uBCF4\uC5EC\uC8FC\uC5B4 \uACF5\uACA9\uB825\uACFC \uACF5\uACA9 \uC18D\uB3C4\uB97C \uAC10\uC18C\uC2DC\uD0A8\uB2E4."
   ignoreDistance: 0
-  targetType: 0
+  targetType: 3
   targetSelection: 0
+  duration: 5
+  attackReduction: 0.25
+  attackSpeedReduction: 0.25

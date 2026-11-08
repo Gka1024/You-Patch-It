@@ -18,31 +18,31 @@ MonoBehaviour:
   role: 4
   stats:
   - statType: 0
-    value: 18
+    value: 22
   - statType: 1
     value: 1.2
   - statType: 2
-    value: 480
+    value: 650
   - statType: 3
-    value: 24
+    value: 32
   - statType: 4
-    value: 1.2
+    value: 28
   - statType: 5
-    value: 3.5
+    value: 2.8
   - statType: 6
     value: 0.9
   - statType: 7
     value: 1.1
   - statType: 8
-    value: 5
+    value: 7
   - statType: 9
-    value: 3
+    value: 0
   - statType: 10
     value: 100
   - statType: 11
     value: 100
   - statType: 12
-    value: 1.2
+    value: 0
   skill: {fileID: 11400000, guid: 94066957e42dccd42a0668a452d49acb, type: 2}
-  defaultEditableStats: 
+  defaultEditableStats: 0000000002000000030000000400000008000000i
   battleAI: {fileID: 11400000, guid: 9f3a04bb3dfad2e44a29c892fe7a247c, type: 2}

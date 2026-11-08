@@ -4,6 +4,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObject/Character/Skill/SwordSaint")]
 public class CharacterSkill_105_SwordSaint_Skill : CharacterSkill
 {
+    private const int attackIntervalTicks = 10;
+    private const float tick = 0.05f;
+
     public override void OnAttackHit(BattleCharacter self)
     {
         self.skillStack++;
@@ -12,10 +15,7 @@ public class CharacterSkill_105_SwordSaint_Skill : CharacterSkill
     public override void Execute(BattleCharacter self, List<BattleCharacter> allies, List<BattleCharacter> enemies, float coefficient, System.Random random)
     {
         if (self.skillStack <= 0)
-        {
             return;
-        }
-
 
         List<BattleCharacter> targets = GetTargets(self, allies, enemies, random, coefficient);
 
@@ -27,64 +27,86 @@ public class CharacterSkill_105_SwordSaint_Skill : CharacterSkill
 
         self.StartSkill(new BattleSkillInstance_105_SwordSaint(self, targets[0], attackCount, coefficient));
     }
-}
 
-public class BattleSkillInstance_105_SwordSaint : BattleSkillInstance
-{
-    private const int ATTACK_INTERVAL_TICKS = 10;
-    private const float TICK = 0.05f;
-
-    private readonly BattleCharacter target;
-    private readonly int totalAttackCount;
-
-    private int currentAttackCount;
-    private int remainingTicks;
-
-    public BattleSkillInstance_105_SwordSaint(BattleCharacter self, BattleCharacter target, int attackCount, float coefficient) : base(self, null, null, coefficient, null)
+    private float CalculateDamage(float attack, float coefficient)
     {
-        this.target = target;
-        totalAttackCount = attackCount;
+        return attack * coefficient;
     }
 
-    protected override void OnStart()
+    public override void RefreshInfo(RuntimeCharacter character)
     {
-        Attack();
+        skillEffectInfos.Clear();
 
-        remainingTicks = ATTACK_INTERVAL_TICKS;
+        float attack = character.GetStat(CharacterStatType.Attack);
+        float coefficient = character.GetStat(CharacterStatType.SkillCoefficient);
+
+        float damage = CalculateDamage(attack, coefficient);
+        float attackInterval = attackIntervalTicks * tick;
+
+        skillEffectInfos.Add(new SkillEffectInfo("일반 공격 적중 시 스택 획득", 1f, "회"));
+        skillEffectInfos.Add(new SkillEffectInfo("스택당 공격 횟수", 1f, "회"));
+        skillEffectInfos.Add(new SkillEffectInfo("공격 1회당 피해량", damage));
+        skillEffectInfos.Add(new SkillEffectInfo("공격 간격", attackInterval, "초"));
     }
 
-    protected override void OnTick(float tick)
+
+    private class BattleSkillInstance_105_SwordSaint : BattleSkillInstance
     {
-        if (target == null || target.IsDead)
+        private const int ATTACK_INTERVAL_TICKS = 10;
+        private const float TICK = 0.05f;
+
+        private readonly BattleCharacter target;
+        private readonly int totalAttackCount;
+
+        private int currentAttackCount;
+        private int remainingTicks;
+
+        public BattleSkillInstance_105_SwordSaint(BattleCharacter self, BattleCharacter target, int attackCount, float coefficient) : base(self, null, null, coefficient, null)
         {
-            Finish();
-            return;
+            this.target = target;
+            totalAttackCount = attackCount;
         }
 
-        remainingTicks--;
-
-        if (remainingTicks > 0)
-            return;
-
-        Attack();
-
-        remainingTicks = ATTACK_INTERVAL_TICKS;
-    }
-
-    private void Attack()
-    {
-        if (target == null || target.IsDead || self.IsDead)
+        protected override void OnStart()
         {
-            Finish();
-            return;
+            Attack();
+
+            remainingTicks = ATTACK_INTERVAL_TICKS;
         }
 
-        float damage = self.GetStat(CharacterStatType.Attack) * coefficient;
-        BattleActionExecutor.DealDamage(self, target, damage);
+        protected override void OnTick(float tick)
+        {
+            if (target == null || target.IsDead)
+            {
+                Finish();
+                return;
+            }
 
-        currentAttackCount++;
+            remainingTicks--;
 
-        if (currentAttackCount >= totalAttackCount)
-            Finish();
+            if (remainingTicks > 0)
+                return;
+
+            Attack();
+
+            remainingTicks = ATTACK_INTERVAL_TICKS;
+        }
+
+        private void Attack()
+        {
+            if (target == null || target.IsDead || self.IsDead)
+            {
+                Finish();
+                return;
+            }
+
+            float damage = self.GetStat(CharacterStatType.Attack) * coefficient;
+            BattleActionExecutor.DealDamage(self, target, damage);
+
+            currentAttackCount++;
+
+            if (currentAttackCount >= totalAttackCount)
+                Finish();
+        }
     }
 }

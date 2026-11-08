@@ -24,9 +24,9 @@ MonoBehaviour:
   - statType: 2
     value: 370
   - statType: 3
-    value: 20
+    value: 16
   - statType: 4
-    value: 1.5
+    value: 13
   - statType: 5
     value: 4.2
   - statType: 6

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -41,6 +42,9 @@ public class SeasonManager : MonoBehaviour
     private List<RuntimePlayer> players = new();
     private List<MatchData> matches = new();
     private List<BattleResult> results = new();
+
+    [Header("Simulation Loading")]
+    [SerializeField] private GameObject simulationLoadingPanel;
 
     private void Awake()
     {
@@ -219,8 +223,8 @@ public class SeasonManager : MonoBehaviour
 
             case SeasonState.Simulation:
                 StatisticsManager.Instance.ResetSeason();
-                results = BattleSimulator.Instance.StartSimulation(matches, seasonRandom);
-                FinishSimulation();
+
+                StartCoroutine(RunSimulation());
                 break;
 
             case SeasonState.Result:
@@ -234,12 +238,8 @@ public class SeasonManager : MonoBehaviour
                 UIManager.Instance.characterTableUI.ReArrangetable();
                 RuntimeCharacterManager.Instance.ResetAllCharacter();
 
-                if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn)
-                {
-                    UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();
-                }
-
                 UIManager.Instance.bottomDisplayUI.ShowReaction();
+                if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn) UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();
                 UIManager.Instance.alertUI.ClearAlerts();
                 break;
 
@@ -293,5 +293,33 @@ public class SeasonManager : MonoBehaviour
             // 같은 시즌의 다음 서브시즌: 기존 플레이어 유지
             players = playerManager.GetPlayers().ToList();
         }
+    }
+
+    private IEnumerator RunSimulation()
+    {
+        if (simulationLoadingPanel != null)
+        {
+            simulationLoadingPanel.SetActive(true);
+            simulationLoadingPanel.GetComponent<LoadingPanelUI>().SetProgress(0f);
+        }
+
+        // 로딩 패널을 먼저 렌더링할 수 있도록 프레임 양보
+        yield return null;
+
+        yield return BattleSimulator.Instance.StartSimulationCoroutine(
+            matches,
+            seasonRandom,
+            simulationResults => { results = simulationResults; },
+            (completed, total) =>
+            {
+                if (simulationLoadingPanel != null)
+                    simulationLoadingPanel.GetComponent<LoadingPanelUI>().SetProgress(completed, total);
+            }
+        );
+
+        if (simulationLoadingPanel != null)
+            simulationLoadingPanel.SetActive(false);
+
+        FinishSimulation();
     }
 }

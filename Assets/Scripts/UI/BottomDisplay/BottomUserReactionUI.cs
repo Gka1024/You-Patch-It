@@ -20,6 +20,7 @@ public class BottomUserReactionUI : MonoBehaviour
     public Toggle Toggle => toggle;
     public bool IsOn => toggle.isOn;
     public bool LoopOn { get; private set; }
+    public bool isLoopOn;
 
     private Coroutine autoRefreshCoroutine;
     private Vector2[] originalPositions;
@@ -212,6 +213,7 @@ public class BottomUserReactionUI : MonoBehaviour
     public void TurnOnLoop()
     {
         LoopOn = true;
+        isLoopOn = true;
 
         Refresh();
         StartAutoRefresh();
@@ -226,7 +228,10 @@ public class BottomUserReactionUI : MonoBehaviour
     private void StartAutoRefresh()
     {
         if (!isActiveAndEnabled || autoRefreshCoroutine != null)
+        {
+            Debug.Log($"isactive : {isActiveAndEnabled} || autorefreshcoroutine : {autoRefreshCoroutine}");
             return;
+        }
 
         Debug.Log("Auto Refresh Coroutine Initialized");
         autoRefreshCoroutine = StartCoroutine(AutoRefresh());
@@ -244,8 +249,6 @@ public class BottomUserReactionUI : MonoBehaviour
     private IEnumerator AutoRefresh()
     {
         Debug.Log("AutoRefresh 시작");
-
-        Refresh();
 
         while (LoopOn)
         {

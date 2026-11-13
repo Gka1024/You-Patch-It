@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class BattleSimulator : MonoBehaviour
 
     private const float TICK = 0.05f;
     private const float BATTLE_TIME_LIMIT = 1000f;
+    [SerializeField] private int matchesPerFrame = 100;
 
     private readonly List<BattleCharacter> redTeam = new();
     private readonly List<BattleCharacter> blueTeam = new();
@@ -45,6 +47,31 @@ public class BattleSimulator : MonoBehaviour
         int battleSeed = simulationRandom.Next();
 
         return Simulate(data.redCharacters, data.redPlayers, data.blueCharacters, data.bluePlayers, battleSeed);
+    }
+
+    public IEnumerator StartSimulationCoroutine(List<MatchData> matches, System.Random random, System.Action<List<BattleResult>> onComplete, System.Action<int, int> onProgress = null)
+    {
+        List<BattleResult> results = new(matches.Count);
+
+        int totalMatches = matches.Count;
+        int completedMatches = 0;
+
+        for (int i = 0; i < totalMatches; i++)
+        {
+            int battleSeed = random.Next();
+
+            BattleResult result = StartSimulation(matches[i], battleSeed);
+            results.Add(result);
+
+            completedMatches++;
+            onProgress?.Invoke(completedMatches, totalMatches);
+
+            // 일정 횟수의 전투를 처리한 뒤 다음 프레임으로 넘어간다.
+            if (completedMatches % matchesPerFrame == 0 || completedMatches == totalMatches)
+                yield return null;
+        }
+
+        onComplete?.Invoke(results);
     }
 
     public BattleResult Simulate(RuntimeCharacter redCharacter, RuntimePlayer redPlayer, RuntimeCharacter blueCharacter, RuntimePlayer bluePlayer, int battleSeed)
@@ -125,6 +152,65 @@ public class BattleSimulator : MonoBehaviour
         ReleaseTeams();
 
         return result;
+    }
+
+    private IEnumerator SimulateCoroutine(List<RuntimeCharacter> redCharacters, List<RuntimePlayer> redPlayers, List<RuntimeCharacter> blueCharacters, List<RuntimePlayer> bluePlayers, int battleSeed, System.Action<BattleResult> onComplete, int ticksPerFrame)
+    {
+        System.Random battleRandom = new(battleSeed);
+        BattleStatistics statistics = new();
+
+        PrepareTeams(redCharacters, redPlayers, blueCharacters, bluePlayers, battleRandom);
+        RegisterStatistics(statistics);
+
+        float battleTime = 0f;
+        int processedTicks = 0;
+
+        BattleActionExecutor.SetDamageMultiplier(1f);
+
+        while (IsTeamAlive(redTeam) && IsTeamAlive(blueTeam))
+        {
+            BattleActionExecutor.SetDamageMultiplier(GetDamageMultiplier(battleTime));
+
+            TickTeam(redTeam);
+            TickTeam(blueTeam);
+
+            commands.Clear();
+
+            CollectTeamActions(redTeam, blueTeam);
+            CollectTeamActions(blueTeam, redTeam);
+
+            ExecuteActions(battleRandom, battleTime);
+
+            battleTime += TICK;
+            processedTicks++;
+
+            if (battleTime > BATTLE_TIME_LIMIT)
+            {
+                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) || {redCharacters[0].OriginCharacter.characterName} vs {blueCharacters[0].OriginCharacter.characterName}");
+                Debug.LogWarning($"Battle Timeout (Seed : {battleSeed}) || {redPlayers[0].Tier} vs {bluePlayers[0].Tier}");
+                break;
+            }
+
+            if (processedTicks >= ticksPerFrame)
+            {
+                processedTicks = 0;
+                yield return null;
+            }
+        }
+
+        statistics.battleDuration = battleTime;
+
+        bool redAlive = IsTeamAlive(redTeam);
+        bool blueAlive = IsTeamAlive(blueTeam);
+
+        BattleResult result = WriteResult(redTeam, blueTeam, redAlive, blueAlive, statistics);
+        result.isDraw = redAlive == blueAlive;
+        result.battleTime = battleTime;
+
+        ReleaseCommands();
+        ReleaseTeams();
+
+        onComplete?.Invoke(result);
     }
 
     private BattleResult WriteResult(List<BattleCharacter> redTeam, List<BattleCharacter> blueTeam, bool redAlive, bool blueAlive, BattleStatistics statistics)

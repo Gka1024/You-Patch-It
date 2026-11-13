@@ -14,7 +14,10 @@ public class DescriptionPopupUI : MonoBehaviour, IPointerEnterHandler, IPointerE
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        UIManager.Instance.SpawnInstantDesc(Name, Description);
+        if (Name.Length > 0 || Description.Length > 0)
+        {
+            UIManager.Instance.SpawnInstantDesc(Name, Description);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)

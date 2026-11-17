@@ -8,20 +8,30 @@ public class PickManager : MonoBehaviour
 {
     public static PickManager Instance;
 
-    private int TeamSize;
-
     private const int TEAM_SIZE_3 = 3051;
 
     private const float MIN_META_LEARNING_RATE = 0.6f;
     private const float MAX_META_LEARNING_RATE = 0.9f;
 
+    [Header("Team Settings")]
+    private int TeamSize = 3;
+
     [Header("Pick Score Weights")]
-    [SerializeField] private float winrateWeight = 1f;
-    [SerializeField] private float pickrateWeight = 1f;
+    [SerializeField][Range(1, 10)] private float winrateWeight = 1f;
+    [SerializeField][Range(1, 10)] private float pickrateWeight = 1f;
+    [SerializeField][Range(1, 10)] private float roleWeight = 1f;
+    [SerializeField][Range(1, 10)] private float characterWeight = 1f;
+
+    private readonly Dictionary<RuntimeCharacter, float> characterPreferenceDictionary = new();
+    private readonly Dictionary<RuntimeCharacter, float> sumPickScore = new();
+    private readonly Dictionary<RuntimeCharacter, int> timePicked = new();
+
+    // =========================================================
+    // Lifecycle
+    // =========================================================
 
     private void Awake()
     {
-        TeamSize = 3;
         Instance = this;
     }
 
@@ -40,15 +50,24 @@ public class PickManager : MonoBehaviour
             Instance = null;
     }
 
+    // =========================================================
+    // Team Settings
+    // =========================================================
+
     private void CheckTeamSize()
     {
-        if (UnlockManager.Instance.IsUnlocked(TEAM_SIZE_3))
-        {
-            UnlockManager.Instance.OnUnlockChanged -= CheckTeamSize;
-            TeamSize = 3;
-            AnalysisManager.Instance.SetCurrentTeamSize(TeamSize);
-        }
+        if (!UnlockManager.Instance.IsUnlocked(TEAM_SIZE_3))
+            return;
+
+        UnlockManager.Instance.OnUnlockChanged -= CheckTeamSize;
+
+        TeamSize = 3;
+        AnalysisManager.Instance.SetCurrentTeamSize(TeamSize);
     }
+
+    // =========================================================
+    // Match Making & Pick
+    // =========================================================
 
     public List<MatchData> StartPick(IReadOnlyList<RuntimePlayer> players, System.Random random)
     {
@@ -66,9 +85,7 @@ public class PickManager : MonoBehaviour
 
             if (bluePlayers == null)
             {
-                foreach (RuntimePlayer player in redPlayers)
-                    queues[player.Tier].Enqueue(player);
-
+                ReturnPlayersToQueues(redPlayers, queues);
                 break;
             }
 
@@ -97,9 +114,7 @@ public class PickManager : MonoBehaviour
 
             if (bluePlayers == null)
             {
-                foreach (RuntimePlayer player in redPlayers)
-                    queues[player.Tier].Enqueue(player);
-
+                ReturnPlayersToQueues(redPlayers, queues);
                 break;
             }
 
@@ -111,6 +126,16 @@ public class PickManager : MonoBehaviour
 
         return matches;
     }
+
+    private void ReturnPlayersToQueues(List<RuntimePlayer> players, Dictionary<PlayerTier, Queue<RuntimePlayer>> queues)
+    {
+        foreach (RuntimePlayer player in players)
+            queues[player.Tier].Enqueue(player);
+    }
+
+    // =========================================================
+    // Queue Management
+    // =========================================================
 
     private Dictionary<PlayerTier, Queue<RuntimePlayer>> CreateQueues(IReadOnlyList<RuntimePlayer> players, System.Random random)
     {
@@ -132,12 +157,7 @@ public class PickManager : MonoBehaviour
             if (queue.Count < TeamSize)
                 continue;
 
-            List<RuntimePlayer> team = new();
-
-            for (int i = 0; i < TeamSize; i++)
-                team.Add(queue.Dequeue());
-
-            return team;
+            return DequeueTeam(queue);
         }
 
         return null;
@@ -158,19 +178,30 @@ public class PickManager : MonoBehaviour
 
         foreach (PlayerTier searchTier in searchTiers)
         {
-            if (queues[searchTier].Count < TeamSize)
+            Queue<RuntimePlayer> queue = queues[searchTier];
+
+            if (queue.Count < TeamSize)
                 continue;
 
-            List<RuntimePlayer> team = new();
-
-            for (int i = 0; i < TeamSize; i++)
-                team.Add(queues[searchTier].Dequeue());
-
-            return team;
+            return DequeueTeam(queue);
         }
 
         return null;
     }
+
+    private List<RuntimePlayer> DequeueTeam(Queue<RuntimePlayer> queue)
+    {
+        List<RuntimePlayer> team = new(TeamSize);
+
+        for (int i = 0; i < TeamSize; i++)
+            team.Add(queue.Dequeue());
+
+        return team;
+    }
+
+    // =========================================================
+    // Character Selection
+    // =========================================================
 
     private List<RuntimeCharacter> PickTeamCharacters(List<RuntimePlayer> players, System.Random random)
     {
@@ -226,22 +257,50 @@ public class PickManager : MonoBehaviour
         return characters[^1];
     }
 
+    // =========================================================
+    // Pick Score
+    // =========================================================
+
     public float GetPickScore(RuntimeCharacter character, RuntimePlayer player)
     {
         float score = 50f;
 
         score += WinrateScore(character, player) * winrateWeight;
         score += PickRateScore(character, player) * pickrateWeight;
-        score += PreferenceScore(character, player);
+        score += GetRolePreferenceScore(character, player) * roleWeight;
+        score += GetCharacterPreference(character) * characterWeight;
+
+        RecordPickScore(character, score);
 
         return Mathf.Max(1f, score);
+    }
+
+    private void RecordPickScore(RuntimeCharacter character, float score)
+    {
+        timePicked[character] = timePicked.GetValueOrDefault(character) + 1;
+        sumPickScore[character] = sumPickScore.GetValueOrDefault(character) + score;
+    } 
+
+    public void GetAveragePickScore()
+    {
+        foreach(RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
+        {
+            Debug.Log($"{character.OriginCharacter.characterName} : {sumPickScore[character] / timePicked[character]:F1}");
+        }
     }
 
     private float WinrateScore(RuntimeCharacter character, RuntimePlayer player)
     {
         float winRate = StatisticsManager.Instance.GetCurrentStatistics(character).Winrate;
 
-        if (winRate == 0 && RuntimeCharacterManager.Instance.AddedRuntimeCharacter == character) winRate = 70f; // 초반 캐릭터 승률 조정
+        if (winRate == 0f)
+        { // 가장 처음 시작하는 캐릭터 보정
+            winRate = 50f;
+        }
+        else if (winRate == 0f && RuntimeCharacterManager.Instance.AddedRuntimeCharacter == character)
+        { // 새로 추가된 캐릭터 보정
+            winRate = 70f;
+        }
 
         float metaWeight = player.MetaKnowledge / 100f;
         float experimentWeight = 1f - player.RiskTaking / 200f;
@@ -255,14 +314,17 @@ public class PickManager : MonoBehaviour
     private float PickRateScore(RuntimeCharacter character, RuntimePlayer player)
     {
         if (!player.KnownPickRates.TryGetValue(character, out float knownPickRate))
+        {
             knownPickRate = AnalysisManager.Instance.GetPickRate(character);
+            knownPickRate = knownPickRate == 0 ? 100f / RuntimeCharacterManager.Instance.CharacterCount : knownPickRate;
+        }
 
         float metaWeight = player.MetaKnowledge / 100f;
 
         return knownPickRate * metaWeight;
     }
 
-    private float PreferenceScore(RuntimeCharacter character, RuntimePlayer player)
+    private float GetRolePreferenceScore(RuntimeCharacter character, RuntimePlayer player)
     {
         if (!player.ClassPreferences.TryGetValue(character.OriginCharacter.role, out float preference))
             return 0f;
@@ -271,6 +333,18 @@ public class PickManager : MonoBehaviour
 
         return (preference - 30f) * weight;
     }
+
+    private float GetCharacterPreference(RuntimeCharacter character)
+    {
+        if (characterPreferenceDictionary.TryGetValue(character, out float value))
+            return value;
+
+        return 0f;
+    }
+
+    // =========================================================
+    // Meta Learning
+    // =========================================================
 
     public void UpdatePlayerMetaKnowledge(IReadOnlyList<RuntimePlayer> players)
     {
@@ -298,6 +372,31 @@ public class PickManager : MonoBehaviour
                     observedPickRate,
                     learningRate);
             }
+        }
+    }
+
+    public void UpdateCharacterPreference(RuntimeCharacter character, float delta)
+    {
+        if (characterPreferenceDictionary.TryGetValue(character, out var value))
+        {
+            characterPreferenceDictionary.Add(character, value + delta);
+        }
+        else
+        {
+            characterPreferenceDictionary.Add(character, GetRandomPreference());
+        }
+    }
+
+    public float GetRandomPreference()
+    {
+        return UnityEngine.Random.Range(5f, 20f);
+    }
+
+    public void GetCharacterPreferenceDebug()
+    {
+        foreach (var kvp in characterPreferenceDictionary)
+        {
+            Debug.Log($"{kvp.Key.OriginCharacter.characterName} : {kvp.Value:F1} ");
         }
     }
 }

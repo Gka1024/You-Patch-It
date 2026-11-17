@@ -6,6 +6,10 @@ public class CharacterTableUI : MonoBehaviour
 {
     private const int CHARACTERS_PER_PAGE = 10;
 
+    private int currentStartIndex = 0;
+    private float previousScrollTime;
+    private const float SCROLL_INPUT_INTERVAL = 0.05f;
+
     [SerializeField] private CharacterRowUI rowPrefab;
     [SerializeField] private Transform content;
 
@@ -20,8 +24,6 @@ public class CharacterTableUI : MonoBehaviour
     [SerializeField] private Sprite assassinSprite;
     [SerializeField] private Sprite tankSprite;
     [SerializeField] private Sprite supportSprite;
-
-    [SerializeField] private List<GameObject> rankNumList;
 
     [Header("Page")]
     [SerializeField] private Button previousPageButton;
@@ -50,6 +52,11 @@ public class CharacterTableUI : MonoBehaviour
         nextPageButton.onClick.AddListener(NextPage);
     }
 
+    void Update()
+    {
+        CheckScrollDown();
+    }
+
     private void OnDestroy()
     {
         if (previousPageButton != null)
@@ -71,15 +78,12 @@ public class CharacterTableUI : MonoBehaviour
         {
             CharacterRowUI row = Instantiate(rowPrefab, content);
 
-            row.Initialize(runtimeCharacter, this);
-
+            row.Initialize(runtimeCharacter, this, 1);
             rowList.Add(row);
             rowMap.Add(runtimeCharacter, row);
         }
 
         currentPage = 0;
-
-        DisplayRankNumber(rowList.Count);
 
         RestorePinnedCharacter();
 
@@ -104,8 +108,6 @@ public class CharacterTableUI : MonoBehaviour
                 row.Refresh();
         }
 
-        DisplayRankNumber(rowList.Count);
-
         RefreshCharacterPage();
     }
 
@@ -118,6 +120,29 @@ public class CharacterTableUI : MonoBehaviour
     // Page
     // =========================================================
 
+    private void RefreshCharacterPage()
+    {
+        int endIndex = Mathf.Min(
+            currentStartIndex + CHARACTERS_PER_PAGE,
+            displayCharacters.Count
+        );
+
+        foreach (CharacterRowUI row in rowList)
+        {
+            if (row != null)
+                row.gameObject.SetActive(false);
+        }
+
+        for (int i = currentStartIndex; i < endIndex; i++)
+        {
+            RuntimeCharacter character = displayCharacters[i];
+
+            if (rowMap.TryGetValue(character, out CharacterRowUI row))
+                row.gameObject.SetActive(true);
+        }
+    }
+
+    /*
     private void RefreshCharacterPage()
     {
         if (displayCharacters.Count == 0)
@@ -152,7 +177,7 @@ public class CharacterTableUI : MonoBehaviour
         }
 
         UpdatePageButtons();
-    }
+    }*/
 
     private void UpdatePageButtons()
     {
@@ -179,6 +204,32 @@ public class CharacterTableUI : MonoBehaviour
             return;
 
         currentPage++;
+
+        RefreshCharacterPage();
+    }
+
+    private void CheckScrollDown()
+    {
+        float scrollInput = Input.mouseScrollDelta.y;
+
+        if (Mathf.Abs(scrollInput) < 0.01f)
+            return;
+
+        if (Time.unscaledTime - previousScrollTime < SCROLL_INPUT_INTERVAL)
+            return;
+
+        previousScrollTime = Time.unscaledTime;
+
+        if (scrollInput < 0)
+            currentStartIndex++;
+        else
+            currentStartIndex--;
+
+        currentStartIndex = Mathf.Clamp(
+            currentStartIndex,
+            0,
+            Mathf.Max(0, displayCharacters.Count - CHARACTERS_PER_PAGE)
+        );
 
         RefreshCharacterPage();
     }
@@ -285,7 +336,7 @@ public class CharacterTableUI : MonoBehaviour
                 continue;
 
             row.ShowPinImage(row == pinnedCharacter);
-
+            row.UpdateRank(i + 1);
             row.transform.SetSiblingIndex(i);
         }
 
@@ -293,6 +344,7 @@ public class CharacterTableUI : MonoBehaviour
         // 4. 현재 페이지 갱신
         // =====================================================
 
+        currentStartIndex = 0;
         RefreshTable();
     }
 
@@ -310,12 +362,10 @@ public class CharacterTableUI : MonoBehaviour
 
         CharacterRowUI row = Instantiate(rowPrefab, content);
 
-        row.Initialize(runtimeCharacter, this);
+        row.Initialize(runtimeCharacter, this, 0);
 
         rowList.Add(row);
         rowMap.Add(runtimeCharacter, row);
-
-        DisplayRankNumber(rowList.Count);
 
         if (pinnedOriginCharacter != null &&
             runtimeCharacter.OriginCharacter == pinnedOriginCharacter)
@@ -349,12 +399,6 @@ public class CharacterTableUI : MonoBehaviour
     // =========================================================
     // Rank
     // =========================================================
-
-    private void DisplayRankNumber(int count)
-    {
-        for (int i = 0; i < rankNumList.Count; i++)
-            rankNumList[i].SetActive(count - 1 >= i);
-    }
 
     // =========================================================
     // Symbol

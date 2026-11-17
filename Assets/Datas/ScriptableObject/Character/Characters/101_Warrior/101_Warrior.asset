@@ -18,19 +18,19 @@ MonoBehaviour:
   role: 0
   stats:
   - statType: 0
-    value: 24
+    value: 27
   - statType: 1
     value: 0
   - statType: 2
     value: 370
   - statType: 3
-    value: 20
+    value: 24
   - statType: 4
-    value: 17
+    value: 19
   - statType: 5
     value: 4.2
   - statType: 6
-    value: 1.5
+    value: 1.4
   - statType: 7
     value: 1.8
   - statType: 8

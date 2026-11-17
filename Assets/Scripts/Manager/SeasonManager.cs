@@ -217,6 +217,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Pick:
+                PickManager.Instance.GetCharacterPreferenceDebug();
                 matches = PickManager.Instance.StartPick(players, seasonRandom);
                 FinishPick();
                 break;

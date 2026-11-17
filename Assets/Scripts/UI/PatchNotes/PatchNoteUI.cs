@@ -79,6 +79,7 @@ public class PatchNoteUI : MonoBehaviour
 
         foreach (PatchHistory history in histories)
         {
+            if (history.Records.Count == 0) continue;
             PatchNoteItemUI item = Instantiate(patchNotePrefab, content).GetComponent<PatchNoteItemUI>();
 
             item.Initialize(history);

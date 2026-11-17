@@ -18,6 +18,19 @@ public class GameManager : MonoBehaviour
         runtimeCharacterManager.Initialize(characterDatabase);
         statisticsManager.Initialize(characterDatabase);
         resultManager.Initialize(characterDatabase);
+
+        Application.runInBackground = true;
+        Application.targetFrameRate = 60;
+    }
+
+    void Start()
+    {
+
+    }
+
+    void OnApplicationFocus(bool focus)
+    {
+        Application.targetFrameRate = focus ? 60 : 15;
     }
 
     public void GameOver()

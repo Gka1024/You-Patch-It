@@ -16,11 +16,15 @@ public class UpDisplayUI : MonoBehaviour
     [SerializeField] private Button ExitButton;
     [SerializeField] private GameObject ExitPopup;
 
+    [SerializeField] private Button ResolutionButton;
+    [SerializeField] private GameObject ResolutionPopup;
+
     public GameObject GameOverUI;
 
     void Awake()
     {
         ExitButton.onClick.AddListener(ShowExitPopup);
+        ResolutionButton.onClick.AddListener(ShowResolutionPopup);
     }
 
     void Start()
@@ -52,5 +56,10 @@ public class UpDisplayUI : MonoBehaviour
     private void ShowExitPopup()
     {
         ExitPopup.SetActive(true);
+    }
+
+    private void ShowResolutionPopup()
+    {
+        ResolutionPopup.SetActive(true);
     }
 }

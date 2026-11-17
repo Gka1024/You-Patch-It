@@ -30,9 +30,9 @@ MonoBehaviour:
   - statType: 5
     value: 4.8
   - statType: 6
-    value: 0.9
+    value: 0.6
   - statType: 7
-    value: 1
+    value: 1.1
   - statType: 8
     value: 4
   - statType: 9

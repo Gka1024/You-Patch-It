@@ -1,33 +1,30 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class InspectorRowUI : MonoBehaviour
 {
     [Header("Stat")]
     [SerializeField] private CharacterStatType statType;
     public CharacterStatType StatType => statType;
-    [SerializeField] private float changeUnit; // 증감 단위
+    [SerializeField] private float changeUnit;
 
     [Header("UI")]
     [SerializeField] private TMP_Text statName;
-
-    [SerializeField] private TMP_Text currentValue; // 현재 스탯
+    [SerializeField] private TMP_Text currentValue;
     [SerializeField] private float currentValueFloat;
 
-    [SerializeField] private TMP_Text changeValue; // 증감할 스탯
+    [SerializeField] private TMP_Text changeValue;
     [SerializeField] private float changeValueFloat;
 
-    [SerializeField] private TMP_Text afterValue; // 스탯 적용 후 값
+    [SerializeField] private TMP_Text afterValue;
 
-    [SerializeField] private Button minusButton;
-    [SerializeField] private Button plusButton;
+    [SerializeField] private InspectorLongPressButton minusButton;
+    [SerializeField] private InspectorLongPressButton plusButton;
 
-
-    void Awake()
+    private void Awake()
     {
-        minusButton.onClick.AddListener(MinusClick);
-        plusButton.onClick.AddListener(PlusClick);
+        minusButton.onClick += MinusClick;
+        plusButton.onClick += PlusClick;
     }
 
     public void Initialize(RuntimeCharacter character)
@@ -79,7 +76,6 @@ public class InspectorRowUI : MonoBehaviour
     {
         return new CharacterPatch(statType, currentValueFloat, currentValueFloat + changeValueFloat);
     }
-
 }
 
 public readonly struct CharacterPatch

@@ -7,6 +7,7 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 {
     [Header("UI")]
     [SerializeField] private TMP_Text nameText;
+    [SerializeField] private TMP_Text rankText;
     [SerializeField] private TMP_Text winRateText;
     [SerializeField] private TMP_Text pickRateText;
     [SerializeField] private TMP_Text tierText;
@@ -30,10 +31,13 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public RuntimeCharacter RuntimeCharacter => runtimeCharacter;
 
-    public void Initialize(RuntimeCharacter character, CharacterTableUI tableUI)
+    public void Initialize(RuntimeCharacter character, CharacterTableUI tableUI, int rank)
     {
         runtimeCharacter = character;
+
         this.tableUI = tableUI;
+
+        UpdateRank(rank);
 
         Symbols.sprite = tableUI.GetSymbolSprite(character);
         RowClickChecker.Initialize(this);
@@ -75,6 +79,11 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             $"{AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue:F1}" : " - ";
     }
 
+    public void UpdateRank(int rank)
+    {
+        rankText.SetText(rank.ToString());
+    }
+
     // =========================================================
     // Click
     // =========================================================
@@ -111,4 +120,5 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         backgroundImage.SetActive(false);
     }
+
 }

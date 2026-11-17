@@ -13,6 +13,7 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private Button applyPatchButton;
     [SerializeField] private Button WriteReasonButton;
+    [SerializeField] private TMP_Text patchResourceText;
     [SerializeField] private GameObject PatchReasonUI;
     [SerializeField] private TMP_InputField PatchReasonInput;
 
@@ -64,6 +65,12 @@ public class InspectorUI : MonoBehaviour
     {
         PatchManager.Instance.OnPatchApplied += RefreshOnPatched;
         PatchManager.Instance.OnPatchUndone += RefreshOnPatched;
+        UnlockManager.Instance.OnUnlockChanged += RefreshPatchResourceText;
+    }
+
+    private void RefreshPatchResourceText()
+    {
+        patchResourceText.text = $"패치 리소스 : {PatchManager.Instance.GetRequiredResource()}";
     }
 
     private void OnDestroy()

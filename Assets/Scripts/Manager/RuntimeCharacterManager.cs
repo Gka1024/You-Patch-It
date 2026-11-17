@@ -7,6 +7,8 @@ public class RuntimeCharacterManager : MonoBehaviour
 {
     public static RuntimeCharacterManager Instance;
     [SerializeField] private CharacterDatabase characterDatabase;
+    
+    [SerializeField] private PickManager pickManager;
 
     [SerializeField] private List<int> startingCharacterIds = new();
     [SerializeField] private List<int> primalAdditionalCharacterIds = new();
@@ -87,6 +89,7 @@ public class RuntimeCharacterManager : MonoBehaviour
 
         runtimeCharacters.Add(id, runtime);
         AddedRuntimeCharacter = runtime;
+        pickManager.UpdateCharacterPreference(runtime, 0);
 
         if (Showlog) Debug.Log($"새 캐릭터 추가 : {runtime.OriginCharacter.characterName}");
 

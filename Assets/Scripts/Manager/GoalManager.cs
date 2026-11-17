@@ -95,7 +95,6 @@ public class GoalManager : MonoBehaviour
     {
         goalList.Clear();
 
-
         goalList.Add(new SpecificCharacterWinrateGoal(45, 55, GoalDifficulty.Easy, GoalType.Challenge));
     }
 

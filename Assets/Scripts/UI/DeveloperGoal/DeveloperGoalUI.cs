@@ -105,6 +105,7 @@ public class DeveloperGoalUI : MonoBehaviour
         SeasonText.text = $"시즌 {SeasonManager.Instance.CurrentSeason} - {SeasonManager.Instance.CurrentSubSeason}";
         DRReward.text = $"+{developerReward}";
         TPReward.text = $"+{trustPoint}";
+        TitleText.SetText("목표를 선택해 주세요.");
     }
 
     public void SetRerollCostValue(int value)

@@ -37,7 +37,6 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private Transform SpecialStatRows;
 
     [SerializeField] private TMP_Dropdown StatDropDown;
-    private readonly List<CharacterStatType> dropdownStatTypes = new();
 
     [Header("Analyses")]
     [SerializeField] private Button AnalysisButton;
@@ -47,6 +46,11 @@ public class InspectorUI : MonoBehaviour
     [Header("Winrate")]
     [SerializeField] private Button WinrateButton;
     [SerializeField] private GameObject Winrate;
+
+    [Header("Current Character")]
+
+    [SerializeField] private int currentPatchResource = 0;
+    private List<CharacterPatch> currentCharacterPatches = new();
 
     private void Awake()
     {
@@ -110,10 +114,10 @@ public class InspectorUI : MonoBehaviour
             return;
 
         currentCharacter = character;
+        currentCharacterPatches.Clear();
 
         SetRoleImage(character.OriginCharacter.role);
         SetCharacterSkillDescription();
-        InitializeStatDropDown();
 
         Refresh();
     }
@@ -173,70 +177,66 @@ public class InspectorUI : MonoBehaviour
 
     public void InitializeStats()
     {
-        ShowAllStatRows(false);
-        ClearSpecialStatRows();
+        ShowAllStatRows(true);
 
         foreach (GameObject row in StatRows)
         {
             InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
 
-            if (currentCharacter.OriginCharacter.defaultEditableStats.Contains(rowUI.StatType))
-            {
-                row.SetActive(true);
-                rowUI.Initialize(currentCharacter);
-            }
+            rowUI.Initialize(this, currentCharacter);
 
-            if (currentCharacter.HasPatchedSpecialStat() == rowUI.StatType)
+            if (currentCharacter.OriginCharacter.recommendEditStats.Contains(rowUI.StatType))
             {
-                ShowSpecificStats(rowUI.StatType);
+                rowUI.SetRecommended();
             }
         }
     }
 
-    private void InitializeStatDropDown()
-    {
-        StatDropDown.onValueChanged.RemoveAllListeners();
-
-        List<string> options = new() { "스탯 선택" };
-        dropdownStatTypes.Clear();
-
-        CharacterStatType? patchedStat = currentCharacter.HasPatchedSpecialStat();
-
-        foreach (CharacterStatType type in System.Enum.GetValues(typeof(CharacterStatType)))
+    /*
+        private void InitializeStatDropDown()
         {
-            // 기본 수정 가능 스탯은 드롭다운에서 제외
-            if (currentCharacter.OriginCharacter.defaultEditableStats.Contains(type))
-                continue;
+            StatDropDown.onValueChanged.RemoveAllListeners();
 
-            options.Add(DisplayNameHelper.GetStatName(type));
-            dropdownStatTypes.Add(type);
-        }
+            List<string> options = new() { "스탯 선택" };
+            dropdownStatTypes.Clear();
 
-        StatDropDown.ClearOptions();
-        StatDropDown.AddOptions(options);
+            CharacterStatType? patchedStat = currentCharacter.HasPatchedSpecialStat();
 
-        // 이미 특수 스탯을 패치했다면 해당 스탯으로 고정
-        if (patchedStat.HasValue)
-        {
-            int index = dropdownStatTypes.IndexOf(patchedStat.Value);
-
-            if (index >= 0)
+            foreach (CharacterStatType type in System.Enum.GetValues(typeof(CharacterStatType)))
             {
-                StatDropDown.value = index + 1;
-                StatDropDown.interactable = false;
-                ShowSpecificStats(patchedStat.Value);
+                // 기본 수정 가능 스탯은 드롭다운에서 제외
+                if (currentCharacter.OriginCharacter.defaultEditableStats.Contains(type))
+                    continue;
+
+                options.Add(DisplayNameHelper.GetStatName(type));
+                dropdownStatTypes.Add(type);
             }
-        }
-        else
-        {
-            StatDropDown.value = 0;
-            StatDropDown.interactable = true;
-        }
 
-        StatDropDown.RefreshShownValue();
-        StatDropDown.onValueChanged.AddListener(OnStatChanged);
-    }
+            StatDropDown.ClearOptions();
+            StatDropDown.AddOptions(options);
 
+            // 이미 특수 스탯을 패치했다면 해당 스탯으로 고정
+            if (patchedStat.HasValue)
+            {
+                int index = dropdownStatTypes.IndexOf(patchedStat.Value);
+
+                if (index >= 0)
+                {
+                    StatDropDown.value = index + 1;
+                    StatDropDown.interactable = false;
+                    ShowSpecificStats(patchedStat.Value);
+                }
+            }
+            else
+            {
+                StatDropDown.value = 0;
+                StatDropDown.interactable = true;
+            }
+
+            StatDropDown.RefreshShownValue();
+            StatDropDown.onValueChanged.AddListener(OnStatChanged);
+        }
+    */
     private void InitializeAnalysis()
     {
         foreach (GameObject row in AnalysisRows)
@@ -262,15 +262,20 @@ public class InspectorUI : MonoBehaviour
         PatchReasonUI.SetActive(true);
     }
 
-    private bool CheckDelta()
+    public void CheckDelta()
     {
+        currentCharacterPatches.Clear();
+
         foreach (GameObject row in StatRows)
         {
-            if (row.GetComponent<InspectorRowUI>().HasChange())
-                return true;
+            InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
+
+            if (rowUI.HasChange())
+                currentCharacterPatches.Add(rowUI.GetPatch());
         }
 
-        return false;
+        currentPatchResource = PatchManager.Instance.CalculateRequiredResource(currentCharacter, currentCharacterPatches);
+        patchResourceText.text = $"패치 리소스 : {currentPatchResource}";
     }
 
     private void ApplyPatch()
@@ -278,27 +283,7 @@ public class InspectorUI : MonoBehaviour
         if (currentCharacter == null)
             return;
 
-        List<CharacterPatch> patches = new();
-        CharacterStatType? specialStat = null;
-
-        // 변경된 스탯 수집
-        foreach (GameObject row in StatRows)
-        {
-            InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
-
-            if (!rowUI.HasChange())
-                continue;
-
-            patches.Add(rowUI.GetPatch());
-
-            // 특수 스탯 종류를 미리 저장
-            if (!currentCharacter.OriginCharacter.defaultEditableStats.Contains(rowUI.StatType))
-            {
-                specialStat = rowUI.StatType;
-            }
-        }
-
-        if (patches.Count == 0)
+        if (currentCharacterPatches.Count == 0)
         {
             PatchReasonUI.SetActive(false);
             return;
@@ -306,20 +291,14 @@ public class InspectorUI : MonoBehaviour
 
         string description = PatchReasonInput.text.Trim();
 
-        if (!PatchManager.Instance.ApplyPatch(currentCharacter, patches, description))
+        if (!PatchManager.Instance.ApplyPatch(currentCharacter, currentCharacterPatches, description))
             return;
 
-        // 패치 성공 후 특수 스탯 기록
-        if (specialStat.HasValue)
-        {
-            currentCharacter.SetPatchedSpecialStat(specialStat.Value);
-        }
-
+        currentCharacterPatches.Clear();
         PatchReasonUI.SetActive(false);
         PatchReasonInput.text = "";
 
         // 드롭다운 및 스탯 UI 갱신
-        InitializeStatDropDown();
         Refresh();
     }
 
@@ -334,57 +313,56 @@ public class InspectorUI : MonoBehaviour
             row.SetActive(show);
         }
     }
+    /*
+      private void ShowSpecificStats(CharacterStatType stat)
+      {
 
-    private void ShowSpecificStats(CharacterStatType stat)
-    {
-        ClearSpecialStatRows();
+          foreach (GameObject row in StatRows)
+          {
+              InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
 
-        foreach (GameObject row in StatRows)
-        {
-            InspectorRowUI rowUI = row.GetComponent<InspectorRowUI>();
+              if (rowUI.StatType != stat)
+                  continue;
 
-            if (rowUI.StatType != stat)
-                continue;
+              RectTransform rect = row.GetComponent<RectTransform>();
 
-            RectTransform rect = row.GetComponent<RectTransform>();
+              row.transform.SetParent(SpecialStatRows, false);
+              rect.anchoredPosition = Vector2.zero;
 
-            row.transform.SetParent(SpecialStatRows, false);
-            rect.anchoredPosition = Vector2.zero;
+              row.SetActive(true);
+              rowUI.Initialize(currentCharacter);
 
-            row.SetActive(true);
-            rowUI.Initialize(currentCharacter);
+              break;
+          }
+      }
 
-            break;
-        }
-    }
+          private void ClearSpecialStatRows()
+          {
+              // 자식 오브젝트를 하나씩 이동
+              // foreach 중 부모가 변경되는 문제 방지
+              while (SpecialStatRows.childCount > 0)
+              {
+                  Transform child = SpecialStatRows.GetChild(0);
 
-    private void ClearSpecialStatRows()
-    {
-        // 자식 오브젝트를 하나씩 이동
-        // foreach 중 부모가 변경되는 문제 방지
-        while (SpecialStatRows.childCount > 0)
-        {
-            Transform child = SpecialStatRows.GetChild(0);
+                  child.SetParent(NormalStatRows, false);
 
-            child.SetParent(NormalStatRows, false);
+                  InspectorRowUI rowUI = child.GetComponent<InspectorRowUI>();
+                  rowUI.ResetValue();
 
-            InspectorRowUI rowUI = child.GetComponent<InspectorRowUI>();
-            rowUI.ResetValue();
+                  child.gameObject.SetActive(false);
+              }
 
-            child.gameObject.SetActive(false);
-        }
+              // 기존 계층 구조 복구
+              foreach (GameObject row in StatRows)
+              {
+                  Transform rowTransform = row.transform;
 
-        // 기존 계층 구조 복구
-        foreach (GameObject row in StatRows)
-        {
-            Transform rowTransform = row.transform;
-
-            if (originalSiblingIndexes.TryGetValue(rowTransform, out int siblingIndex))
-            {
-                rowTransform.SetSiblingIndex(siblingIndex);
-            }
-        }
-    }
+                  if (originalSiblingIndexes.TryGetValue(rowTransform, out int siblingIndex))
+                  {
+                      rowTransform.SetSiblingIndex(siblingIndex);
+                  }
+              }
+          }
 
     private void OnStatChanged(int index)
     {
@@ -396,9 +374,8 @@ public class InspectorUI : MonoBehaviour
         if (statIndex < 0 || statIndex >= dropdownStatTypes.Count)
             return;
 
-        ShowSpecificStats(dropdownStatTypes[statIndex]);
     }
-
+      */
     public void ShowPatchResourceLackAlert(bool show)
     {
         // TODO

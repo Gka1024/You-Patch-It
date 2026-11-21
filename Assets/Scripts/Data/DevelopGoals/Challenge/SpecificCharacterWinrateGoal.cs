@@ -4,7 +4,7 @@ public class SpecificCharacterWinrateGoal : DeveloperGoal
     private readonly float maxWinrate;
     private RuntimeCharacter character;
 
-    public override string Title => $"{character.OriginCharacter.characterName}가 좋아요";
+    public override string Title => $"한 캐릭터가 좋아요";
     public override string Description =>
     $"{character.OriginCharacter.characterName}의 승률을 {minWinrate}% ~ {maxWinrate}%로 맞추세요.";
 

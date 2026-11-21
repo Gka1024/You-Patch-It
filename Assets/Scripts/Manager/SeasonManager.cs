@@ -238,7 +238,7 @@ public class SeasonManager : MonoBehaviour
                 UIManager.Instance.patchNoteUI.Refresh();
                 UIManager.Instance.characterTableUI.ReArrangetable();
                 RuntimeCharacterManager.Instance.ResetAllCharacter();
-
+                PickManager.Instance.UpdateAllCharacterPreference();
                 UIManager.Instance.bottomDisplayUI.ShowReaction();
                 if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn) UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();
                 UIManager.Instance.alertUI.ClearAlerts();

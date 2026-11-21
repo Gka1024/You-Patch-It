@@ -110,6 +110,7 @@ public class GoalManager : MonoBehaviour
             currentGoalCount = Mathf.Max(currentGoalCount, 3);
 
         AddUnlockedGoals();
+        ApplyToGoalUI();
     }
 
     private void HandleUnlockChanged()
@@ -181,6 +182,11 @@ public class GoalManager : MonoBehaviour
             AddGoalOnce(new ReverseMetaGoal(GoalDifficulty.Hard, GoalType.Meta));
             AddGoalOnce(new SingleStatPatchGoal(GoalDifficulty.Hard, GoalType.Patch));
         }
+    }
+
+    private void ApplyToGoalUI()
+    {
+        GoalUI.SetInspectorTitle(goalList);
     }
 
     private void AddGoalOnce(DeveloperGoal goal)
@@ -420,6 +426,7 @@ public class GoalManager : MonoBehaviour
         }
 
         RefreshUI();
+        GoalUI.ResetCurrentGoalAlert();
     }
 
     private void RefreshUI()

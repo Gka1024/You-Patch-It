@@ -20,7 +20,7 @@ MonoBehaviour:
   - statType: 0
     value: 21
   - statType: 1
-    value: 1.7
+    value: 14
   - statType: 2
     value: 250
   - statType: 3
@@ -44,5 +44,5 @@ MonoBehaviour:
   - statType: 12
     value: 1.7
   skill: {fileID: 11400000, guid: 2979aee63d36802468fed39fc19474f2, type: 2}
-  defaultEditableStats: 000000000600000007000000090000000c000000i
+  recommendEditStats: 
   battleAI: {fileID: 11400000, guid: f1f675742f9ce4142924efb568c95706, type: 2}

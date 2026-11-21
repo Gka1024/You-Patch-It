@@ -279,11 +279,11 @@ public class PickManager : MonoBehaviour
     {
         timePicked[character] = timePicked.GetValueOrDefault(character) + 1;
         sumPickScore[character] = sumPickScore.GetValueOrDefault(character) + score;
-    } 
+    }
 
     public void GetAveragePickScore()
     {
-        foreach(RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
+        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
         {
             Debug.Log($"{character.OriginCharacter.characterName} : {sumPickScore[character] / timePicked[character]:F1}");
         }
@@ -375,11 +375,19 @@ public class PickManager : MonoBehaviour
         }
     }
 
+    public void UpdateAllCharacterPreference()
+    {
+        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
+        {
+            UpdateCharacterPreference(character, GetPreferenceDelta());
+        }
+    }
+
     public void UpdateCharacterPreference(RuntimeCharacter character, float delta)
     {
         if (characterPreferenceDictionary.TryGetValue(character, out var value))
         {
-            characterPreferenceDictionary.Add(character, value + delta);
+            characterPreferenceDictionary[character] = value + delta;
         }
         else
         {
@@ -390,6 +398,11 @@ public class PickManager : MonoBehaviour
     public float GetRandomPreference()
     {
         return UnityEngine.Random.Range(5f, 20f);
+    }
+
+    public float GetPreferenceDelta()
+    {
+        return UnityEngine.Random.Range(-1f, 1f);
     }
 
     public void GetCharacterPreferenceDebug()

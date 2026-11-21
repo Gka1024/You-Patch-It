@@ -20,6 +20,9 @@ public class DeveloperGoalUI : MonoBehaviour
     [SerializeField] private Button ConfirmButton;
     [SerializeField] private GameObject GoalAlert;
 
+    [SerializeField] private Transform inspectorTitleParent;
+    [SerializeField] private GameObject inspectorTitlePrefab;
+
     private int selectedIndex = -1;
 
     public void Initialize(List<DeveloperGoal> goals, GoalManager goalManager)
@@ -105,6 +108,10 @@ public class DeveloperGoalUI : MonoBehaviour
         SeasonText.text = $"시즌 {SeasonManager.Instance.CurrentSeason} - {SeasonManager.Instance.CurrentSubSeason}";
         DRReward.text = $"+{developerReward}";
         TPReward.text = $"+{trustPoint}";
+    }
+
+    public void ResetCurrentGoalAlert()
+    {
         TitleText.SetText("목표를 선택해 주세요.");
     }
 
@@ -116,5 +123,23 @@ public class DeveloperGoalUI : MonoBehaviour
     public void ShowAlert(bool show)
     {
         GoalAlert.SetActive(show);
+    }
+
+    // ========================================
+    // 오른쪽 인스펙터
+    // ========================================
+
+    public void SetInspectorTitle(List<DeveloperGoal> goals)
+    {
+        foreach (Transform obj in inspectorTitleParent)
+        {
+            Destroy(obj.gameObject);
+        }
+
+        foreach (DeveloperGoal goal in goals)
+        {
+            TMP_Text text = Instantiate(inspectorTitlePrefab, inspectorTitleParent).GetComponent<TMP_Text>();
+            text.text = $"{goal.Title}";
+        }
     }
 }

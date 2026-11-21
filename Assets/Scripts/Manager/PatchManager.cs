@@ -29,6 +29,9 @@ public class PatchManager : MonoBehaviour
     private const float PATCH_REQUIRE_RESOURCE_II = 0.3f;
     private const int PATCH_REQUIRE_RESOURCE_III = 0;
 
+    private const int RECOMMENDED_PATCH_RESOURCE = 5;
+    private const int NORMAL_PATCH_RESOURCE = 10;
+
     private const int PATCH_EFFICIENCY_I = 1011;
     private const int PATCH_EFFICIENCY_II = 1012;
     private const int PATCH_EFFICIENCY_III = 1013;
@@ -80,7 +83,9 @@ public class PatchManager : MonoBehaviour
         if (patches == null || patches.Count == 0)
             return false;
 
-        if (!ResourceManager.Instance.SpendDevelopResource(GetRequiredResource()))
+        int requiredResource = CalculateRequiredResource(character, patches);
+
+        if (!ResourceManager.Instance.SpendDevelopResource(requiredResource))
         {
             UIManager.Instance.inspectorUI.ShowPatchResourceLackAlert(true);
             return false;
@@ -105,20 +110,21 @@ public class PatchManager : MonoBehaviour
 
     public int GetRequiredResource()
     {
-        float multiplier = 1f;
+        return (int)(patchRequireResource * GetPatchResourceMultiplier());
+    }
 
+    private float GetPatchResourceMultiplier()
+    {
         if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_III))
-            multiplier = PATCH_REQUIRE_RESOURCE_III;
-        else if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_II))
-            multiplier = PATCH_REQUIRE_RESOURCE_II;
-        else if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_I))
-            multiplier = PATCH_REQUIRE_RESOURCE_I;
+            return PATCH_REQUIRE_RESOURCE_III;
 
-        int result = Mathf.RoundToInt(multiplier * patchRequireResource);
+        if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_II))
+            return PATCH_REQUIRE_RESOURCE_II;
 
-        Debug.Log($"Multiplier : {multiplier}, Required Resource : {result}");
+        if (UnlockManager.Instance.IsUnlocked(PATCH_EFFICIENCY_I))
+            return PATCH_REQUIRE_RESOURCE_I;
 
-        return result;
+        return 1f;
     }
 
     public void Undo()
@@ -139,6 +145,27 @@ public class PatchManager : MonoBehaviour
     {
         appliedPatches.Clear();
         undoStack.Clear();
+    }
+
+    // ====================================================
+    // Resource Calculate
+    // ====================================================
+
+    public int CalculateRequiredResource(RuntimeCharacter character, IReadOnlyList<CharacterPatch> patches)
+    {
+        if (character == null || patches == null || patches.Count == 0)
+            return 0;
+
+        int totalResource = 0;
+
+        foreach (CharacterPatch patch in patches)
+        {
+            bool isRecommended = character.OriginCharacter.recommendEditStats.Contains(patch.StatType);
+
+            totalResource += isRecommended ? RECOMMENDED_PATCH_RESOURCE : NORMAL_PATCH_RESOURCE;
+        }
+
+        return Mathf.RoundToInt(totalResource * GetPatchResourceMultiplier());
     }
 
     //====================================================

@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObject/Character/Skill/Assasin")]
 public class CharacterSkill_Clown : CharacterSkill
 {
-    [SerializeField] private float damageMultiplier = 1f;
+    [SerializeField] private float damageMultiplier = 2.5f;
     [SerializeField] private float stunDuration = 1f;
 
     private float CalculateMoveDistance(float moveSpeed, float coefficient)

@@ -297,22 +297,22 @@ public class CharacterTableUI : MonoBehaviour
         List<RuntimeCharacter> sortedCharacters =
             AnalysisManager.Instance.GetSortedCharacters(item, direction);
 
+        // 정렬 결과 기준 순위를 먼저 저장
+        Dictionary<RuntimeCharacter, int> rankMap = new();
+
+        for (int i = 0; i < sortedCharacters.Count; i++)
+            rankMap[sortedCharacters[i]] = i + 1;
+
         displayCharacters.Clear();
 
-        // =====================================================
-        // 1. 고정 캐릭터를 가장 먼저 추가
-        // =====================================================
-
+        // 고정 캐릭터는 화면에서만 가장 먼저 표시
         if (pinnedCharacter != null &&
             rowMap.ContainsKey(pinnedCharacter.RuntimeCharacter))
         {
             displayCharacters.Add(pinnedCharacter.RuntimeCharacter);
         }
 
-        // =====================================================
-        // 2. 나머지 캐릭터를 정렬 순서대로 추가
-        // =====================================================
-
+        // 나머지는 원래 정렬 순서대로 표시
         foreach (RuntimeCharacter character in sortedCharacters)
         {
             if (pinnedCharacter != null &&
@@ -324,10 +324,7 @@ public class CharacterTableUI : MonoBehaviour
             displayCharacters.Add(character);
         }
 
-        // =====================================================
-        // 3. Hierarchy도 displayCharacters 순서대로 정렬
-        // =====================================================
-
+        // 화면 순서와 순위를 분리해서 적용
         for (int i = 0; i < displayCharacters.Count; i++)
         {
             RuntimeCharacter character = displayCharacters[i];
@@ -336,18 +333,17 @@ public class CharacterTableUI : MonoBehaviour
                 continue;
 
             row.ShowPinImage(row == pinnedCharacter);
-            row.UpdateRank(i + 1);
+
+            if (rankMap.TryGetValue(character, out int rank))
+                row.UpdateRank(rank);
+
             row.transform.SetSiblingIndex(i);
         }
-
-        // =====================================================
-        // 4. 현재 페이지 갱신
-        // =====================================================
 
         currentStartIndex = 0;
         RefreshTable();
     }
-
+    
     // =========================================================
     // Add Character
     // =========================================================

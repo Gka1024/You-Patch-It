@@ -379,7 +379,8 @@ public class PickManager : MonoBehaviour
     {
         foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
         {
-            UpdateCharacterPreference(character, GetPreferenceDelta());
+            CharacterTier tier = AnalysisManager.Instance.GetTier(character);
+            UpdateCharacterPreference(character, GetPreferenceDelta(tier));
         }
     }
 
@@ -400,16 +401,27 @@ public class PickManager : MonoBehaviour
         return UnityEngine.Random.Range(5f, 20f);
     }
 
-    public float GetPreferenceDelta()
+    public float GetPreferenceDelta(CharacterTier tier)
     {
-        return UnityEngine.Random.Range(-1f, 1f);
+        float delta = 0;
+
+        delta = tier switch
+        {
+            CharacterTier.D => UnityEngine.Random.Range(-3f, 0f),
+            CharacterTier.C => UnityEngine.Random.Range(-1.2f, 0.8f),
+            CharacterTier.B => UnityEngine.Random.Range(-1f, 1f),
+            CharacterTier.A => UnityEngine.Random.Range(-0.8f, 1.2f),
+            CharacterTier.S => UnityEngine.Random.Range(-0.5f, 1.5f),
+            _ => 0,
+        };
+        return delta;
     }
 
     public void GetCharacterPreferenceDebug()
     {
         foreach (var kvp in characterPreferenceDictionary)
         {
-            Debug.Log($"{kvp.Key.OriginCharacter.characterName} : {kvp.Value:F1} ");
+            Debug.Log($"[선호도] {kvp.Key.OriginCharacter.characterName} : {kvp.Value:F1} ");
         }
     }
 }

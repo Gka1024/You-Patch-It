@@ -5,10 +5,10 @@ using UnityEngine;
 public class CharacterSkill_Falcon : CharacterSkill
 {
     [Header("Hawk Summon")]
-    [SerializeField] private float attackBonusCoefficient = 0.3f;
+    [SerializeField] private float attackBonusCoefficient = 0.2f;
 
     [Header("Hawk Sacrifice")]
-    [SerializeField] private float sacrificeDamageCoefficient = 2.5f;
+    [SerializeField] private float sacrificeDamageCoefficient = 1.5f;
 
     private float CalculateAttackBonus(float coefficient)
     {

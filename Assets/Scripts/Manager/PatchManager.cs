@@ -11,8 +11,6 @@ public class PatchManager : MonoBehaviour
     public event Action<PatchRecord> OnPatchUndone;
     public event Action OnPatchConfirmed;
 
-    [SerializeField] private int patchRequireResource;
-
     /// <summary>
     /// 현재 적용되어 있는 패치
     /// </summary>
@@ -110,7 +108,7 @@ public class PatchManager : MonoBehaviour
 
     public int GetRequiredResource()
     {
-        return (int)(patchRequireResource * GetPatchResourceMultiplier());
+        return (int)(NORMAL_PATCH_RESOURCE * GetPatchResourceMultiplier());
     }
 
     private float GetPatchResourceMultiplier()

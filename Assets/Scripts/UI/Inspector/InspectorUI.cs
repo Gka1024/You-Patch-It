@@ -33,10 +33,6 @@ public class InspectorUI : MonoBehaviour
     [SerializeField] private Button StatsButton;
     [SerializeField] private GameObject Stats;
     [SerializeField] private GameObject[] StatRows;
-    [SerializeField] private Transform NormalStatRows;
-    [SerializeField] private Transform SpecialStatRows;
-
-    [SerializeField] private TMP_Dropdown StatDropDown;
 
     [Header("Analyses")]
     [SerializeField] private Button AnalysisButton;

@@ -7791,8 +7791,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1545014706}
+  m_Children: []
   m_Father: {fileID: 1307744424}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &260479949
@@ -15457,9 +15456,6 @@ MonoBehaviour:
   - {fileID: 1462735534}
   - {fileID: 398465536}
   - {fileID: 973017781}
-  NormalStatRows: {fileID: 0}
-  SpecialStatRows: {fileID: 0}
-  StatDropDown: {fileID: 0}
   AnalysisButton: {fileID: 666757372}
   Analysis: {fileID: 1957727746}
   AnalysisRows:
@@ -15472,6 +15468,7 @@ MonoBehaviour:
   - {fileID: 2035789069}
   WinrateButton: {fileID: 1888075418}
   Winrate: {fileID: 951804491}
+  currentPatchResource: 0
 --- !u!1 &508465122
 GameObject:
   m_ObjectHideFlags: 0
@@ -25459,7 +25456,7 @@ GameObject:
   - component: {fileID: 855891234}
   - component: {fileID: 855891233}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PatchResource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25504,7 +25501,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD328\uCE58 \uB9AC\uC18C\uC2A4 : 30"
+  m_text: "\uD328\uCE58 \uB9AC\uC18C\uC2A4 : 0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cca8473c419c2cd409d13ccfab9f0a4b, type: 2}
   m_sharedMaterial: {fileID: 7390122558761162208, guid: cca8473c419c2cd409d13ccfab9f0a4b, type: 2}
@@ -40333,6 +40330,7 @@ RectTransform:
   - {fileID: 1084335506}
   - {fileID: 1517968513}
   - {fileID: 260479948}
+  - {fileID: 1545014706}
   - {fileID: 1080374334}
   - {fileID: 12807380}
   - {fileID: 921297647}
@@ -44471,7 +44469,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2f73d6695a14742b4e5a33193ee856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patchRequireResource: 30
 --- !u!1 &1523621881
 GameObject:
   m_ObjectHideFlags: 0
@@ -44742,7 +44739,7 @@ GameObject:
   - component: {fileID: 1545014706}
   - component: {fileID: 1545014707}
   m_Layer: 0
-  m_Name: ResourceCalculateManager
+  m_Name: BalanceEvaluationManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44761,7 +44758,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 260479948}
+  m_Father: {fileID: 1307744424}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1545014707
 MonoBehaviour:
@@ -44772,24 +44769,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1545014705}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84a0ffd169cb3504cbc6bfc445f7bccc, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e2b53398babd514cbb70b921e3562ce, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  tierWeights:
-  - tier: 0
-    weight: 1.2
-  - tier: 1
-    weight: 2
-  - tier: 2
-    weight: 3.3
-  - tier: 3
-    weight: 4.2
-  - tier: 4
-    weight: 6.5
-  - tier: 5
-    weight: 8
-  - tier: 6
-    weight: 10
+  m_EditorClassIdentifier: Assembly-CSharp::BalanceEvaluationManager
+  tierWeights: []
+  targetWinRate: 50
+  minimumMatchCount: 30
+  winRatePenalties:
+  - winRateDeltaThreshold: 5
+    penalty: 0.3
+  - winRateDeltaThreshold: 10
+    penalty: 0.7
+  - winRateDeltaThreshold: 15
+    penalty: 1.5
+  - winRateDeltaThreshold: 20
+    penalty: 2.5
 --- !u!1 &1547239870
 GameObject:
   m_ObjectHideFlags: 0

@@ -46,10 +46,10 @@ public class    ResourceManager : MonoBehaviour
 
     public void CalculateSeasonReward()
     {
-        int developResource = ResourceCalculateManager.Instance.CalculateSeasonDevelopResource();
-        float trust = ResourceCalculateManager.Instance.CalculateSeasonTrust();
-        int money = ResourceCalculateManager.Instance.CalculateMoney();
-        int operatingCost = ResourceCalculateManager.Instance.CalculateOperatingCost();
+        int developResource = BalanceEvaluationManager.Instance.CalculateSeasonDevelopResource();
+        float trust = BalanceEvaluationManager.Instance.CalculateSeasonTrust();
+        int money = BalanceEvaluationManager.Instance.CalculateMoney();
+        int operatingCost = BalanceEvaluationManager.Instance.CalculateOperatingCost();
 
         AddDevelopResource(developResource);
         AddTrust(trust);

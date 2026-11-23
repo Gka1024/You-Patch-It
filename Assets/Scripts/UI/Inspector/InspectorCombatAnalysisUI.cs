@@ -129,7 +129,7 @@ public class InspectorCombatAnalysisUI : MonoBehaviour
 
         if (baseCharacter != null && opponentCharacter != null)
         {
-            float rate = BattlePredictor.Instance.PredictBattle(baseCharacter, opponentCharacter, 100);
+            float rate = BattlePredictor.Instance.PredictBattle(baseCharacter, opponentCharacter, selectedTier ?? default, 100);
             SetExpectWinrateText(rate);
         }
     }

@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,17 +16,46 @@ public class InspectorStatisticRowUI : MonoBehaviour
     [SerializeField] private TMP_Text currentSeasonText;
     [SerializeField] private TMP_Text pastSeasonText;
 
+    private const int SHOW_DPS = 1024;
+    private bool isDPSUnlocked = false;
 
     public void Initialize(RuntimeCharacter character)
     {
         RefreshUI(character);
+        if (analysisItem == AnalysisItem.AverageDPS)
+        {
+            UnlockManager.Instance.OnUnlockChanged += CheckUnlock;
+        }
+    }
+
+    private void CheckUnlock()
+    {
+        if (UnlockManager.Instance.IsUnlocked(SHOW_DPS))
+        {
+            isDPSUnlocked = true;
+            UnlockManager.Instance.OnUnlockChanged -= CheckUnlock;
+        }
     }
 
     private void RefreshUI(RuntimeCharacter character)
     {
         AnalysisData data = AnalysisManager.Instance.GetAnalysis(character, analysisItem);
 
-        SetText(data);
+        if (analysisItem == AnalysisItem.AverageDPS)
+        {
+            if (isDPSUnlocked)
+            {
+                SetText(data);
+            }
+            else
+            {
+                SetTextEmpty();
+            }
+        }
+        else
+        {
+            SetText(data);
+        }
     }
 
     private void SetText(AnalysisData data)
@@ -50,6 +80,13 @@ public class InspectorStatisticRowUI : MonoBehaviour
         {
             rankDelta.text = "-";
         }
+    }
+
+    private void SetTextEmpty()
+    {
+        currentSeasonText.text = $" - ";
+        pastSeasonText.text = $" - ";
+        rankDelta.text = "-";
     }
 
     private string FormatValue(float value)

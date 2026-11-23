@@ -10549,8 +10549,6 @@ MonoBehaviour:
   assassinSprite: {fileID: -1950056267831496790, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
   tankSprite: {fileID: -2588839765438997867, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
   supportSprite: {fileID: -8893909045972252029, guid: 2e6fe1738530d52458316733822d55ca, type: 3}
-  previousPageButton: {fileID: 268248350}
-  nextPageButton: {fileID: 98574263}
 --- !u!1001 &364461012
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29501,7 +29499,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 4
   m_Viewport: {fileID: 1687732594}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 148341078}

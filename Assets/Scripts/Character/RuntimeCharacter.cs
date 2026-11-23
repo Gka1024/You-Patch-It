@@ -5,7 +5,6 @@ public class RuntimeCharacter
 {
     public Character OriginCharacter { get; }
     public Dictionary<CharacterStatType, RuntimeStat> Stats { get; } = new();
-    private CharacterStatType? patchedSpecialStat;
 
     public event Action OnStatChanged;
 
@@ -21,21 +20,6 @@ public class RuntimeCharacter
     public float GetStat(CharacterStatType stat)
     {
         return Stats[stat].CurrentValue;
-    }
-
-    public CharacterStatType? HasPatchedSpecialStat()
-    {
-        return patchedSpecialStat;
-    }
-
-    public void SetPatchedSpecialStat(CharacterStatType stat)
-    {
-        patchedSpecialStat = stat;
-    }
-
-    public void ResetSpecialStat()
-    {
-        patchedSpecialStat = null;
     }
 
     public void Patch(List<CharacterPatch> patches)

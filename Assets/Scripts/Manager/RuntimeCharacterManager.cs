@@ -7,7 +7,7 @@ public class RuntimeCharacterManager : MonoBehaviour
 {
     public static RuntimeCharacterManager Instance;
     [SerializeField] private CharacterDatabase characterDatabase;
-    
+
     [SerializeField] private PickManager pickManager;
 
     [SerializeField] private List<int> startingCharacterIds = new();
@@ -138,14 +138,6 @@ public class RuntimeCharacterManager : MonoBehaviour
     public IEnumerable<RuntimeCharacter> GetAllCharacters()
     {
         return runtimeCharacters.Values;
-    }
-
-    public void ResetAllCharacter()
-    {
-        foreach (RuntimeCharacter character in GetAllCharacters())
-        {
-            character.ResetSpecialStat();
-        }
     }
 
     public RuntimeCharacter GetRandomCharacter()

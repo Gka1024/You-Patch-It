@@ -223,6 +223,7 @@ public class SeasonManager : MonoBehaviour
                 break;
 
             case SeasonState.Simulation:
+                UIManager.Instance.characterTableUI.SetAllOld();
                 StatisticsManager.Instance.ResetSeason();
 
                 StartCoroutine(RunSimulation());
@@ -237,7 +238,6 @@ public class SeasonManager : MonoBehaviour
                 PatchHistoryManager.Instance.SaveCurrentSeason();
                 UIManager.Instance.patchNoteUI.Refresh();
                 UIManager.Instance.characterTableUI.ReArrangetable();
-                RuntimeCharacterManager.Instance.ResetAllCharacter();
                 PickManager.Instance.UpdateAllCharacterPreference();
                 UIManager.Instance.bottomDisplayUI.ShowReaction();
                 if (!UIManager.Instance.bottomDisplayUI.UserReaction.LoopOn) UIManager.Instance.bottomDisplayUI.UserReaction.TurnOnLoop();

@@ -5,9 +5,6 @@ using UnityEngine.UI;
 public class CharacterTableUI : MonoBehaviour
 {
     private const int CHARACTERS_PER_PAGE = 10;
-
-    private int currentStartIndex = 0;
-    private float previousScrollTime;
     private const float SCROLL_INPUT_INTERVAL = 0.05f;
 
     [SerializeField] private CharacterRowUI rowPrefab;
@@ -25,69 +22,77 @@ public class CharacterTableUI : MonoBehaviour
     [SerializeField] private Sprite tankSprite;
     [SerializeField] private Sprite supportSprite;
 
-    [Header("Page")]
-    [SerializeField] private Button previousPageButton;
-    [SerializeField] private Button nextPageButton;
-
+    // 실제 생성한 행. 최대 CHARACTERS_PER_PAGE개만 유지한다.
     private readonly List<CharacterRowUI> rowList = new();
-    private readonly Dictionary<RuntimeCharacter, CharacterRowUI> rowMap = new();
 
-    // 실제 화면에 표시되는 순서
+    // 현재 화면에 표시되는 순서
     private readonly List<RuntimeCharacter> displayCharacters = new();
 
-    private CharacterRowUI pinnedCharacter;
+    // 캐릭터의 정렬 순위. 화면 표시 순서와 별도로 유지한다.
+    private readonly Dictionary<RuntimeCharacter, int> rankMap = new();
+
     private Character pinnedOriginCharacter;
 
-    private int currentPage = 0;
+    // 현재 화면의 첫 번째 캐릭터 인덱스
+    private int currentStartIndex;
 
-    private int TotalPage =>
-        Mathf.Max(1, Mathf.CeilToInt((float)displayCharacters.Count / CHARACTERS_PER_PAGE));
+    // 캐릭터가 새로 추가될 때, 예상 승률을 캐싱해두는 딕셔너리
+    private readonly Dictionary<RuntimeCharacter, float> expectedWinRateCache = new();
+    private bool showExpectWinrate = false;
+    private RuntimeCharacter newcharacter;
+
+    private float previousScrollTime;
+
+    private int MaxStartIndex =>
+        Mathf.Max(0, displayCharacters.Count - CHARACTERS_PER_PAGE);
 
     private void Start()
     {
         GenerateTable();
         InitializeHeaders();
 
-        previousPageButton.onClick.AddListener(PreviousPage);
-        nextPageButton.onClick.AddListener(NextPage);
+        showExpectWinrate = true;
     }
 
-    void Update()
+    private void Update()
     {
         CheckScrollDown();
     }
 
-    private void OnDestroy()
-    {
-        if (previousPageButton != null)
-            previousPageButton.onClick.RemoveListener(PreviousPage);
-
-        if (nextPageButton != null)
-            nextPageButton.onClick.RemoveListener(NextPage);
-    }
-
-    // =========================================================
+    //========================================================
     // Generate
-    // =========================================================
+    //========================================================
 
     public void GenerateTable()
     {
-        ClearTable();
+        displayCharacters.Clear();
+        rankMap.Clear();
 
-        foreach (RuntimeCharacter runtimeCharacter in RuntimeCharacterManager.Instance.GetAllCharacters())
+        foreach (RuntimeCharacter character in RuntimeCharacterManager.Instance.GetAllCharacters())
         {
-            CharacterRowUI row = Instantiate(rowPrefab, content);
+            if (character != null) displayCharacters.Add(character);
 
-            row.Initialize(runtimeCharacter, this, 1);
-            rowList.Add(row);
-            rowMap.Add(runtimeCharacter, row);
+            CacheExpectedWinRate(character);
         }
 
-        currentPage = 0;
+        currentStartIndex = 0;
 
-        RestorePinnedCharacter();
-
+        EnsureRowCount();
         ArrangeTable(currentSortItem, currentDirection);
+    }
+
+    private void EnsureRowCount()
+    {
+        int requiredCount = Mathf.Min(CHARACTERS_PER_PAGE, displayCharacters.Count);
+
+        while (rowList.Count < requiredCount)
+        {
+            CharacterRowUI row = Instantiate(rowPrefab, content);
+            row.Initialize(this);
+            row.gameObject.SetActive(false);
+
+            rowList.Add(row);
+        }
     }
 
     private void InitializeHeaders()
@@ -96,18 +101,12 @@ public class CharacterTableUI : MonoBehaviour
             header.Initialize(this);
     }
 
-    // =========================================================
+    //========================================================
     // Refresh
-    // =========================================================
+    //========================================================
 
     public void RefreshTable()
     {
-        foreach (CharacterRowUI row in rowList)
-        {
-            if (row != null)
-                row.Refresh();
-        }
-
         RefreshCharacterPage();
     }
 
@@ -116,97 +115,60 @@ public class CharacterTableUI : MonoBehaviour
         ArrangeTable(currentSortItem, currentDirection);
     }
 
-    // =========================================================
+    public void SetAllOld()
+    {
+        foreach (CharacterRowUI row in rowList)
+        {
+            row.isNewCharacter = false;
+        }
+    }
+
+    //========================================================
     // Page
-    // =========================================================
+    //========================================================
 
     private void RefreshCharacterPage()
     {
+        currentStartIndex = Mathf.Clamp(currentStartIndex, 0, MaxStartIndex);
+
         int endIndex = Mathf.Min(
             currentStartIndex + CHARACTERS_PER_PAGE,
             displayCharacters.Count
         );
 
-        foreach (CharacterRowUI row in rowList)
-        {
-            if (row != null)
-                row.gameObject.SetActive(false);
-        }
+        int visibleCount = endIndex - currentStartIndex;
 
-        for (int i = currentStartIndex; i < endIndex; i++)
+        for (int i = 0; i < rowList.Count; i++)
         {
-            RuntimeCharacter character = displayCharacters[i];
+            CharacterRowUI row = rowList[i];
 
-            if (rowMap.TryGetValue(character, out CharacterRowUI row))
+            if (i < visibleCount)
+            {
+                RuntimeCharacter character = displayCharacters[currentStartIndex + i];
+
+                int rank = rankMap.TryGetValue(character, out int value)
+                    ? value
+                    : 0;
+
                 row.gameObject.SetActive(true);
-        }
-    }
-
-    /*
-    private void RefreshCharacterPage()
-    {
-        if (displayCharacters.Count == 0)
-        {
-            currentPage = 0;
-            UpdatePageButtons();
-            return;
-        }
-
-        if (currentPage >= TotalPage)
-            currentPage = TotalPage - 1;
-
-        int startIndex = currentPage * CHARACTERS_PER_PAGE;
-        int endIndex = Mathf.Min(
-            startIndex + CHARACTERS_PER_PAGE,
-            displayCharacters.Count);
-
-        // 일단 모든 Row를 비활성화
-        foreach (CharacterRowUI row in rowList)
-        {
-            if (row != null)
+                row.SetCharacter(character, rank);
+                if (row.isNewCharacter)
+                {
+                    if (expectedWinRateCache.TryGetValue(character, out float expectedWinRate))
+                    {
+                        row.UpdateExpectedWinRate(expectedWinRate);
+                        Debug.Log($"{row.RuntimeCharacter.OriginCharacter.characterName} : {expectedWinRate}");
+                    }
+                }
+            }
+            else
+            {
                 row.gameObject.SetActive(false);
+            }
         }
 
-        // 현재 페이지에 해당하는 Row만 활성화
-        for (int i = startIndex; i < endIndex; i++)
-        {
-            RuntimeCharacter character = displayCharacters[i];
-
-            if (rowMap.TryGetValue(character, out CharacterRowUI row))
-                row.gameObject.SetActive(true);
-        }
-
-        UpdatePageButtons();
-    }*/
-
-    private void UpdatePageButtons()
-    {
-        if (previousPageButton != null)
-            previousPageButton.interactable = currentPage > 0;
-
-        if (nextPageButton != null)
-            nextPageButton.interactable = currentPage < TotalPage - 1;
     }
 
-    private void PreviousPage()
-    {
-        if (currentPage <= 0)
-            return;
-
-        currentPage--;
-
-        RefreshCharacterPage();
-    }
-
-    private void NextPage()
-    {
-        if (currentPage >= TotalPage - 1)
-            return;
-
-        currentPage++;
-
-        RefreshCharacterPage();
-    }
 
     private void CheckScrollDown()
     {
@@ -225,80 +187,73 @@ public class CharacterTableUI : MonoBehaviour
         else
             currentStartIndex--;
 
-        currentStartIndex = Mathf.Clamp(
-            currentStartIndex,
-            0,
-            Mathf.Max(0, displayCharacters.Count - CHARACTERS_PER_PAGE)
-        );
+        currentStartIndex = Mathf.Clamp(currentStartIndex, 0, MaxStartIndex);
 
         RefreshCharacterPage();
     }
 
-    // =========================================================
+    //========================================================
     // Pin
-    // =========================================================
+    //========================================================
 
     public void TogglePinCharacter(CharacterRowUI row)
     {
-        if (row == null)
+        if (row == null || row.RuntimeCharacter == null)
             return;
 
-        if (pinnedCharacter == row)
-        {
-            // 고정 해제
-            pinnedCharacter.ShowPinImage(false);
+        Character originCharacter = row.RuntimeCharacter.OriginCharacter;
 
-            pinnedCharacter = null;
+        if (pinnedOriginCharacter == originCharacter)
+        {
             pinnedOriginCharacter = null;
         }
         else
         {
-            // 기존 고정 해제
-            if (pinnedCharacter != null)
-                pinnedCharacter.ShowPinImage(false);
-
-            // 새로운 캐릭터 고정
-            pinnedCharacter = row;
-            pinnedOriginCharacter = row.RuntimeCharacter.OriginCharacter;
-
-            pinnedCharacter.ShowPinImage(true);
+            pinnedOriginCharacter = originCharacter;
         }
 
-        // 고정 상태가 바뀌면 1페이지로 이동
-        currentPage = 0;
+        // 핀 상태가 바뀌면 첫 캐릭터부터 표시
+        currentStartIndex = 0;
 
         ArrangeTable(currentSortItem, currentDirection);
     }
 
-    private void RestorePinnedCharacter()
+    public bool IsPinnedCharacter(RuntimeCharacter character)
     {
-        pinnedCharacter = null;
-
-        if (pinnedOriginCharacter == null)
-            return;
-
-        foreach (CharacterRowUI row in rowList)
-        {
-            if (row.RuntimeCharacter.OriginCharacter == pinnedOriginCharacter)
-            {
-                pinnedCharacter = row;
-                pinnedCharacter.ShowPinImage(true);
-                return;
-            }
-        }
+        return character != null &&
+               pinnedOriginCharacter == character.OriginCharacter;
     }
 
-    // =========================================================
+    //========================================================
+    // Winrate Expect
+    //========================================================
+
+    public void CacheExpectedWinRate(RuntimeCharacter character)
+    {
+        if (character == null || expectedWinRateCache.ContainsKey(character))
+            return;
+
+        if (BattlePredictor.Instance == null)
+        {
+            Debug.LogError("BattlePredictor가 초기화되지 않았습니다.");
+            return;
+        }
+
+        float winRate = BattlePredictor.Instance.PredictBattle(character, PlayerTier.Gold);
+
+        expectedWinRateCache.Add(character, winRate);
+    }
+
+    //========================================================
     // Arrange
-    // =========================================================
+    //========================================================
 
     private void ArrangeTable(AnalysisItem item, SortDirection direction)
     {
         List<RuntimeCharacter> sortedCharacters =
             AnalysisManager.Instance.GetSortedCharacters(item, direction);
 
-        // 정렬 결과 기준 순위를 먼저 저장
-        Dictionary<RuntimeCharacter, int> rankMap = new();
+        rankMap.Clear();
 
         for (int i = 0; i < sortedCharacters.Count; i++)
             rankMap[sortedCharacters[i]] = i + 1;
@@ -306,17 +261,23 @@ public class CharacterTableUI : MonoBehaviour
         displayCharacters.Clear();
 
         // 고정 캐릭터는 화면에서만 가장 먼저 표시
-        if (pinnedCharacter != null &&
-            rowMap.ContainsKey(pinnedCharacter.RuntimeCharacter))
+        if (pinnedOriginCharacter != null)
         {
-            displayCharacters.Add(pinnedCharacter.RuntimeCharacter);
+            foreach (RuntimeCharacter character in sortedCharacters)
+            {
+                if (character.OriginCharacter == pinnedOriginCharacter)
+                {
+                    displayCharacters.Add(character);
+                    break;
+                }
+            }
         }
 
-        // 나머지는 원래 정렬 순서대로 표시
+        // 나머지는 정렬 순서대로 표시
         foreach (RuntimeCharacter character in sortedCharacters)
         {
-            if (pinnedCharacter != null &&
-                character == pinnedCharacter.RuntimeCharacter)
+            if (pinnedOriginCharacter != null &&
+                character.OriginCharacter == pinnedOriginCharacter)
             {
                 continue;
             }
@@ -324,81 +285,16 @@ public class CharacterTableUI : MonoBehaviour
             displayCharacters.Add(character);
         }
 
-        // 화면 순서와 순위를 분리해서 적용
-        for (int i = 0; i < displayCharacters.Count; i++)
-        {
-            RuntimeCharacter character = displayCharacters[i];
+        EnsureRowCount();
 
-            if (!rowMap.TryGetValue(character, out CharacterRowUI row))
-                continue;
+        currentStartIndex = Mathf.Clamp(currentStartIndex, 0, MaxStartIndex);
 
-            row.ShowPinImage(row == pinnedCharacter);
-
-            if (rankMap.TryGetValue(character, out int rank))
-                row.UpdateRank(rank);
-
-            row.transform.SetSiblingIndex(i);
-        }
-
-        currentStartIndex = 0;
-        RefreshTable();
-    }
-    
-    // =========================================================
-    // Add Character
-    // =========================================================
-
-    public void AddCharacter(RuntimeCharacter runtimeCharacter)
-    {
-        if (runtimeCharacter == null)
-            return;
-
-        if (rowMap.ContainsKey(runtimeCharacter))
-            return;
-
-        CharacterRowUI row = Instantiate(rowPrefab, content);
-
-        row.Initialize(runtimeCharacter, this, 0);
-
-        rowList.Add(row);
-        rowMap.Add(runtimeCharacter, row);
-
-        if (pinnedOriginCharacter != null &&
-            runtimeCharacter.OriginCharacter == pinnedOriginCharacter)
-        {
-            pinnedCharacter = row;
-            pinnedCharacter.ShowPinImage(true);
-        }
-
-        ArrangeTable(currentSortItem, currentDirection);
+        RefreshCharacterPage();
     }
 
-    // =========================================================
-    // Clear
-    // =========================================================
-
-    private void ClearTable()
-    {
-        foreach (CharacterRowUI row in rowList)
-        {
-            if (row != null)
-                Destroy(row.gameObject);
-        }
-
-        rowList.Clear();
-        rowMap.Clear();
-        displayCharacters.Clear();
-
-        pinnedCharacter = null;
-    }
-
-    // =========================================================
-    // Rank
-    // =========================================================
-
-    // =========================================================
+    //========================================================
     // Symbol
-    // =========================================================
+    //========================================================
 
     public Sprite GetSymbolSprite(RuntimeCharacter character)
     {
@@ -417,9 +313,9 @@ public class CharacterTableUI : MonoBehaviour
         };
     }
 
-    // =========================================================
+    //========================================================
     // Header
-    // =========================================================
+    //========================================================
 
     public void OnClickHeader(AnalysisItem item)
     {
@@ -427,8 +323,8 @@ public class CharacterTableUI : MonoBehaviour
         {
             currentDirection =
                 currentDirection == SortDirection.Ascending
-                ? SortDirection.Descending
-                : SortDirection.Ascending;
+                    ? SortDirection.Descending
+                    : SortDirection.Ascending;
         }
         else
         {
@@ -436,8 +332,7 @@ public class CharacterTableUI : MonoBehaviour
             currentDirection = SortDirection.Descending;
         }
 
-        // 정렬 기준이 바뀌면 1페이지부터
-        currentPage = 0;
+        currentStartIndex = 0;
 
         ArrangeTable(currentSortItem, currentDirection);
 
@@ -445,7 +340,8 @@ public class CharacterTableUI : MonoBehaviour
         {
             header.Refresh(
                 currentSortItem == header.Item,
-                currentDirection);
+                currentDirection
+            );
         }
     }
 }

@@ -24,6 +24,9 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private RuntimeCharacter runtimeCharacter;
     private CharacterTableUI tableUI;
 
+    private bool isInitialized;
+    public bool isNewCharacter;
+
     private const int UnlockShowTier = 1021;
     private const int UnlockShowBan = 1022;
     private const int UnlockShowLivetime = 1023;
@@ -31,20 +34,55 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public RuntimeCharacter RuntimeCharacter => runtimeCharacter;
 
-    public void Initialize(RuntimeCharacter character, CharacterTableUI tableUI, int rank)
+    /// <summary>
+    /// 행을 처음 생성했을 때 한 번 호출한다.
+    /// </summary>
+    public void Initialize(CharacterTableUI tableUI)
     {
-        runtimeCharacter = character;
-
+        isNewCharacter = true;
         this.tableUI = tableUI;
+
+        if (!isInitialized)
+        {
+            RowClickChecker.Initialize(this);
+
+            if (UnlockManager.Instance != null)
+                UnlockManager.Instance.OnUnlockChanged += Refresh;
+
+            isInitialized = true;
+        }
+    }
+
+    /// <summary>
+    /// 기존 행에 표시할 캐릭터를 새로 연결한다.
+    /// </summary>
+    public void SetCharacter(RuntimeCharacter character, int rank)
+    {
+        if (runtimeCharacter != character)
+        {
+            if (runtimeCharacter != null)
+                runtimeCharacter.OnStatChanged -= Refresh;
+
+            runtimeCharacter = character;
+
+            if (runtimeCharacter != null)
+                runtimeCharacter.OnStatChanged += Refresh;
+        }
 
         UpdateRank(rank);
 
-        Symbols.sprite = tableUI.GetSymbolSprite(character);
-        RowClickChecker.Initialize(this);
-        Refresh();
+        if (runtimeCharacter == null)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
 
-        runtimeCharacter.OnStatChanged += Refresh;
-        UnlockManager.Instance.OnUnlockChanged += Refresh;
+        Symbols.sprite = tableUI.GetSymbolSprite(runtimeCharacter);
+
+        ShowPinImage(tableUI.IsPinnedCharacter(runtimeCharacter));
+        backgroundImage.SetActive(false);
+
+        Refresh();
     }
 
     private void OnDestroy()
@@ -58,25 +96,37 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void Refresh()
     {
-        CharacterStatistics stat = StatisticsManager.Instance.GetCurrentStatistics(runtimeCharacter);
+        if (runtimeCharacter == null)
+            return;
+
+        CharacterStatistics stat =
+            StatisticsManager.Instance.GetCurrentStatistics(runtimeCharacter);
 
         nameText.text = runtimeCharacter.OriginCharacter.characterName;
-
         winRateText.text = $"{stat.Winrate:F1}%";
-
         pickRateText.text = $"{AnalysisManager.Instance.GetPickRate(runtimeCharacter):F1}%";
 
-        tierText.text = UnlockManager.Instance.IsUnlocked(UnlockShowTier) ? $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}" : " - ";
+        tierText.text = UnlockManager.Instance.IsUnlocked(UnlockShowTier)
+            ? $"{AnalysisManager.Instance.GetTier(runtimeCharacter)}"
+            : " - ";
 
-        banRateText.text = UnlockManager.Instance.IsUnlocked(UnlockShowBan) ? $" - " : $" - ";
+        banRateText.text = UnlockManager.Instance.IsUnlocked(UnlockShowBan)
+            ? " - "
+            : " - ";
 
         damageText.text = $"{stat.AverageDamage:F0}";
 
-        float dps = stat.AverageSurvivalTime <= 0f ? 0f : stat.AverageDamage / stat.AverageSurvivalTime;
-        DPSText.text = UnlockManager.Instance.IsUnlocked(UnlockShowDPS) ? $"{dps:F1}" : " - ";
+        float dps = stat.AverageSurvivalTime <= 0f
+            ? 0f
+            : stat.AverageDamage / stat.AverageSurvivalTime;
 
-        livetimeText.text = UnlockManager.Instance.IsUnlocked(UnlockShowLivetime) ?
-            $"{AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue:F1}" : " - ";
+        DPSText.text = UnlockManager.Instance.IsUnlocked(UnlockShowDPS)
+            ? $"{dps:F1}"
+            : " - ";
+
+        livetimeText.text = UnlockManager.Instance.IsUnlocked(UnlockShowLivetime)
+            ? $"{AnalysisManager.Instance.GetAnalysis(runtimeCharacter, AnalysisItem.AverageLiveTime).CurrentValue:F1}"
+            : " - ";
     }
 
     public void UpdateRank(int rank)
@@ -84,12 +134,23 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         rankText.SetText(rank.ToString());
     }
 
-    // =========================================================
+    public void UpdateExpectedWinRate(float winRate)
+    {
+        if (winRateText == null)
+            return;
+
+        winRateText.text = $"({winRate:F1}%)";
+    }
+
+    //========================================================
     // Click
-    // =========================================================
+    //========================================================
 
     public void OnClickLeft()
     {
+        if (runtimeCharacter == null)
+            return;
+
         Debug.Log(runtimeCharacter.OriginCharacter.name);
 
         InspectorUI.Instance.Showcharacter(runtimeCharacter);
@@ -99,6 +160,9 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnClickRight()
     {
+        if (runtimeCharacter == null)
+            return;
+
         tableUI.TogglePinCharacter(this);
     }
 
@@ -107,9 +171,9 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         PinImage.gameObject.SetActive(show);
     }
 
-    // =========================================================
+    //========================================================
     // Hover
-    // =========================================================
+    //========================================================
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -120,5 +184,4 @@ public class CharacterRowUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         backgroundImage.SetActive(false);
     }
-
 }

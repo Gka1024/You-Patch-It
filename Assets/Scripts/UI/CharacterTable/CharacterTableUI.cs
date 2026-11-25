@@ -38,10 +38,11 @@ public class CharacterTableUI : MonoBehaviour
 
     // 캐릭터가 새로 추가될 때, 예상 승률을 캐싱해두는 딕셔너리
     private readonly Dictionary<RuntimeCharacter, float> expectedWinRateCache = new();
-    private bool showExpectWinrate = false;
-    private RuntimeCharacter newcharacter;
+    private bool isPredictUnlocked = false;
 
     private float previousScrollTime;
+
+    private const int UNLOCK_META_PREDICT = 1032;
 
     private int MaxStartIndex =>
         Mathf.Max(0, displayCharacters.Count - CHARACTERS_PER_PAGE);
@@ -50,13 +51,21 @@ public class CharacterTableUI : MonoBehaviour
     {
         GenerateTable();
         InitializeHeaders();
-
-        showExpectWinrate = true;
+        UnlockManager.Instance.OnUnlockChanged += CheckPredict;
     }
 
     private void Update()
     {
         CheckScrollDown();
+    }
+
+    private void CheckPredict()
+    {
+        if (UnlockManager.Instance.IsUnlocked(UNLOCK_META_PREDICT))
+        {
+            isPredictUnlocked = true;
+            UnlockManager.Instance.OnUnlockChanged += CheckPredict;
+        }
     }
 
     //========================================================
@@ -152,7 +161,7 @@ public class CharacterTableUI : MonoBehaviour
 
                 row.gameObject.SetActive(true);
                 row.SetCharacter(character, rank);
-                if (row.isNewCharacter)
+                if (row.isNewCharacter && isPredictUnlocked)
                 {
                     if (expectedWinRateCache.TryGetValue(character, out float expectedWinRate))
                     {

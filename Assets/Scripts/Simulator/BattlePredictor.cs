@@ -7,7 +7,7 @@ public class BattlePredictor : MonoBehaviour
 
     private const int TeamSize = 3;
 
-    [SerializeField] private int defaultSimulationCount = 100;
+    [SerializeField] private int defaultSimulationCount = 1000;
 
     private void Awake()
     {

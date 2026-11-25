@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: 1032_PredictMeta
   m_EditorClassIdentifier: 
   id: 1032
-  unlockName: "\uBA54\uD0C0 \uC608\uCE21 (\uAC1C\uBC1C\uC548\uB428)"
-  description: "\uAC00\uC7A5 \uC2B9\uB960\uC774 \uB192\uC740 \uCE90\uB9AD\uD130\uB97C
-    \uC608\uCE21\uD569\uB2C8\uB2E4."
+  unlockName: "\uBA54\uD0C0 \uC608\uCE21"
+  description: "\uC2E0\uADDC \uCE90\uB9AD\uD130\uAC00 \uCD94\uAC00\uB420 \uB54C \uC608\uC0C1 \uC2B9\uB960\uC744 \uD45C\uC2DC\uD569\uB2C8\uB2E4."
   category: 0
-  costResource: -1
+  costResource: 300
   icon: {fileID: 0}
   prerequisites:
   - {fileID: 11400000, guid: 5612e4d5d7bc8e64e8626a99aae0ca0f, type: 2}

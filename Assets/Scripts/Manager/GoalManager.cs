@@ -34,14 +34,14 @@ public class GoalManager : MonoBehaviour
 
     private const int REROLL_REQUIRE_RESOURCE = 10;
 
-    private const int GOAL_REWARD = 2011;
-    private const int ADDITIONAL_SLOT_1 = 2021;
-    private const int ADDITIONAL_SLOT_2 = 2022;
-    private const int FREE_REROLL = 2031;
+    private const int UNLOCK_GOAL_REWARD = 2011;
+    private const int UNLOCK_ADDITIONAL_SLOT_1 = 2021;
+    private const int UNLOCK_ADDITIONAL_SLOT_2 = 2022;
+    private const int UNLOCK_FREE_REROLL = 2031;
 
-    private const int ADDITIONAL_GOAL_I = 2041;
-    private const int ADDITIONAL_GOAL_II = 2042;
-    private const int ADDITIONAL_GOAL_III = 2043;
+    private const int UNLOCK_ADDITIONAL_GOAL_I = 2041;
+    private const int UNLOCK_ADDITIONAL_GOAL_II = 2042;
+    private const int UNLOCK_ADDITIONAL_GOAL_III = 2043;
 
     public event Action OnGoalChanged;
     public event Action OnGoalConfirmed;
@@ -103,10 +103,10 @@ public class GoalManager : MonoBehaviour
         if (UnlockManager.Instance == null)
             return;
 
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT_1))
+        if (UnlockManager.Instance.IsUnlocked(UNLOCK_ADDITIONAL_SLOT_1))
             currentGoalCount = Mathf.Max(currentGoalCount, 2);
 
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_SLOT_2))
+        if (UnlockManager.Instance.IsUnlocked(UNLOCK_ADDITIONAL_SLOT_2))
             currentGoalCount = Mathf.Max(currentGoalCount, 3);
 
         AddUnlockedGoals();
@@ -137,7 +137,7 @@ public class GoalManager : MonoBehaviour
 
     private void AddUnlockedGoals()
     {
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_I))
+        if (UnlockManager.Instance.IsUnlocked(UNLOCK_ADDITIONAL_GOAL_I))
         {
             AddGoalOnce(new NerfTopGoal(GoalDifficulty.Normal, GoalType.Challenge));
             AddGoalOnce(new WinrateBandGoal(49f, 54f, 3, GoalDifficulty.Hard, GoalType.Balance));
@@ -153,7 +153,7 @@ public class GoalManager : MonoBehaviour
             }
         }
 
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_II))
+        if (UnlockManager.Instance.IsUnlocked(UNLOCK_ADDITIONAL_GOAL_II))
         {
             AddGoalOnce(new BottomToTopGoal(AnalysisManager.Instance.GetLowestCharacter(AnalysisItem.Winrate, true), 3, GoalDifficulty.Normal, GoalType.Balance));
             AddGoalOnce(new PatchCountGoal(3, GoalDifficulty.Normal, GoalType.Patch));
@@ -170,7 +170,7 @@ public class GoalManager : MonoBehaviour
             }
         }
 
-        if (UnlockManager.Instance.IsUnlocked(ADDITIONAL_GOAL_III))
+        if (UnlockManager.Instance.IsUnlocked(UNLOCK_ADDITIONAL_GOAL_III))
         {
             int characterCount = RuntimeCharacterManager.Instance.CharacterCount;
 
@@ -347,7 +347,7 @@ public class GoalManager : MonoBehaviour
         else
         {
             rerollCount =
-                UnlockManager.Instance.IsUnlocked(FREE_REROLL)
+                UnlockManager.Instance.IsUnlocked(UNLOCK_FREE_REROLL)
                 ? 0
                 : 1;
         }
@@ -387,7 +387,7 @@ public class GoalManager : MonoBehaviour
             return new GoalReward(0, 0);
         }
 
-        float multiplier = UnlockManager.Instance != null && UnlockManager.Instance.IsUnlocked(GOAL_REWARD) ? 1.2f : 1f;
+        float multiplier = UnlockManager.Instance != null && UnlockManager.Instance.IsUnlocked(UNLOCK_GOAL_REWARD) ? 1.2f : 1f;
 
         return new GoalReward(Mathf.RoundToInt(reward.DevelopResource * multiplier), Mathf.RoundToInt(reward.TrustPoint * multiplier));
     }

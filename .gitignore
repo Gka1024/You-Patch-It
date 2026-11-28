@@ -24,10 +24,8 @@ Assets/SPUM/**
 Assets/RetroUI/
 Assets/RetroUI/**
 
-
 Assets/Animation/
 Assets/Animation/**
-
 
 # Prefab 메타파일도 포함
 !Assets/**/Prefab.meta

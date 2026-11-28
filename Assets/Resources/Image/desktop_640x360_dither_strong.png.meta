@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3b6a2e6d128e2fa46ae66453e78ad1de
+guid: c9890aabae190f04aadb45acf29d4ca1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8752449215231406387
-    second: eaca928c-17ee-412e-a608-7571d3ae4237_0
+      213: 4624642984043210346
+    second: desktop_640x360_dither_strong_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -47,7 +47,7 @@ TextureImporter:
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
-  spriteExtrude: 1
+  spriteExtrude: 23
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
@@ -56,7 +56,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -100,13 +102,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: eaca928c-17ee-412e-a608-7571d3ae4237_0
+      name: desktop_640x360_dither_strong_0
       rect:
         serializedVersion: 2
-        x: 29
-        y: 23
-        width: 1803
-        height: 743
+        x: 0
+        y: 0
+        width: 640
+        height: 360
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +117,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: dce4c7bafcd098680800000000000000
-      internalID: -8752449215231406387
+      spriteID: a66e5e4aa480e2040800000000000000
+      internalID: 4624642984043210346
       vertices: []
       indices: 
       edges: []
@@ -135,7 +137,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      eaca928c-17ee-412e-a608-7571d3ae4237_0: -8752449215231406387
+      desktop_640x360_dither_strong_0: 4624642984043210346
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

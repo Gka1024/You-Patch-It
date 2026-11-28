@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 44a476e53cd675b42a01a8d9b0c14a66
+guid: 73bdf287189ded940ac52b9f8d86446b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4233753041225338697
-    second: Guage Back_0
+      213: 954547199164627986
+    second: 5d844895-8c67-4e49-a1e8-ba0f97fb8038_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -51,12 +51,14 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -75,7 +77,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,23 +102,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Guage Back_0
+      name: 5d844895-8c67-4e49-a1e8-ba0f97fb8038_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 10
-        height: 8
+        width: 1536
+        height: 1024
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 2, y: 2, z: 2, w: 2}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7b0b8075a00be35c0800000000000000
-      internalID: -4233753041225338697
+      spriteID: 21c3d87ce9b3f3d00800000000000000
+      internalID: 954547199164627986
       vertices: []
       indices: 
       edges: []
@@ -125,7 +127,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: eaa543599a35e6e4d93a393119e8898c
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +137,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Guage Back_0: -4233753041225338697
+      5d844895-8c67-4e49-a1e8-ba0f97fb8038_0: 954547199164627986
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

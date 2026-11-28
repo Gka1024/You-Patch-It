@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 73bdf287189ded940ac52b9f8d86446b
+guid: 70d9219cf7313184bba197e52e4fe817
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 954547199164627986
-    second: 5d844895-8c67-4e49-a1e8-ba0f97fb8038_0
+      213: 3131158489703418818
+    second: Taskbar_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -56,7 +56,9 @@ TextureImporter:
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
+  spriteTessellationMethod: 0
   spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -100,13 +102,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 5d844895-8c67-4e49-a1e8-ba0f97fb8038_0
+      name: Taskbar_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1536
-        height: 1024
+        width: 640
+        height: 20
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +117,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 21c3d87ce9b3f3d00800000000000000
-      internalID: 954547199164627986
+      spriteID: 2cb883a8e0c147b20800000000000000
+      internalID: 3131158489703418818
       vertices: []
       indices: 
       edges: []
@@ -135,7 +137,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      5d844895-8c67-4e49-a1e8-ba0f97fb8038_0: 954547199164627986
+      Taskbar_0: 3131158489703418818
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
